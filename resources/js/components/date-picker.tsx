@@ -13,11 +13,15 @@ import {
 // Define props type
 type DatePickerProps = {
   handleChange: (date: Date | undefined) => void
+  selected?: Date | undefined
 }
 
-export function DatePicker({ handleChange }: DatePickerProps) {
+export function DatePicker({ handleChange, selected }: DatePickerProps) {
+  console.log(
+    selected
+  );
   const [open, setOpen] = React.useState(false)
-  const [date, setDate] = React.useState<Date | undefined>(undefined)
+  const [date, setDate] = React.useState<Date | undefined>(selected ?? undefined)
 
   return (
       
@@ -38,6 +42,7 @@ export function DatePicker({ handleChange }: DatePickerProps) {
             selected={date}
             captionLayout="dropdown"
             className="w-72"
+            
             onSelect={(newDate) => {
               setDate(newDate)
               handleChange(newDate) // 🔑 send back to parent

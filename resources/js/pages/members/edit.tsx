@@ -10,6 +10,7 @@ import { PlusIcon } from 'lucide-react';
 import { DatePicker } from '@/components/date-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
 import { SelectValue } from '@radix-ui/react-select';
+import { da } from 'date-fns/locale';
 const breadcrumbs: BreadcrumbItem[] = [
         {
                 title: 'Početna stranica',
@@ -25,23 +26,23 @@ const breadcrumbs: BreadcrumbItem[] = [
         }
 ];
 
-export default function Create({ users }: { users: any }) {
-        console.log(users);
+export default function Edit({ member, users }: { member:any, users: any }) {
+        console.log(member.family_members);
         const { data, setData, post } = useForm<Member>({
                 id: 0,
-                first_name: "",
-                last_name: "",
-                birthdate: "",
-                email: "",
-                phone: "",
-                address: "",
-                family_members: [],
-                email_abroad: "",
-                phone_abroad: "",
-                address_abroad: "",
-                city_abroad: "",
-                country: "",
-                user_id: 0
+                first_name: member.first_name || "",
+                last_name: member.last_name || "",
+                birthdate: member.birthdate || "",
+                email: member.email || "",
+                phone: member.phone || "",
+                address: member.address || "",
+                family_members: member.family_members || [],
+                email_abroad: member.email_abroad || "",
+                phone_abroad: member.phone_abroad || "",
+                address_abroad: member.address_abroad || "",
+                city_abroad: member.city_abroad || "",
+                country: member.country || "",
+                user_id: member.user_id || null,
         })
 
         const handleChange = (name: string, value: string): void => {
@@ -79,16 +80,29 @@ export default function Create({ users }: { users: any }) {
 
         const handleSubmit = (e) => {
                 e.preventDefault();
-                post('/members');
+                post('/members/' + member.id);
+        }
+
+        const convertDate = (dateString: string) => {
+                const date = new Date(dateString);
+               return date;
         }
         return (
                 <AppLayout breadcrumbs={breadcrumbs}>
                         <Head title="Članovi" />
                         <ContentHolder>
+                                <div className="flex justify-end">
+                                        <Button asChild>
+                                                <Link href={route('payments.create', member.id)}>
+                                                        <PlusIcon className="w-4 h-4 mr-2" />
+                                                        Dodajte uplatu
+                                                </Link>
+                                        </Button>
+                                </div>
                                 <form className="grid grid-cols-1" onSubmit={handleSubmit}>
                                         <div className="flex w-full flex-col">
                                                 <Label className="mb-3">Odaberite korisnika</Label>
-                                                <Select onValueChange={handleSelectUser}>
+                                                <Select onValueChange={handleSelectUser} defaultValue={data.user_id.toString()}>
                                                         <SelectTrigger className='w-full'>
                                                                 <SelectValue placeholder="Odaberite korisnika" />
                                                         </SelectTrigger>
@@ -123,7 +137,7 @@ export default function Create({ users }: { users: any }) {
                                                         <Label htmlFor='birthdate'>
                                                                 Datum rođenja
                                                         </Label>
-                                                        <DatePicker handleChange={(date: any) => handleChange('birthdate', date)} />
+                                                        <DatePicker selected={convertDate(data.birthdate)} handleChange={(date: any) => handleChange('birthdate', date)} />
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                         <Label htmlFor='email'>
@@ -136,13 +150,13 @@ export default function Create({ users }: { users: any }) {
                                                         <Label htmlFor='phone'>
                                                                 Telefon
                                                         </Label>
-                                                        <Input type="text" name="phone" id="phone" placeholder='npr. +387 61 123 456' onChange={(e) => handleChange(e.target.name, e.target.value)} />
+                                                        <Input type="text" name="phone" id="phone" placeholder='npr. +387 61 123 456' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.phone}/>
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                         <Label htmlFor='address'>
                                                                 Adresa
                                                         </Label>
-                                                        <Input type="text" name="address" id="address" placeholder='npr. Gornja mahala 54' onChange={(e) => handleChange(e.target.name, e.target.value)} />
+                                                        <Input type="text" name="address" id="address" placeholder='npr. Gornja mahala 54' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.address}/>
                                                 </div>
                                         </div>
                                         <hr className='my-5' />
@@ -152,33 +166,33 @@ export default function Create({ users }: { users: any }) {
                                                         <Label htmlFor='address_abroad'>
                                                                 Adresa u inostranstvu
                                                         </Label>
-                                                        <Input type="text" name="address_abroad" id="address_abroad" placeholder='npr. Friedrichstrasse n.45' onChange={(e) => handleChange(e.target.name, e.target.value)} />
+                                                        <Input type="text" name="address_abroad" id="address_abroad" placeholder='npr. Friedrichstrasse n.45' onChange={(e) => handleChange(e.target.name, e.target.value)}  value={data.address_abroad}/>
                                                 </div>
 
                                                 <div className="flex flex-col gap-2">
                                                         <Label htmlFor='city_abroad'>
                                                                 Grad u inostranstvu
                                                         </Label>
-                                                        <Input type="text" name="city_abroad" id="city_abroad" placeholder='npr. Iserlohn' onChange={(e) => handleChange(e.target.name, e.target.value)} />
+                                                        <Input type="text" name="city_abroad" id="city_abroad" placeholder='npr. Iserlohn' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.city_abroad}/>
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                         <Label htmlFor='country'>
                                                                 Država
                                                         </Label>
-                                                        <Input type="text" name="country" id="country" placeholder='npr. Njemačka' onChange={(e) => handleChange(e.target.name, e.target.value)} />
+                                                        <Input type="text" name="country" id="country" placeholder='npr. Njemačka' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.country}/>
                                                 </div>
 
                                                 <div className="flex flex-col gap-2">
                                                         <Label htmlFor='phone_abroad'>
                                                                 Telefon
                                                         </Label>
-                                                        <Input type="text" name="phone_abroad" id="phone_abroad" placeholder='npr. +45 12 345 6789' onChange={(e) => handleChange(e.target.name, e.target.value)} />
+                                                        <Input type="text" name="phone_abroad" id="phone_abroad" placeholder='npr. +45 12 345 6789' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.phone_abroad}/>
                                                 </div>
                                                 <div className="flex flex-col gap-2">
                                                         <Label htmlFor='email_abroad'>
                                                                 Email
                                                         </Label>
-                                                        <Input type="text" name="email_abroad" id="email_abroad" placeholder='npr. osman@click.de' onChange={(e) => handleChange(e.target.name, e.target.value)} />
+                                                        <Input type="text" name="email_abroad" id="email_abroad" placeholder='npr. osman@click.de' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.email_abroad}/>
                                                 </div>
                                         </div>
 
@@ -198,14 +212,14 @@ export default function Create({ users }: { users: any }) {
                                                                         <Label htmlFor='first_name'>
                                                                                 Ime
                                                                         </Label>
-                                                                        <Input type="text" name="first_name" id="" placeholder='npr. Osman' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} />
+                                                                        <Input type="text" name="first_name" id="" placeholder='npr. Osman' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} value={member.first_name}/>
                                                                 </div>
 
                                                                 <div className="flex flex-col gap-2">
                                                                         <Label htmlFor='last_name'>
                                                                                 Prezime
                                                                         </Label>
-                                                                        <Input type="text" name="last_name" id="" placeholder='npr. Ljubinac' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} />
+                                                                        <Input type="text" name="last_name" id="" placeholder='npr. Ljubinac' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} value={member.last_name}/>
                                                                 </div>
                                                                 <div className="flex flex-col gap-2">
                                                                         <Label htmlFor='birthdate'>
@@ -217,20 +231,20 @@ export default function Create({ users }: { users: any }) {
                                                                         <Label htmlFor='email'>
                                                                                 Email
                                                                         </Label>
-                                                                        <Input type="text" name="email" id="" placeholder='npr. osman.ljubinac@gmail.com' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} />
+                                                                        <Input type="text" name="email" id="" placeholder='npr. osman.ljubinac@gmail.com' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} value={member.email}/>
                                                                 </div>
 
                                                                 <div className="flex flex-col gap-2">
                                                                         <Label htmlFor='phone'>
                                                                                 Telefon
                                                                         </Label>
-                                                                        <Input type="text" name="phone" id="" placeholder='npr. +387 61 123 456' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} />
+                                                                        <Input type="text" name="phone" id="" placeholder='npr. +387 61 123 456' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} value={member.phone}/>
                                                                 </div>
                                                                 <div className="flex flex-col gap-2">
                                                                         <Label htmlFor='address'>
                                                                                 Adresa
                                                                         </Label>
-                                                                        <Input type="text" name="address" id="" placeholder='npr. Gornja mahala 54' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} />
+                                                                        <Input type="text" name="address" id="" placeholder='npr. Gornja mahala 54' onChange={(e) => changeFamilyMember(e.target.name, e.target.value, index)} value={member.address}/>
                                                                 </div>
                                                         </div>
                                                 ))}
