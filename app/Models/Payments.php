@@ -28,4 +28,12 @@ class Payments extends Model
             set: fn ($value) => (int) round($value * 100) // App → DB (123.45 → 12345)
         );
     }
+    
+    protected function dateOfPayment(): Attribute
+    {
+        return Attribute::make(
+            get: fn ($value) => date('d.m.Y', strtotime($value)),
+            set: fn ($value) => $value
+        );
+    }
 }

@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, DollarSign, Folder, LayoutGrid, User } from 'lucide-react';
+import { BookOpen, DollarSign, Folder, LayoutGrid, User, HandCoins, Newspaper } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -23,6 +23,16 @@ const mainNavItems: NavItem[] = [
         title: 'Uplate',
         href:'/payments',
         icon: DollarSign
+    }, 
+    {
+        title: 'Moje uplate',
+        href:'/my-payments',
+        icon: HandCoins
+    }, 
+    {
+        title: 'Vijesti',
+        href:'/articles',
+        icon: Newspaper
     }
 ];
 

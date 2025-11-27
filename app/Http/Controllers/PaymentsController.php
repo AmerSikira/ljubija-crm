@@ -100,4 +100,18 @@ class PaymentsController extends Controller
         return redirect()->route('payments')->with('success', 'Uplata je uspješno ažurirana.');
 
     }
+
+
+    public function myPaymentsIndex(Request $request) {
+        $user = $request->user();
+        $member = Member::where('user_id', $user->id)->first();
+
+        if (!$member) {
+            return redirect()->route('dashboard')->with('error', 'Nemate pridruženog člana za pregled uplata.');
+        }
+
+        $payments = Payments::where('member_id', $member->id)->get();
+
+        return Inertia::render('my-payments/index', ['payments' => $payments]);
+    }
 }
