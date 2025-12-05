@@ -1,7 +1,7 @@
 import React from "react";
 import AppLayout from '@/layouts/app-layout';
-import { type BreadcrumbItem, type Member } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { type BreadcrumbItem } from '@/types';
+import { Head } from '@inertiajs/react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
@@ -21,8 +21,21 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 
 
-export default function Index({ payments }: Member[] | any) {
-    
+type Payment = {
+    id: number;
+    amount: number;
+    type_of_payment: string;
+    date_of_payment: string;
+};
+
+export default function Index({ payments }: { payments: Payment[] }) {
+    const formatDate = (value?: string | null) => {
+        if (!value) return '';
+        const d = new Date(value);
+        if (isNaN(d.getTime())) return value;
+        return d.toLocaleDateString('en-GB'); // dd/mm/yyyy
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Uplate" />
@@ -56,7 +69,7 @@ export default function Index({ payments }: Member[] | any) {
                                             <TableCell>{payment.id}</TableCell>
                                                 <TableCell>{payment.amount}</TableCell>
                                             <TableCell>{payment.type_of_payment}</TableCell>
-                                            <TableCell>{payment.date_of_payment}</TableCell> 
+                                            <TableCell>{formatDate(payment.date_of_payment)}</TableCell> 
                                         </TableRow>
                                     );
                                 })

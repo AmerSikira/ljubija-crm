@@ -3,7 +3,6 @@ import { ChevronDownIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
-import { Label } from "@/components/ui/label"
 import {
   Popover,
   PopoverContent,
@@ -17,11 +16,15 @@ type DatePickerProps = {
 }
 
 export function DatePicker({ handleChange, selected }: DatePickerProps) {
-  console.log(
-    selected
-  );
   const [open, setOpen] = React.useState(false)
-  const [date, setDate] = React.useState<Date | undefined>(selected ?? undefined)
+  const normalize = (d?: Date | null) =>
+    d ? new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12) : undefined
+
+  const [date, setDate] = React.useState<Date | undefined>(normalize(selected))
+
+  React.useEffect(() => {
+    setDate(normalize(selected))
+  }, [selected])
 
   return (
       
@@ -32,7 +35,7 @@ export function DatePicker({ handleChange, selected }: DatePickerProps) {
             id="date"
             className="w-full justify-between font-normal"
           >
-            {date ? date.toLocaleDateString() : "Odaberite datum"}
+            {date ? date.toLocaleDateString('en-GB') : "Odaberite datum"}
             <ChevronDownIcon />
           </Button>
         </PopoverTrigger>
@@ -40,12 +43,17 @@ export function DatePicker({ handleChange, selected }: DatePickerProps) {
           <Calendar
             mode="single"
             selected={date}
+            defaultMonth={date}
             captionLayout="dropdown"
+            fromYear={1900}
+            toYear={2100}
             className="w-72"
+            disabled={{ before: new Date(1900, 0, 1) }}
             
             onSelect={(newDate) => {
-              setDate(newDate)
-              handleChange(newDate) // 🔑 send back to parent
+              const normalized = normalize(newDate)
+              setDate(normalized)
+              handleChange(normalized) // 🔑 send back to parent
               setOpen(false)
             }}
           />

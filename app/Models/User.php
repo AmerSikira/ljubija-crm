@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'workos_id',
         'avatar',
+        'role',
     ];
 
     /**
@@ -48,7 +49,17 @@ class User extends Authenticatable
     }
 
     public function member()
-{
-    return $this->hasOne(Member::class);
-}
+    {
+        return $this->hasOne(Member::class);
+    }
+
+    public function polls()
+    {
+        return $this->hasMany(Poll::class, 'created_by');
+    }
+
+    public function pollVotes()
+    {
+        return $this->hasMany(PollVote::class);
+    }
 }

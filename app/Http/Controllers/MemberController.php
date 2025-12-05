@@ -11,13 +11,42 @@ class MemberController extends Controller
 {
     //
 
-    public function index() {
+    protected function authorizeManager(Request $request)
+    {
+        $role = $request->user()?->role;
+        if (!in_array($role, ['admin', 'manager'])) {
+            abort(403, 'Nedovoljno privilegija.');
+        }
+    }
 
-        $members = Member::all();
-        return Inertia::render('members/index', ['members' => $members]);
+    public function index(Request $request) {
+        $this->authorizeManager($request);
+        $search = trim((string) $request->input('search', ''));
+
+        $members = Member::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('id')
+            ->paginate(20)
+            ->appends(['search' => $search]);
+
+        return Inertia::render('members/index', [
+            'members' => $members,
+            'filters' => [
+                'search' => $search,
+            ],
+        ]);
     }
 
     public function create() {
+        // Only admins/managers
+        $this->authorizeManager(request());
         
         $users = User::select('id', 'name', 'email')->get();
         // dd($users);
@@ -68,6 +97,7 @@ class MemberController extends Controller
 
 
     public function edit(Request $request, $member) {
+        $this->authorizeManager($request);
         $users = User::select('id', 'name', 'email')->get();
         $member = Member::find($member);
         if (!$member) {
@@ -80,6 +110,7 @@ class MemberController extends Controller
 
 
     public function update(Request $request, $member) {
+        $this->authorizeManager($request);
         $member = Member::find($member);
         if (!$member) {
             return redirect()->route('members')->with('error', 'Član nije pronađen.');

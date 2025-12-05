@@ -16,12 +16,12 @@ const breadcrumbs: BreadcrumbItem[] = [
                 href: '/dashboard',
         },
         {
-                title: 'Članovi',
-                href: '/members',
+                title: 'Uplate',
+                href: '/payments',
         },
         {
-                title: 'Dodaj člana',
-                href: '/members/create',
+                title: 'Uredi uplatu',
+                href: '#',
         }
 ];
 
@@ -33,6 +33,8 @@ export default function Create({ payment, members = [] }: { payment: any, member
                 amount: payment.amount,
                 type_of_payment: payment.type_of_payment,
                 date_of_payment: payment.date_of_payment,
+                paid_from: payment.paid_from,
+                paid_to: payment.paid_to,
                 note: payment.note,
                 member_id: payment.member_id || 0,
         })
@@ -41,6 +43,31 @@ export default function Create({ payment, members = [] }: { payment: any, member
                 setData(name, value)
         }
 
+        const formatDate = (date?: Date | null) => {
+                if (!date) return '';
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+        };
+
+        const parseDate = (value?: string | null) => {
+                if (!value) return undefined;
+                // Supports dd/mm/yyyy or ISO strings
+                const parts = value.includes('/') ? value.split('/') : null;
+                if (parts && parts.length === 3) {
+                        const [d, m, y] = parts.map(Number);
+                        if (!isNaN(d) && !isNaN(m) && !isNaN(y)) {
+                                return new Date(y, m - 1, d);
+                        }
+                }
+                const parsed = new Date(value);
+                return isNaN(parsed.getTime()) ? undefined : parsed;
+        };
+
+        const handleDateChange = (field: string, date?: Date) => {
+                setData(field, formatDate(date ?? null) as any);
+        };
 
 
         const handleSelectMember = (value: string) => {
@@ -61,10 +88,6 @@ export default function Create({ payment, members = [] }: { payment: any, member
                 post('/payments/' + payment.id);
         }
 
-        const convertDate = (dateString: string) => {
-                const date = new Date(dateString);
-               return date;
-        }
         return (
                 <AppLayout breadcrumbs={breadcrumbs}>
                         <Head title="Uplate" />
@@ -117,7 +140,21 @@ export default function Create({ payment, members = [] }: { payment: any, member
                                                         <Label htmlFor='birthdate'>
                                                                 Datum uplate
                                                         </Label>
-                                                        <DatePicker selected={convertDate(data.date_of_payment)} handleChange={(date: any) => handleChange('date_of_payment', date)} />
+                                                        <DatePicker selected={parseDate(data.date_of_payment)} handleChange={(date: any) => handleDateChange('date_of_payment', date)} />
+                                                </div>
+
+                                                <div className="flex flex-col gap-2">
+                                                        <Label htmlFor='paid_from'>
+                                                                Plaćeno od
+                                                        </Label>
+                                                        <DatePicker selected={parseDate(data.paid_from)} handleChange={(date: any) => handleDateChange('paid_from', date)} />
+                                                </div>
+
+                                                <div className="flex flex-col gap-2">
+                                                        <Label htmlFor='paid_to'>
+                                                                Plaćeno do
+                                                        </Label>
+                                                        <DatePicker selected={parseDate(data.paid_to)} handleChange={(date: any) => handleDateChange('paid_to', date)} />
                                                 </div>
 
                                                 <div className="flex flex-col gap-2">
@@ -130,7 +167,7 @@ export default function Create({ payment, members = [] }: { payment: any, member
                                         
                                         <div className="flex justify-end">
                                                 <Button type='submit'>
-                                                        Dodajte članarinu
+                                                        Uredite članarinu
                                                 </Button>
                                         </div>
                                 </form>

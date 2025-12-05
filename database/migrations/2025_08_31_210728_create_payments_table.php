@@ -16,6 +16,8 @@ return new class extends Migration
             $table->integer('amount');
             $table->string('type_of_payment');
             $table->date('date_of_payment');
+            $table->date('paid_from')->nullable();
+            $table->date('paid_to')->nullable();
             $table->string('note')->nullable();
             $table->foreignId('member_id')->constrained()->onDelete('cascade'); // 🔑
             $table->timestamps();

@@ -21,7 +21,9 @@ export default function Dashboard({articles} : any) {
                 <div className="grid grid-cols-5">
             {articles.length === 0 && (
                 <div className="col-span-5">
-                    <PlaceholderPattern className="h-48 w-full" />
+                    <div className="h-48 w-full border rounded-lg flex items-center justify-center text-gray-600">
+                        Ovdje će biti objavljene vijesti
+                    </div>
                 </div>
             )}
 
@@ -49,17 +51,19 @@ export default function Dashboard({articles} : any) {
                 </a>
             ))}
            </div>
-            <div className="flex justify-center">
-                <Button asChild>
-                <Link href={route('articles')}>
-                    Pogledaj sve vijesti
-                </Link>
-            </Button>
-            </div>
+            {articles.length > 0 && (
+                <div className="flex justify-center">
+                    <Button asChild>
+                    <Link href={route('articles')}>
+                        Pogledaj sve vijesti
+                    </Link>
+                </Button>
+                </div>
+            )}
            <hr className="my-6" />
            </ContentHolder>
            
-            
+           
         </AppLayout>
     );
 }

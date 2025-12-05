@@ -31,6 +31,16 @@ Route::middleware([
     //My Payments
     Route::get('my-payments', [\App\Http\Controllers\PaymentsController::class, 'myPaymentsIndex'])->name('my-payments');
 
+    //Polls
+    Route::get('polls', [\App\Http\Controllers\PollController::class, 'index'])->name('polls');
+    Route::get('polls/create', [\App\Http\Controllers\PollController::class, 'create'])->name('polls.create');
+    Route::post('polls', [\App\Http\Controllers\PollController::class, 'store'])->name('polls.store');
+    Route::get('polls/{poll}', [\App\Http\Controllers\PollController::class, 'edit'])->name('polls.edit');
+    Route::post('polls/{poll}', [\App\Http\Controllers\PollController::class, 'update'])->name('polls.update');
+    Route::get('polls/show/{poll}', [\App\Http\Controllers\PollController::class, 'show'])->name('polls.show');
+    Route::delete('polls/{poll}', [\App\Http\Controllers\PollController::class, 'destroy'])->name('polls.destroy');
+    Route::post('polls/{poll}/vote', [\App\Http\Controllers\PollController::class, 'vote'])->name('polls.vote');
+
     //Articles
     Route::get('articles', [\App\Http\Controllers\ArticleController::class, 'index'])->name('articles');
     Route::get('articles/create', [\App\Http\Controllers\ArticleController::class, 'create'])->name('articles.create');

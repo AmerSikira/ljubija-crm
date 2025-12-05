@@ -33,6 +33,8 @@ export default function Create({ members = [], memberId }: { members: any, membe
                 amount: '0',
                 type_of_payment: '',
                 date_of_payment: '',
+                paid_from: '',
+                paid_to: '',
                 note:'',
                 member_id: memberId ? memberId : 0,
         })
@@ -41,6 +43,17 @@ export default function Create({ members = [], memberId }: { members: any, membe
                 setData(name, value)
         }
 
+        const formatDate = (date?: Date | null) => {
+                if (!date) return '';
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}/${month}/${year}`;
+        };
+
+        const handleDateChange = (field: string, date?: Date) => {
+                setData(field, formatDate(date ?? null) as any);
+        };
 
 
         const handleSelectMember = (value: string) => {
@@ -112,7 +125,21 @@ export default function Create({ members = [], memberId }: { members: any, membe
                                                         <Label htmlFor='birthdate'>
                                                                 Datum uplate
                                                         </Label>
-                                                        <DatePicker handleChange={(date: any) => handleChange('date_of_payment', date)} />
+                                                        <DatePicker handleChange={(date: any) => handleDateChange('date_of_payment', date)} />
+                                                </div>
+
+                                                <div className="flex flex-col gap-2">
+                                                        <Label htmlFor='paid_from'>
+                                                                Plaćeno od
+                                                        </Label>
+                                                        <DatePicker handleChange={(date: any) => handleDateChange('paid_from', date)} />
+                                                </div>
+
+                                                <div className="flex flex-col gap-2">
+                                                        <Label htmlFor='paid_to'>
+                                                                Plaćeno do
+                                                        </Label>
+                                                        <DatePicker handleChange={(date: any) => handleDateChange('paid_to', date)} />
                                                 </div>
 
                                                 <div className="flex flex-col gap-2">
