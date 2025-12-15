@@ -2,7 +2,7 @@ import { SidebarInset } from '@/components/ui/sidebar';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { usePage } from '@inertiajs/react';
 import * as React from 'react';
-
+import { PwaInstallButton } from './pwa-install-button';
 interface AppContentProps extends React.ComponentProps<'main'> {
     variant?: 'header' | 'sidebar';
 }
@@ -37,6 +37,8 @@ export function AppContent({ variant = 'header', children, ...props }: AppConten
         return (
             <SidebarInset {...props}>
                 <FlashMessage />
+                                        <PwaInstallButton />
+
                 {children}
             </SidebarInset>
         );
