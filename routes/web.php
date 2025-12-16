@@ -20,6 +20,10 @@ Route::middleware([
     Route::get('members/{member}', [\App\Http\Controllers\MemberController::class, 'edit'])->name('members.edit');
     Route::post('members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->name('members.update');
 
+    //My member profile
+    Route::get('my-membership', [\App\Http\Controllers\MemberController::class, 'editSelf'])->name('members.self');
+    Route::post('my-membership', [\App\Http\Controllers\MemberController::class, 'updateSelf'])->name('members.self.update');
+
 
     //Payments
     Route::get('payments', [\App\Http\Controllers\PaymentsController::class, 'index'])->name('payments');
@@ -48,6 +52,21 @@ Route::middleware([
     Route::get('articles/{article}', [\App\Http\Controllers\ArticleController::class, 'edit'])->name('articles.edit');
     Route::post('articles/{article}', [\App\Http\Controllers\ArticleController::class, 'update'])->name('articles.update');
     Route::get('articles/show/{article}', [\App\Http\Controllers\ArticleController::class, 'show'])->name('articles.show');
+
+    //Content items (Dove i hadisi)
+    Route::get('content-items', [\App\Http\Controllers\ContentItemController::class, 'index'])->name('content-items.index');
+    Route::get('content-items/create', [\App\Http\Controllers\ContentItemController::class, 'create'])->name('content-items.create');
+    Route::post('content-items', [\App\Http\Controllers\ContentItemController::class, 'store'])->name('content-items.store');
+    Route::get('content-items/{contentItem}/edit', [\App\Http\Controllers\ContentItemController::class, 'edit'])->name('content-items.edit');
+    Route::post('content-items/{contentItem}', [\App\Http\Controllers\ContentItemController::class, 'update'])->name('content-items.update');
+    Route::get('content-items/{contentItem}', [\App\Http\Controllers\ContentItemController::class, 'show'])->name('content-items.show');
+
+    //Boards
+    Route::get('boards', [\App\Http\Controllers\BoardController::class, 'index'])->name('boards.index');
+    Route::get('boards/create', [\App\Http\Controllers\BoardController::class, 'create'])->name('boards.create');
+    Route::post('boards', [\App\Http\Controllers\BoardController::class, 'store'])->name('boards.store');
+    Route::get('boards/{board}', [\App\Http\Controllers\BoardController::class, 'edit'])->name('boards.edit');
+    Route::post('boards/{board}', [\App\Http\Controllers\BoardController::class, 'update'])->name('boards.update');
 });
 
 

@@ -8,8 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { DatePicker } from '@/components/date-picker';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import { SelectValue } from '@radix-ui/react-select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import MemberAutocomplete from '@/components/member-autocomplete';
+import { useMemo } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
         {
                 title: 'Početna stranica',
@@ -36,8 +37,18 @@ export default function Create({ payment, members = [] }: { payment: any, member
                 paid_from: payment.paid_from,
                 paid_to: payment.paid_to,
                 note: payment.note,
-                member_id: payment.member_id || 0,
+                member_id: payment.member_id ?? null,
         })
+
+        const memberOptions = useMemo(
+                () =>
+                        members.map((m: any) => ({
+                                id: m.id,
+                                name: `${m.first_name ?? ''} ${m.last_name ?? ''}`.trim() || m.email || `Član #${m.id}`,
+                                email: m.email,
+                        })),
+                [members]
+        );
 
         const handleChange = (name: string, value: string): void => {
                 setData(name, value)
@@ -70,14 +81,14 @@ export default function Create({ payment, members = [] }: { payment: any, member
         };
 
 
-        const handleSelectMember = (value: string) => {
-
-                const member = members.find(m => m.id.toString() === value)
-
+        const handleSelectMember = (value: number | null) => {
+                const member = members.find((m: any) => m.id === value);
                 if (member) {
-                        handleChange('member_id', member.id);
+                        handleChange('member_id', member.id as any);
+                } else {
+                        handleChange('member_id', null as any);
                 }
-        }
+        };
 
         const handleTypeOfPayment = (value: string) => {
                 handleChange('type_of_payment', value);
@@ -95,20 +106,12 @@ export default function Create({ payment, members = [] }: { payment: any, member
                                 <form className="grid grid-cols-1" onSubmit={handleSubmit}>
                                         <div className="flex w-full flex-col">
                                                 <Label className="mb-3">Odaberite korisnika</Label>
-                                                <Select onValueChange={handleSelectMember} defaultValue={data.member_id ? data.member_id.toString() : undefined}>
-                                                        <SelectTrigger className='w-full'>
-                                                                <SelectValue placeholder="Odaberite korisnika" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                                {
-                                                                        members.map((member, index) => {
-                                                                                return (
-                                                                                        <SelectItem key={index} value={member.id.toString()}>{member.first_name} {member.last_name}</SelectItem>
-                                                                                )
-                                                                        })
-                                                                }
-                                                        </SelectContent>
-                                                </Select>
+                                                <MemberAutocomplete
+                                                        members={memberOptions}
+                                                        value={data.member_id || null}
+                                                        onChange={handleSelectMember}
+                                                        placeholder="Počnite kucati ime člana"
+                                                />
                                         </div>
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3 gap-y-4">
                                                 <div className="flex flex-col gap-2">

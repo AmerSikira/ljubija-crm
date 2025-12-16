@@ -8,8 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { DatePicker } from '@/components/date-picker';
-import { Select, SelectContent, SelectItem, SelectTrigger } from '@/components/ui/select';
-import { SelectValue } from '@radix-ui/react-select';
+import MemberAutocomplete from '@/components/member-autocomplete';
+import { useMemo } from 'react';
 const breadcrumbs: BreadcrumbItem[] = [
         {
                 title: 'Početna stranica',
@@ -27,6 +27,15 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 export default function Create({ users }: { users: any }) {
         console.log(users);
+        const userOptions = useMemo(
+                () =>
+                        users.map((u: any) => ({
+                                id: u.id,
+                                name: u.name || u.email || `Korisnik #${u.id}`,
+                                email: u.email,
+                        })),
+                [users]
+        );
         const { data, setData, post } = useForm<Member>({
                 id: 0,
                 first_name: "",
@@ -41,7 +50,7 @@ export default function Create({ users }: { users: any }) {
                 address_abroad: "",
                 city_abroad: "",
                 country: "",
-                user_id: 0
+                user_id: null as any
         })
 
         const handleChange = (name: string, value: string): void => {
@@ -66,16 +75,17 @@ export default function Create({ users }: { users: any }) {
                 }));
         };
 
-        const handleSelectUser = (value: string) => {
-
-                const user = users.find(u => u.id.toString() === value)
+        const handleSelectUser = (value: number | null) => {
+                const user = users.find((u: any) => u.id === value);
 
                 if (user) {
                         handleChange('user_id', user.id);
                         handleChange('first_name', user.name);
                         handleChange('email', user.email);
+                } else {
+                        handleChange('user_id', 0 as any);
                 }
-        }
+        };
 
         const handleSubmit = (e) => {
                 e.preventDefault();
@@ -88,20 +98,12 @@ export default function Create({ users }: { users: any }) {
                                 <form className="grid grid-cols-1" onSubmit={handleSubmit}>
                                         <div className="flex w-full flex-col">
                                                 <Label className="mb-3">Odaberite korisnika</Label>
-                                                <Select onValueChange={handleSelectUser}>
-                                                        <SelectTrigger className='w-full'>
-                                                                <SelectValue placeholder="Odaberite korisnika" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                                {
-                                                                        users.map((user, index) => {
-                                                                                return (
-                                                                                        <SelectItem key={index} value={user.id.toString()}>{user.name}</SelectItem>
-                                                                                )
-                                                                        })
-                                                                }
-                                                        </SelectContent>
-                                                </Select>
+                                                <MemberAutocomplete
+                                                        members={userOptions}
+                                                        value={data.user_id || null}
+                                                        onChange={handleSelectUser}
+                                                        placeholder="Počnite kucati ime korisnika"
+                                                />
                                         </div>
                                         <hr className='my-5' />
                                         <h3 className='font-bold text-xl'>Osnovne informacije o članu</h3>

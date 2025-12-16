@@ -4,6 +4,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 import { Button } from "@/components/ui/button";
 import ContentHolder from "@/components/content-holder";
+import { useEffect, useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -13,11 +14,60 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Dashboard({articles} : any) {
+    const [now, setNow] = useState(new Date());
+
+    useEffect(() => {
+        const id = setInterval(() => setNow(new Date()), 30000);
+        return () => clearInterval(id);
+    }, []);
+
+    const cities = useMemo(
+        () => [
+            { label: 'Pert', tz: 'Australia/Perth' },
+            { label: 'Sidnej', tz: 'Australia/Sydney' },
+            { label: 'San Francisko', tz: 'America/Los_Angeles' },
+            { label: 'Čikago', tz: 'America/Chicago' },
+            { label: 'Njujork', tz: 'America/New_York' },
+            { label: 'London', tz: 'Europe/London' },
+            { label: 'Ljubija', tz: 'Europe/Sarajevo' },
+            { label: 'Istanbul', tz: 'Europe/Istanbul' },
+            { label: 'Meka', tz: 'Asia/Riyadh' },
+            { label: 'Damask', tz: 'Asia/Damascus' },
+            { label: 'Tokio', tz: 'Asia/Tokyo' },
+            { label: 'Moskva', tz: 'Europe/Moscow' },
+        ],
+        []
+    );
+
+    const formatTime = (timeZone: string) =>
+        new Intl.DateTimeFormat('bs-BA', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: false,
+            timeZone,
+        }).format(now);
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Početna stranica" />
            <ContentHolder>
-                <h1 className='font-bold text-2xl'>Vijesti iz džemata</h1>
+                <div className="mb-6 space-y-2">
+                    <div className="rounded-lg border bg-card p-3 shadow-sm">
+                        <h2 className="mb-2 text-lg font-semibold">Trenutna vremena</h2>
+                        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4">
+                            {cities.map((city) => (
+                                <div
+                                    key={city.label}
+                                    className="flex items-center justify-between rounded-md border bg-background px-3 py-2 shadow-xs"
+                                >
+                                    <div className="text-sm font-medium">{city.label}</div>
+                                    <div className="text-lg font-semibold tabular-nums">{formatTime(city.tz)}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+                <h1 className="mb-4 font-bold text-2xl">Vijesti iz džemata</h1>
                 <div className="grid grid-cols-5">
             {articles.length === 0 && (
                 <div className="col-span-5">

@@ -11,16 +11,16 @@ class MemberController extends Controller
 {
     //
 
-    protected function authorizeManager(Request $request)
+    protected function authorizeAdmin(Request $request)
     {
         $role = $request->user()?->role;
-        if (!in_array($role, ['admin', 'manager'])) {
+        if ($role !== 'admin') {
             abort(403, 'Nedovoljno privilegija.');
         }
     }
 
     public function index(Request $request) {
-        $this->authorizeManager($request);
+        $this->authorizeAdmin($request);
         $search = trim((string) $request->input('search', ''));
 
         $members = Member::query()
@@ -45,8 +45,8 @@ class MemberController extends Controller
     }
 
     public function create() {
-        // Only admins/managers
-        $this->authorizeManager(request());
+        // Only admins
+        $this->authorizeAdmin(request());
         
         $users = User::select('id', 'name', 'email')->get();
         // dd($users);
@@ -97,7 +97,7 @@ class MemberController extends Controller
 
 
     public function edit(Request $request, $member) {
-        $this->authorizeManager($request);
+        $this->authorizeAdmin($request);
         $users = User::select('id', 'name', 'email')->get();
         $member = Member::find($member);
         if (!$member) {
@@ -110,7 +110,7 @@ class MemberController extends Controller
 
 
     public function update(Request $request, $member) {
-        $this->authorizeManager($request);
+        $this->authorizeAdmin($request);
         $member = Member::find($member);
         if (!$member) {
             return redirect()->route('members')->with('error', 'Član nije pronađen.');
@@ -150,5 +150,58 @@ class MemberController extends Controller
         $member->save();
 
         return redirect()->route('members')->with('success', 'Član je uspješno ažuriran.');
+    }
+
+    public function editSelf(Request $request)
+    {
+        $member = Member::where('user_id', $request->user()->id)->first();
+
+        if (!$member) {
+            return redirect()->route('dashboard')->with('error', 'Nemate pridruženog člana za uređivanje.');
+        }
+
+        $member->family_members = json_decode($member->family_members, true) ?? [];
+
+        return Inertia::render('members/my-profile', ['member' => $member]);
+    }
+
+    public function updateSelf(Request $request)
+    {
+        $member = Member::where('user_id', $request->user()->id)->first();
+
+        if (!$member) {
+            return redirect()->route('dashboard')->with('error', 'Nemate pridruženog člana za uređivanje.');
+        }
+
+        $request->validate([
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:20',
+            'address' => 'nullable|string|max:500',
+        ], [
+            'first_name.max' => 'Ime ne može biti duže od 255 znakova',
+            'last_name.max' => 'Prezime ne može biti duže od 255 znakova',
+            'email.email' => 'Email nije ispravan',
+            'email.max' => 'Email ne može biti duži od 255 znakova',
+            'phone.max' => 'Broj telefona ne može biti duži od 20 znakova',
+            'address.max' => 'Adresa ne može biti duža od 500 znakova',
+        ]);
+
+        $member->first_name = $request->first_name;
+        $member->last_name = $request->last_name;
+        $member->email = $request->email;
+        $member->phone = $request->phone;
+        $member->address = $request->address;
+        $member->birthdate = $request->birthdate;
+        $member->family_members = json_encode($request->family_members);
+        $member->email_abroad = $request->email_abroad;
+        $member->phone_abroad = $request->phone_abroad;
+        $member->address_abroad = $request->address_abroad;
+        $member->city_abroad = $request->city_abroad;
+        $member->country = $request->country;
+        $member->save();
+
+        return redirect()->route('members.self')->with('success', 'Podaci su uspješno ažurirani.');
     }
 }
