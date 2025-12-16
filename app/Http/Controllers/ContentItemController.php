@@ -16,13 +16,30 @@ class ContentItemController extends Controller
 
     public function index(Request $request)
     {
-        $items = ContentItem::orderByDesc('created_at')
+        $search = trim((string) $request->input('search', ''));
+        $type = $request->input('type', '');
+
+        $items = ContentItem::query()
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('title', 'like', "%{$search}%")
+                        ->orWhere('description', 'like', "%{$search}%");
+                });
+            })
+            ->when(in_array($type, ['dova', 'hadis'], true), function ($query) use ($type) {
+                $query->where('type', $type);
+            })
+            ->orderByDesc('created_at')
             ->get()
             ->map(fn (ContentItem $item) => $this->transformItem($item, true));
 
         return Inertia::render('content/index', [
             'items' => $items,
             'typeLabels' => $this->typeLabels,
+            'filters' => [
+                'search' => $search,
+                'type' => in_array($type, ['dova', 'hadis'], true) ? $type : '',
+            ],
         ]);
     }
 

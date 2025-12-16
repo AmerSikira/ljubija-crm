@@ -13,7 +13,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function Dashboard({articles} : any) {
+export default function Dashboard({ articles, daily_content }: any) {
     const [now, setNow] = useState(new Date());
 
     useEffect(() => {
@@ -66,6 +66,24 @@ export default function Dashboard({articles} : any) {
                             ))}
                         </div>
                     </div>
+                </div>
+                <div className="mb-8 rounded-lg border bg-card p-4 shadow-sm">
+                    <div className="mb-2 flex items-center justify-between">
+                        <h2 className="text-xl font-semibold">Uputa dana</h2>
+                        {daily_content?.type_label && (
+                            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                                {daily_content.type_label}
+                            </span>
+                        )}
+                    </div>
+                    {daily_content ? (
+                        <div className="space-y-2">
+                            <h3 className="text-lg font-bold">{daily_content.title}</h3>
+                            <p className="whitespace-pre-line leading-relaxed text-muted-foreground">{daily_content.description}</p>
+                        </div>
+                    ) : (
+                        <p className="text-muted-foreground">Nema dostupne upute za prikaz.</p>
+                    )}
                 </div>
                 <h1 className="mb-4 font-bold text-2xl">Vijesti iz džemata</h1>
                 <div className="grid grid-cols-5">

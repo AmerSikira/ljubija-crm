@@ -3,9 +3,11 @@ import ContentHolder from '@/components/content-holder';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 
 type ContentItem = {
     id: number;
@@ -18,12 +20,18 @@ type ContentItem = {
 
 export default function ContentIndex({
     items,
+    filters,
 }: {
     items: ContentItem[];
+    filters?: { search?: string; type?: string };
 }) {
     const { props } = usePage();
     const role = (props as any)?.auth?.user?.role ?? '';
     const isAdmin = role === 'admin';
+    const { data, setData } = useForm({
+        search: filters?.search ?? '',
+        type: (filters?.type as 'dova' | 'hadis' | '') ?? '',
+    });
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Početna stranica', href: '/dashboard' },
@@ -42,13 +50,62 @@ export default function ContentIndex({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dove i hadisi" />
             <ContentHolder>
-                <div className="mb-4 flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Dove i hadisi</h1>
-                    {isAdmin && (
-                        <Button asChild>
-                            <Link href={route('content-items.create')}>Dodaj novo</Link>
-                        </Button>
-                    )}
+                <div className="mb-4 space-y-3">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <h1 className="text-2xl font-bold">Dove i hadisi</h1>
+                        {isAdmin && (
+                            <Button asChild>
+                                <Link href={route('content-items.create')}>Dodaj novo</Link>
+                            </Button>
+                        )}
+                    </div>
+
+                    <form
+                        className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:items-center"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            router.get(
+                                route('content-items.index'),
+                                { search: data.search, type: data.type === 'all' ? '' : data.type },
+                                { preserveScroll: true, preserveState: true }
+                            );
+                        }}
+                    >
+                        <Input
+                            placeholder="Pretraga po naslovu ili opisu"
+                            value={data.search}
+                            onChange={(e) => setData('search', e.target.value)}
+                        />
+                        <Select
+                            value={data.type}
+                            onValueChange={(value) => setData('type', value as 'dova' | 'hadis' | 'all')}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Svi tipovi" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Svi tipovi</SelectItem>
+                                <SelectItem value="dova">Dova</SelectItem>
+                                <SelectItem value="hadis">Hadis</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <div className="flex items-center gap-2">
+                            <Button type="submit" variant="secondary" className="w-full sm:w-auto">
+                                Pretraži
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full sm:w-auto"
+                                onClick={() => {
+                                    setData({ search: '', type: 'all' });
+                                    router.get(route('content-items.index'), {}, { preserveScroll: true });
+                                }}
+                            >
+                                Reset
+                            </Button>
+                        </div>
+                    </form>
                 </div>
 
                 <Card>
