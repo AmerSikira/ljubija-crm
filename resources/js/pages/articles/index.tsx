@@ -1,11 +1,12 @@
 import React from "react";
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Member } from '@/types';
-import { Head, Link } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
 import ContentHolder from "@/components/content-holder";
+import { PlusIcon } from "lucide-react";
+import { ActionsMenu } from "@/components/actions-menu";
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -22,6 +23,9 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 
 export default function Index({ articles }: Member[] | any) {
+    const { props } = usePage();
+    const role = (props as any)?.auth?.user?.role ?? '';
+    const isAdmin = role === 'admin';
     
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -38,21 +42,11 @@ export default function Index({ articles }: Member[] | any) {
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>
-                                ID
-                            </TableHead>
-                            <TableHead>
-                                Ime i prezime
-                            </TableHead>
-                            <TableHead>
-                                Email
-                            </TableHead>
-                            <TableHead>
-                                Telefon
-                            </TableHead>
-                            <TableHead>
-                                Akcije
-                            </TableHead>
+                            <TableHead>ID</TableHead>
+                            <TableHead>Slika</TableHead>
+                            <TableHead>Naslov</TableHead>
+                            <TableHead>Uvod</TableHead>
+                            <TableHead className="text-right">Akcije</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -67,25 +61,40 @@ export default function Index({ articles }: Member[] | any) {
                                             <TableCell><img src={article.image_url} className="w-20 h-20 object-cover"/></TableCell>
                                             <TableCell>{article.title}</TableCell>
                                             <TableCell>{article.intro}</TableCell>
-                                            <TableCell >
-                                                <Button asChild>
-                                                    <Link href={route('articles.edit', { article: article.id })}>
-                                                        Uredi
-                                                    </Link>
-                                                </Button>
-
-                                                <Button asChild className="ml-2" variant="secondary">
-                                                    <Link href={route('articles.show', { article: article.id })}>
-                                                        Pročitaj
-                                                    </Link>
-                                                </Button>
+                                            <TableCell className="text-right">
+                                                <ActionsMenu
+                                                    actions={[
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Detalji',
+                                                            href: route('articles.show', { article: article.id }),
+                                                        },
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Uredi',
+                                                            href: route('articles.edit', { article: article.id }),
+                                                        },
+                                                        ...(isAdmin
+                                                            ? [
+                                                                { type: 'separator' as const },
+                                                                {
+                                                                    type: 'item' as const,
+                                                                    label: 'Obriši',
+                                                                    variant: 'destructive',
+                                                                    onSelect: () =>
+                                                                        router.delete(route('articles.destroy', { article: article.id })),
+                                                                },
+                                                            ]
+                                                            : []),
+                                                    ]}
+                                                />
                                             </TableCell>
                                         </TableRow>
                                     );
                                 })
                             ) : (
                                 <TableRow>
-                                    <TableCell colSpan={4} className="text-center">
+                                    <TableCell colSpan={5} className="text-center">
                                         Nema vijesti
                                     </TableCell>
                                 </TableRow>

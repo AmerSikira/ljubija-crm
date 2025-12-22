@@ -49,12 +49,16 @@ type FamilyMember = {
   email: string;
   phone: string;
   address: string;
+  relation?: string;
 };
 
 type MemberForm = {
   id: number;
   first_name: string;
   last_name: string;
+  title?: string | null;
+  fathers_name?: string | null;
+  profile_image?: File | null;
   birthdate: string;
   email: string;
   phone: string;

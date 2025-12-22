@@ -68,7 +68,13 @@ class ArticleController extends Controller
                 'title'      => $article->title,
                 'intro'      => $article->intro,
                 'main_text'  => $article->main_text,
-                'image_url'  => $article->getLastMediaUrl('images'),
+                'image_url'  => $article->getFirstMediaUrl('images'),
+                'gallery' => $article->getMedia('images')->map(function ($media) {
+                    return [
+                        'id' => $media->id,
+                        'url' => $media->getUrl(),
+                    ];
+                }),
             ],
         ]);
     }
@@ -80,6 +86,8 @@ class ArticleController extends Controller
             'intro' => 'required|string',
             'main_text' => 'required|string',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'removed_media_ids' => 'array',
+            'removed_media_ids.*' => 'integer',
         ]);
 
         $article->update([
@@ -87,6 +95,10 @@ class ArticleController extends Controller
             'intro' => $validated['intro'],
             'main_text' => $validated['main_text'],
         ]);
+
+        if (!empty($validated['removed_media_ids'])) {
+            $article->media()->whereIn('id', $validated['removed_media_ids'])->get()->each->delete();
+        }
 
         if ($request->hasFile('images')) {
             foreach ($request->file('images') as $image) {
@@ -109,8 +121,25 @@ class ArticleController extends Controller
                 'title'      => $article->title,
                 'intro'      => $article->intro,
                 'main_text'  => $article->main_text,
-                'image_url'  => $article->getLastMediaUrl('images'),
+                'image_url'  => $article->getFirstMediaUrl('images'),
+                'gallery_urls' => $article->getMedia('images')->map->getUrl()->values()->all(),
             ],
         ]);
+    }
+
+    public function destroy(Request $request, Article $article)
+    {
+        $this->authorizeAdmin($request);
+        $article->clearMediaCollection('images');
+        $article->delete();
+
+        return redirect()->route('articles')->with('success', 'Vijest je obrisana.');
+    }
+
+    private function authorizeAdmin(Request $request): void
+    {
+        if ($request->user()?->role !== 'admin') {
+            abort(403, 'Nedovoljno privilegija.');
+        }
     }
 }

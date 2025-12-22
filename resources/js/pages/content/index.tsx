@@ -6,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { ActionsMenu } from '@/components/actions-menu';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 
@@ -134,15 +135,32 @@ export default function ContentIndex({
                                             <TableCell>
                                                 <Badge variant="secondary">{item.type_label}</Badge>
                                             </TableCell>
-                                            <TableCell className="flex items-center justify-end gap-2">
-                                                <Button variant="outline" size="sm" asChild>
-                                                    <Link href={route('content-items.show', item.id)}>Pregled</Link>
-                                                </Button>
-                                                {isAdmin && (
-                                                    <Button variant="ghost" size="sm" asChild>
-                                                        <Link href={route('content-items.edit', item.id)}>Uredi</Link>
-                                                    </Button>
-                                                )}
+                                            <TableCell className="text-right">
+                                                <ActionsMenu
+                                                    actions={[
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Detalji',
+                                                            href: route('content-items.show', item.id),
+                                                        },
+                                                        ...(isAdmin
+                                                            ? [
+                                                                {
+                                                                    type: 'item' as const,
+                                                                    label: 'Uredi',
+                                                                    href: route('content-items.edit', item.id),
+                                                                },
+                                                                { type: 'separator' as const },
+                                                                {
+                                                                    type: 'item' as const,
+                                                                    label: 'Obriši',
+                                                                    variant: 'destructive',
+                                                                    onSelect: () => router.delete(route('content-items.destroy', item.id)),
+                                                                },
+                                                            ]
+                                                            : []),
+                                                    ]}
+                                                />
                                             </TableCell>
                                         </TableRow>
                                     ))

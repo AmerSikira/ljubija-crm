@@ -1,11 +1,12 @@
 import React from "react";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from "@/types";
-import { Head, Link, router } from "@inertiajs/react";
+import { Head, Link, router, usePage } from "@inertiajs/react";
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import ContentHolder from "@/components/content-holder";
+import { ActionsMenu } from "@/components/actions-menu";
 
 type PollItem = {
     id: number;
@@ -34,6 +35,10 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Index({ polls }: { polls: Poll[] }) {
+    const { props } = usePage();
+    const role = (props as any)?.auth?.user?.role ?? '';
+    const isAdmin = role === 'admin';
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ankete" />
@@ -55,7 +60,7 @@ export default function Index({ polls }: { polls: Poll[] }) {
                             <TableHead>Status</TableHead>
                             <TableHead>Broj opcija</TableHead>
                             <TableHead>Ukupno glasova</TableHead>
-                            <TableHead>Akcije</TableHead>
+                            <TableHead className="text-right">Akcije</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -70,29 +75,39 @@ export default function Index({ polls }: { polls: Poll[] }) {
                                     </TableCell>
                                     <TableCell>{poll.items?.length ?? 0}</TableCell>
                                     <TableCell>{poll.votes_count ?? 0}</TableCell>
-                                    <TableCell className="space-x-2">
-                                        <Button asChild disabled={!!poll.finished_at}>
-                                            <Link href={route("polls.edit", { poll: poll.id })}>Uredi</Link>
-                                        </Button>
-                                        <Button asChild variant="secondary">
-                                            <Link href={route("polls.show", { poll: poll.id })}>Detalji</Link>
-                                        </Button>
-                                        {!poll.finished_at && (
-                                            <Button
-                                                variant="destructive"
-                                                onClick={() =>
-                                                    router.delete(route("polls.destroy", { poll: poll.id }))
-                                                }
-                                            >
-                                                Obriši
-                                            </Button>
-                                        )}
+                                    <TableCell className="text-right">
+                                        <ActionsMenu
+                                            actions={[
+                                                {
+                                                    type: 'item',
+                                                    label: 'Detalji',
+                                                    href: route("polls.show", { poll: poll.id }),
+                                                },
+                                                {
+                                                    type: 'item',
+                                                    label: 'Uredi',
+                                                    href: route("polls.edit", { poll: poll.id }),
+                                                    disabled: !!poll.finished_at,
+                                                },
+                                                ...(isAdmin && !poll.finished_at
+                                                    ? [
+                                                        { type: 'separator' as const },
+                                                        {
+                                                            type: 'item' as const,
+                                                            label: 'Obriši',
+                                                            variant: 'destructive',
+                                                            onSelect: () => router.delete(route("polls.destroy", { poll: poll.id })),
+                                                        },
+                                                    ]
+                                                    : []),
+                                            ]}
+                                        />
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={6} className="text-center">
+                                <TableCell colSpan={7} className="text-center">
                                     Nema anketa
                                 </TableCell>
                             </TableRow>

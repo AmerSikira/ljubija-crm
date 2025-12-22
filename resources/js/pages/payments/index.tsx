@@ -8,6 +8,7 @@ import { PlusIcon } from "lucide-react";
 import ContentHolder from "@/components/content-holder";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/date-picker";
+import { ActionsMenu } from "@/components/actions-menu";
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -124,27 +125,14 @@ export default function Index({ payments, filters }: { payments: Pagination<Paym
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>
-                                ID
-                            </TableHead>
-                            <TableHead>
-                                Iznos
-                            </TableHead>
-                            <TableHead>
-                                Datum uplate
-                            </TableHead>
-                            <TableHead>
-                                Vrsta
-                            </TableHead>
-                            <TableHead>
-                                Ime i prezime
-                            </TableHead>
-                            <TableHead>
-                                Email
-                            </TableHead>
-                            <TableHead>
-                                Telefon
-                            </TableHead>
+                            <TableHead>ID</TableHead>
+                            <TableHead>Iznos</TableHead>
+                            <TableHead>Datum uplate</TableHead>
+                            <TableHead>Vrsta</TableHead>
+                            <TableHead>Ime i prezime</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Telefon</TableHead>
+                            <TableHead className="text-right">Akcije</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -159,12 +147,28 @@ export default function Index({ payments, filters }: { payments: Pagination<Paym
                                     <TableCell>{payment.member.first_name} {payment.member.last_name}</TableCell>
                                     <TableCell>{payment.member.email}</TableCell>
                                     <TableCell>{payment.member.phone}</TableCell>
-                                    <TableCell>
-                                        <Button asChild>
-                                            <Link href={route('payments.edit', { payment: payment.id })}>
-                                                Uredi
-                                            </Link>
-                                        </Button>
+                                    <TableCell className="text-right">
+                                        <ActionsMenu
+                                            actions={[
+                                                {
+                                                    type: 'item',
+                                                    label: 'Detalji',
+                                                    href: route('payments.edit', { payment: payment.id }),
+                                                },
+                                                {
+                                                    type: 'item',
+                                                    label: 'Uredi',
+                                                    href: route('payments.edit', { payment: payment.id }),
+                                                },
+                                                { type: 'separator' },
+                                                {
+                                                    type: 'item',
+                                                    label: 'Obriši',
+                                                    variant: 'destructive',
+                                                    onSelect: () => router.delete(route('payments.destroy', { payment: payment.id })),
+                                                },
+                                            ]}
+                                        />
                                     </TableCell>
                                 </TableRow>
                             ))

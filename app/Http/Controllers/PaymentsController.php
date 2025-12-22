@@ -211,6 +211,14 @@ class PaymentsController extends Controller
         return Inertia::render('my-payments/index', ['payments' => $payments]);
     }
 
+    public function destroy(Request $request, Payments $payment)
+    {
+        $this->authorizeManager($request);
+        $payment->delete();
+
+        return redirect()->route('payments')->with('success', 'Uplata je obrisana.');
+    }
+
     private function parseDate(?string $value): ?string
     {
         if (!$value) {

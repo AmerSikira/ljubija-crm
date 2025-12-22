@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { DatePicker } from '@/components/date-picker';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useEffect, useRef, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,6 +27,9 @@ export default function MyProfile({ member }: { member: any }) {
         id: member.id || 0,
         first_name: member.first_name || "",
         last_name: member.last_name || "",
+        title: member.title || "",
+        fathers_name: member.fathers_name || "",
+        profile_image: null as File | null,
         birthdate: member.birthdate || "",
         email: member.email || "",
         phone: member.phone || "",
@@ -42,21 +47,55 @@ export default function MyProfile({ member }: { member: any }) {
         setData(name, value);
     };
 
+    const [previewUrl, setPreviewUrl] = useState<string | null>(member.profile_image_url || null);
+    const objectUrlRef = useRef<string | null>(null);
+
+    const setPreviewFromFile = (file: File | null) => {
+        if (objectUrlRef.current) {
+            URL.revokeObjectURL(objectUrlRef.current);
+            objectUrlRef.current = null;
+        }
+        if (file) {
+            const url = URL.createObjectURL(file);
+            objectUrlRef.current = url;
+            setPreviewUrl(url);
+        } else {
+            setPreviewUrl(member.profile_image_url || null);
+        }
+    };
+
+    useEffect(() => {
+        return () => {
+            if (objectUrlRef.current) {
+                URL.revokeObjectURL(objectUrlRef.current);
+            }
+        };
+    }, []);
+
     const addFamilyMember = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
-        setData({ ...data, family_members: [...data.family_members, { first_name: "", last_name: "", birthdate: "" }] });
+        setData({
+            ...data,
+            family_members: [
+                ...data.family_members,
+                { first_name: "", last_name: "", birthdate: "", email: "", phone: "", address: "", relation: "" },
+            ],
+        });
     };
 
     const changeFamilyMember = (name: keyof FamilyMember, value: string, index: number): void => {
-        setData("family_members", data.family_members.map((familyMember, i) => {
-            if (i === index) {
-                return {
-                    ...familyMember,
-                    [name]: value,
-                };
-            }
-            return familyMember;
-        }));
+        setData(
+            "family_members",
+            data.family_members.map((familyMember, i) => {
+                if (i === index) {
+                    return {
+                        ...familyMember,
+                        [name]: value,
+                    };
+                }
+                return familyMember;
+            })
+        );
     };
 
     const handleSubmit = (e: React.FormEvent) => {
@@ -75,6 +114,29 @@ export default function MyProfile({ member }: { member: any }) {
             <Head title="Moj profil člana" />
             <ContentHolder>
                 <form className="grid grid-cols-1" onSubmit={handleSubmit}>
+                    <div className="mb-6 flex flex-col items-center gap-3">
+                        <div className="h-24 w-24 overflow-hidden rounded-full border bg-muted">
+                            {previewUrl ? (
+                                <img src={previewUrl} alt="Profilna slika" className="h-full w-full object-cover" />
+                            ) : (
+                                <div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground">
+                                    Nema slike
+                                </div>
+                            )}
+                        </div>
+                        <Input
+                            type="file"
+                            name="profile_image"
+                            id="profile_image"
+                            accept="image/*"
+                            className="w-56 cursor-pointer text-center"
+                            onChange={(e) => {
+                                const file = e.target.files?.[0] ?? null;
+                                handleChange('profile_image' as any, file);
+                                setPreviewFromFile(file);
+                            }}
+                        />
+                    </div>
                     <h3 className='font-bold text-xl mb-4'>Osnovne informacije o članu</h3>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3 gap-y-4">
                         <div className="flex flex-col gap-2">
@@ -89,6 +151,18 @@ export default function MyProfile({ member }: { member: any }) {
                                 Prezime
                             </Label>
                             <Input type="text" name="last_name" id="last_name" placeholder='npr. Ljubinac' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.last_name} />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor='fathers_name'>
+                                Ime oca
+                            </Label>
+                            <Input type="text" name="fathers_name" id="fathers_name" placeholder='npr. Ahmet' onChange={(e) => handleChange(e.target.name, e.target.value)} value={(data as any).fathers_name || ""} />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                            <Label htmlFor='title'>
+                                Titula
+                            </Label>
+                            <Input type="text" name="title" id="title" placeholder='npr. dr., mr., ing.' onChange={(e) => handleChange(e.target.name, e.target.value)} value={(data as any).title || ""} />
                         </div>
                         <div className="flex flex-col gap-2">
                             <Label htmlFor='birthdate'>
@@ -170,14 +244,35 @@ export default function MyProfile({ member }: { member: any }) {
                                         <Label htmlFor='first_name'>
                                             Ime
                                         </Label>
-                                        <Input type="text" name="first_name" placeholder='npr. Osman' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.first_name} />
+                                        <Input type="text" name="first_name" placeholder='npr. Osman' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.first_name || ''} />
                                     </div>
 
                                     <div className="flex flex-col gap-2">
                                         <Label htmlFor='last_name'>
                                             Prezime
                                         </Label>
-                                        <Input type="text" name="last_name" placeholder='npr. Ljubinac' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.last_name} />
+                                        <Input type="text" name="last_name" placeholder='npr. Ljubinac' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.last_name || ''} />
+                                    </div>
+                                    <div className="flex flex-col gap-2">
+                                        <Label>Odnos</Label>
+                                        <Select
+                                            value={familyMember.relation || ""}
+                                            onValueChange={(val) => changeFamilyMember('relation', val, index)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Odaberite odnos" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="otac">Otac</SelectItem>
+                                                <SelectItem value="majka">Majka</SelectItem>
+                                                <SelectItem value="sin">Sin</SelectItem>
+                                                <SelectItem value="kćerka">Kćerka</SelectItem>
+                                                <SelectItem value="supruga">Supruga</SelectItem>
+                                                <SelectItem value="punac">Punac</SelectItem>
+                                                <SelectItem value="punica">Punica</SelectItem>
+                                                <SelectItem value="druga rodbina">Druga rodbina</SelectItem>
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <Label htmlFor='birthdate'>
@@ -189,20 +284,20 @@ export default function MyProfile({ member }: { member: any }) {
                                         <Label htmlFor='email'>
                                             Email
                                         </Label>
-                                        <Input type="text" name="email" placeholder='npr. osman.ljubinac@gmail.com' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.email} />
+                                        <Input type="text" name="email" placeholder='npr. osman.ljubinac@gmail.com' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.email || ''} />
                                     </div>
 
                                     <div className="flex flex-col gap-2">
                                         <Label htmlFor='phone'>
                                             Telefon
                                         </Label>
-                                        <Input type="text" name="phone" placeholder='npr. +387 61 123 456' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.phone} />
+                                        <Input type="text" name="phone" placeholder='npr. +387 61 123 456' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.phone || ''} />
                                     </div>
                                     <div className="flex flex-col gap-2">
                                         <Label htmlFor='address'>
                                             Adresa
                                         </Label>
-                                        <Input type="text" name="address" placeholder='npr. Gornja mahala 54' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.address} />
+                                        <Input type="text" name="address" placeholder='npr. Gornja mahala 54' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.address || ''} />
                                     </div>
                                 </div>
                             ))}

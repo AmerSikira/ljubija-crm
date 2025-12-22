@@ -23,18 +23,18 @@ export default function Dashboard({ articles, daily_content }: any) {
 
     const cities = useMemo(
         () => [
-            { label: 'Pert', tz: 'Australia/Perth' },
-            { label: 'Sidnej', tz: 'Australia/Sydney' },
-            { label: 'San Francisko', tz: 'America/Los_Angeles' },
-            { label: 'Čikago', tz: 'America/Chicago' },
-            { label: 'Njujork', tz: 'America/New_York' },
+            { label: 'Perth', tz: 'Australia/Perth' },
+            { label: 'Sydney', tz: 'Australia/Sydney' },
+            { label: 'San Francisco', tz: 'America/Los_Angeles' },
+            { label: 'Chicago', tz: 'America/Chicago' },
+            { label: 'New York', tz: 'America/New_York' },
             { label: 'London', tz: 'Europe/London' },
             { label: 'Ljubija', tz: 'Europe/Sarajevo' },
             { label: 'Istanbul', tz: 'Europe/Istanbul' },
-            { label: 'Meka', tz: 'Asia/Riyadh' },
-            { label: 'Damask', tz: 'Asia/Damascus' },
-            { label: 'Tokio', tz: 'Asia/Tokyo' },
-            { label: 'Moskva', tz: 'Europe/Moscow' },
+            { label: 'Mecca', tz: 'Asia/Riyadh' },
+            { label: 'Damascus', tz: 'Asia/Damascus' },
+            { label: 'Tokyo', tz: 'Asia/Tokyo' },
+            { label: 'Moscow', tz: 'Europe/Moscow' },
         ],
         []
     );

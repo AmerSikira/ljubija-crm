@@ -56,11 +56,12 @@ class BoardController extends Controller
         $this->authorizeBoardManager($request);
 
         $members = Member::orderBy('first_name')
-            ->get(['id', 'first_name', 'last_name', 'email'])
+            ->get(['id', 'first_name', 'last_name', 'title', 'email'])
             ->map(function (Member $member) {
+                $fullName = trim(($member->title ? $member->title . ' ' : '') . ($member->first_name ?? '') . ' ' . ($member->last_name ?? ''));
                 return [
                     'id' => $member->id,
-                    'name' => trim(($member->first_name ?? '') . ' ' . ($member->last_name ?? '')) ?: $member->email,
+                    'name' => $fullName ?: $member->email,
                     'email' => $member->email,
                 ];
             });
@@ -120,11 +121,12 @@ class BoardController extends Controller
         }
 
         $members = Member::orderBy('first_name')
-            ->get(['id', 'first_name', 'last_name', 'email'])
+            ->get(['id', 'first_name', 'last_name', 'title', 'email'])
             ->map(function (Member $member) {
+                $fullName = trim(($member->title ? $member->title . ' ' : '') . ($member->first_name ?? '') . ' ' . ($member->last_name ?? ''));
                 return [
                     'id' => $member->id,
-                    'name' => trim(($member->first_name ?? '') . ' ' . ($member->last_name ?? '')) ?: $member->email,
+                    'name' => $fullName ?: $member->email,
                     'email' => $member->email,
                 ];
             });

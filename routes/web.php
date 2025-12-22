@@ -19,6 +19,7 @@ Route::middleware([
     Route::post('members', [\App\Http\Controllers\MemberController::class, 'store'])->name('members.store');
     Route::get('members/{member}', [\App\Http\Controllers\MemberController::class, 'edit'])->name('members.edit');
     Route::post('members/{member}', [\App\Http\Controllers\MemberController::class, 'update'])->name('members.update');
+    Route::delete('members/{member}', [\App\Http\Controllers\MemberController::class, 'destroy'])->name('members.destroy');
 
     //My member profile
     Route::get('my-membership', [\App\Http\Controllers\MemberController::class, 'editSelf'])->name('members.self');
@@ -31,6 +32,7 @@ Route::middleware([
     Route::post('payments', [\App\Http\Controllers\PaymentsController::class, 'store'])->name('payments.store');
     Route::get('payments/{payment}', [\App\Http\Controllers\PaymentsController::class, 'edit'])->name('payments.edit');
     Route::post('payments/{payment}', [\App\Http\Controllers\PaymentsController::class, 'update'])->name('payments.update');
+    Route::delete('payments/{payment}', [\App\Http\Controllers\PaymentsController::class, 'destroy'])->name('payments.destroy');
 
     //My Payments
     Route::get('my-payments', [\App\Http\Controllers\PaymentsController::class, 'myPaymentsIndex'])->name('my-payments');
@@ -52,6 +54,36 @@ Route::middleware([
     Route::get('articles/{article}', [\App\Http\Controllers\ArticleController::class, 'edit'])->name('articles.edit');
     Route::post('articles/{article}', [\App\Http\Controllers\ArticleController::class, 'update'])->name('articles.update');
     Route::get('articles/show/{article}', [\App\Http\Controllers\ArticleController::class, 'show'])->name('articles.show');
+    Route::delete('articles/{article}', [\App\Http\Controllers\ArticleController::class, 'destroy'])->name('articles.destroy');
+
+    //Projects
+    Route::get('projects', [\App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
+    Route::get('projects/create', [\App\Http\Controllers\ProjectController::class, 'create'])->name('projects.create');
+    Route::post('projects', [\App\Http\Controllers\ProjectController::class, 'store'])->name('projects.store');
+    Route::get('projects/{project}', [\App\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
+    Route::get('projects/{project}/edit', [\App\Http\Controllers\ProjectController::class, 'edit'])->name('projects.edit');
+    Route::post('projects/{project}', [\App\Http\Controllers\ProjectController::class, 'update'])->name('projects.update');
+    Route::delete('projects/{project}', [\App\Http\Controllers\ProjectController::class, 'destroy'])->name('projects.destroy');
+    Route::post('projects/{project}/join', [\App\Http\Controllers\ProjectController::class, 'join'])->name('projects.join');
+    Route::post('projects/{project}/interests/{interest}/confirm', [\App\Http\Controllers\ProjectController::class, 'confirmInterest'])->name('projects.interests.confirm');
+
+    //Memorials
+    Route::get('memorials', [\App\Http\Controllers\MemorialController::class, 'index'])->name('memorials.index');
+    Route::get('memorials/create', [\App\Http\Controllers\MemorialController::class, 'create'])->name('memorials.create');
+    Route::post('memorials', [\App\Http\Controllers\MemorialController::class, 'store'])->name('memorials.store');
+    Route::get('memorials/{memorial}', [\App\Http\Controllers\MemorialController::class, 'show'])->name('memorials.show');
+    Route::get('memorials/{memorial}/edit', [\App\Http\Controllers\MemorialController::class, 'edit'])->name('memorials.edit');
+    Route::post('memorials/{memorial}', [\App\Http\Controllers\MemorialController::class, 'update'])->name('memorials.update');
+    Route::delete('memorials/{memorial}', [\App\Http\Controllers\MemorialController::class, 'destroy'])->name('memorials.destroy');
+
+    //Mekteb
+    Route::get('mekteb', [\App\Http\Controllers\MektebController::class, 'index'])->name('mekteb.index');
+    Route::get('mekteb/create', [\App\Http\Controllers\MektebController::class, 'create'])->name('mekteb.create');
+    Route::post('mekteb', [\App\Http\Controllers\MektebController::class, 'store'])->name('mekteb.store');
+    Route::get('mekteb/{mekteb}', [\App\Http\Controllers\MektebController::class, 'show'])->name('mekteb.show');
+    Route::get('mekteb/{mekteb}/edit', [\App\Http\Controllers\MektebController::class, 'edit'])->name('mekteb.edit');
+    Route::post('mekteb/{mekteb}', [\App\Http\Controllers\MektebController::class, 'update'])->name('mekteb.update');
+    Route::delete('mekteb/{mekteb}', [\App\Http\Controllers\MektebController::class, 'destroy'])->name('mekteb.destroy');
 
     //Content items (Dove i hadisi)
     Route::get('content-items', [\App\Http\Controllers\ContentItemController::class, 'index'])->name('content-items.index');
@@ -60,6 +92,7 @@ Route::middleware([
     Route::get('content-items/{contentItem}/edit', [\App\Http\Controllers\ContentItemController::class, 'edit'])->name('content-items.edit');
     Route::post('content-items/{contentItem}', [\App\Http\Controllers\ContentItemController::class, 'update'])->name('content-items.update');
     Route::get('content-items/{contentItem}', [\App\Http\Controllers\ContentItemController::class, 'show'])->name('content-items.show');
+    Route::delete('content-items/{contentItem}', [\App\Http\Controllers\ContentItemController::class, 'destroy'])->name('content-items.destroy');
 
     //Boards
     Route::get('boards', [\App\Http\Controllers\BoardController::class, 'index'])->name('boards.index');

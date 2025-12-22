@@ -8,13 +8,17 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 use App\Models\Payment;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Member extends Model
+class Member extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\MemberFactory> */
     use HasFactory;
+    use InteractsWithMedia;
 
     protected $guarded = [];
+    protected $appends = ['profile_image_url'];
 
     public function user()
     {
@@ -24,5 +28,15 @@ class Member extends Model
     public function payments()
     {
         return $this->hasMany(Payment::class);
+    }
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('profile_image')->singleFile();
+    }
+
+    public function getProfileImageUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl('profile_image') ?: ($this->profile_image ?? null);
     }
 }

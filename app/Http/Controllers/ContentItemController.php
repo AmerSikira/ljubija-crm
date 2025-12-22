@@ -92,6 +92,15 @@ class ContentItemController extends Controller
         return redirect()->route('content-items.index')->with('success', 'Uspješno izmijenjeno.');
     }
 
+    public function destroy(Request $request, ContentItem $contentItem)
+    {
+        $this->authorizeAdmin($request);
+
+        $contentItem->delete();
+
+        return redirect()->route('content-items.index')->with('success', 'Uspješno obrisano.');
+    }
+
     private function authorizeAdmin(Request $request): void
     {
         $role = $request->user()?->role;

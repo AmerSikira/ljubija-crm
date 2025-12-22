@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import ContentHolder from "@/components/content-holder";
 import { Input } from "@/components/ui/input";
+import { ActionsMenu } from "@/components/actions-menu";
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -26,6 +27,9 @@ type Member = {
     id: number;
     first_name: string;
     last_name: string;
+    title?: string | null;
+    fathers_name?: string | null;
+    profile_image_url?: string | null;
     email?: string | null;
     phone?: string | null;
 };
@@ -43,7 +47,6 @@ export default function Index({ members, filters }: { members: Pagination<Member
     const { data, setData } = useForm({
         search: filters?.search ?? '',
     });
-
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         router.get(route('members'), { search: data.search }, { preserveState: true, preserveScroll: true });
@@ -85,21 +88,12 @@ export default function Index({ members, filters }: { members: Pagination<Member
                 <Table>
                     <TableHeader>
                         <TableRow>
-                            <TableHead>
-                                ID
-                            </TableHead>
-                            <TableHead>
-                                Ime i prezime
-                            </TableHead>
-                            <TableHead>
-                                Email
-                            </TableHead>
-                            <TableHead>
-                                Telefon
-                            </TableHead>
-                            <TableHead>
-                                Akcije
-                            </TableHead>
+                            <TableHead>ID</TableHead>
+                            <TableHead>Ime i prezime</TableHead>
+                            <TableHead>Ime oca</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Telefon</TableHead>
+                            <TableHead className="text-right">Akcije</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -107,21 +101,47 @@ export default function Index({ members, filters }: { members: Pagination<Member
                             members.data.map((member) => (
                                 <TableRow key={member.id}>
                                     <TableCell>{member.id}</TableCell>
-                                    <TableCell>{member.first_name} {member.last_name}</TableCell>
+                                    <TableCell className="flex items-center gap-2">
+                                        {member.profile_image_url && (
+                                            <img
+                                                src={member.profile_image_url}
+                                                alt={`${member.first_name} ${member.last_name}`}
+                                                className="h-8 w-8 rounded-full object-cover"
+                                            />
+                                        )}
+                                        <span>{member.title ? `${member.title} ` : ''}{member.first_name} {member.last_name}</span>
+                                    </TableCell>
+                                    <TableCell>{member.fathers_name || '-'}</TableCell>
                                     <TableCell>{member.email}</TableCell>
                                     <TableCell>{member.phone}</TableCell>
-                                    <TableCell>
-                                        <Button asChild>
-                                            <Link href={route('members.edit', { member: member.id })}>
-                                                Uredi
-                                            </Link>
-                                        </Button>
+                                    <TableCell className="text-right">
+                                        <ActionsMenu
+                                            actions={[
+                                                {
+                                                    type: 'item',
+                                                    label: 'Detalji',
+                                                    href: route('members.edit', { member: member.id }),
+                                                },
+                                                {
+                                                    type: 'item',
+                                                    label: 'Uredi',
+                                                    href: route('members.edit', { member: member.id }),
+                                                },
+                                                { type: 'separator' },
+                                                {
+                                                    type: 'item',
+                                                    label: 'Obriši',
+                                                    variant: 'destructive',
+                                                    onSelect: () => router.delete(route('members.destroy', { member: member.id })),
+                                                },
+                                            ]}
+                                        />
                                     </TableCell>
                                 </TableRow>
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={5} className="text-center">
+                                <TableCell colSpan={6} className="text-center">
                                     Nema članova
                                 </TableCell>
                             </TableRow>

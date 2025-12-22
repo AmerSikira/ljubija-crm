@@ -120,9 +120,9 @@ class PollController extends Controller
         return redirect()->route('polls')->with('success', 'Anketa je ažurirana.');
     }
 
-    public function destroy(Poll $poll)
+    public function destroy(Request $request, Poll $poll)
     {
-        $this->authorizeManage();
+        $this->authorizeAdmin($request);
         if ($poll->finished_at) {
             return redirect()->route('polls')->with('error', 'Završenu anketu nije moguće obrisati.');
         }
@@ -170,6 +170,13 @@ class PollController extends Controller
     {
         $role = auth()->user()?->role;
         if (!in_array($role, ['admin', 'manager'])) {
+            abort(403, 'Nedovoljno privilegija.');
+        }
+    }
+
+    private function authorizeAdmin(Request $request): void
+    {
+        if ($request->user()?->role !== 'admin') {
             abort(403, 'Nedovoljno privilegija.');
         }
     }

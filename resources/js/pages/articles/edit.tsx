@@ -6,8 +6,9 @@ import ContentHolder from "@/components/content-holder";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useState } from 'react';
-import Editor from 'react-simple-wysiwyg';
+import { RichEditor } from '@/components/rich-editor';
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -31,21 +32,22 @@ export default function Edit ({article}: any) {
         intro: article.intro || '',
         main_text: article.main_text || '',
         image_url: article.image_url || '',
-        images: [],
+        images: [] as File[] | [],
+        removed_media_ids: [] as number[],
     });
 
-  function changeMainText(e) {
-    setData('main_text', e.target.value);
+  function changeMainText(val: string) {
+    setData('main_text', val);
   }
   
-  function changeIntro(e) {
-    setData('intro', e.target.value);
+  function changeIntro(val: string) {
+    setData('intro', val);
   }
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    post('/articles/' + article.id);
+    post('/articles/' + article.id, { forceFormData: true });
     // Handle form submission logic here
 };
         return (
@@ -65,7 +67,7 @@ export default function Edit ({article}: any) {
                         <Label htmlFor="title">
                                 Uvod
                         </Label>
-                        <Editor value={data.intro} onChange={changeIntro} />
+                        <RichEditor label={undefined} value={data.intro} onChange={changeIntro} error={errors.intro} />
                         {errors.intro && <div className="text-red-500">{errors.intro}</div>}
                     </div>
 
@@ -73,15 +75,43 @@ export default function Edit ({article}: any) {
                         <Label htmlFor="title">
                                 Glavni tekst
                         </Label>
-                        <Editor value={data.main_text} onChange={changeMainText} />
-                        {errors.main_text && <div className="text-red-500">{errors.main_text}</div>}
+                        <RichEditor label={undefined} value={data.main_text} onChange={changeMainText} error={errors.main_text} />
                     </div>
                     <div className="flex flex-col gap-2">
-                        <img src={article.image_url} className="w-full h-auto mb-2"/>
                         <Label htmlFor="title">
                                 Slike
                         </Label>
-                        <Input id="images" type="file" className="mt-1 block w-full" onChange={(e) => setData('images', e.target.files)}/>
+                        {article.gallery && article.gallery.length > 0 && (
+                            <div className="flex flex-wrap gap-3">
+                                {article.gallery.map((img: any) => (
+                                    <div key={img.id} className="relative">
+                                        <img src={img.url} className="h-20 w-20 rounded-md object-cover" />
+                                        <Button
+                                            type="button"
+                                            size="sm"
+                                            variant="destructive"
+                                            className="absolute -right-2 -top-2 h-6 w-6 rounded-full p-0 text-xs"
+                                            onClick={() =>
+                                                setData('removed_media_ids', [
+                                                    ...data.removed_media_ids.filter((id: number) => id !== img.id),
+                                                    img.id,
+                                                ])
+                                            }
+                                        >
+                                            ×
+                                        </Button>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                        <Input
+                            id="images"
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            className="mt-1 block w-full"
+                            onChange={(e) => setData('images', e.target.files ? Array.from(e.target.files) : [])}
+                        />
                         {errors.images && <div className="text-red-500">{errors.images}</div>}
                     </div>
                     

@@ -28,6 +28,8 @@ class MemberController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->where('first_name', 'like', "%{$search}%")
                         ->orWhere('last_name', 'like', "%{$search}%")
+                        ->orWhere('fathers_name', 'like', "%{$search}%")
+                        ->orWhere('title', 'like', "%{$search}%")
                         ->orWhere('email', 'like', "%{$search}%")
                         ->orWhere('phone', 'like', "%{$search}%");
                 });
@@ -56,11 +58,14 @@ class MemberController extends Controller
     public function store(Request $request) {
         $request->validate([
             'user_id' => 'required|exists:users,id',
+            'title' => 'nullable|string|max:50',
+            'fathers_name' => 'nullable|string|max:255',
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
+            'profile_image' => 'nullable|image|max:2048',
         ], [
             'user_id.required' => 'Morate odabrati korisnika',
             'user_id.exists' => 'Odabrani korisnik ne postoji',
@@ -70,12 +75,17 @@ class MemberController extends Controller
             'email.max' => 'Email ne može biti duži od 255 znakova',
             'phone.max' => 'Broj telefona ne može biti duži od 20 znakova',
             'address.max' => 'Adresa ne može biti duža od 500 znakova',
+            'profile_image.image' => 'Profilna slika mora biti slika.',
+            'profile_image.max' => 'Profilna slika je prevelika (max 2MB).',
         ]);
 
         // dd($request->all());
         $member = new Member();
         $member->first_name = $request->first_name;
         $member->last_name = $request->last_name;
+        $member->title = $request->title;
+        $member->fathers_name = $request->fathers_name;
+        $member->profile_image = null;
         $member->email = $request->email;
         $member->phone = $request->phone;
         $member->address = $request->address;
@@ -88,6 +98,13 @@ class MemberController extends Controller
         $member->country = $request->country;
         $member->user()->associate($request->user_id);
         $member->save();
+
+        if ($request->hasFile('profile_image')) {
+            $member->clearMediaCollection('profile_image');
+            $media = $member->addMediaFromRequest('profile_image')->toMediaCollection('profile_image');
+            $member->profile_image = $media->getUrl();
+            $member->save();
+        }
         
        
        
@@ -118,11 +135,14 @@ class MemberController extends Controller
 
         $request->validate([
             'user_id' => 'required|exists:users,id',
+            'title' => 'nullable|string|max:50',
+            'fathers_name' => 'nullable|string|max:255',
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
+            'profile_image' => 'nullable|image|max:2048',
         ], [
             'user_id.required' => 'Morate odabrati korisnika',
             'user_id.exists' => 'Odabrani korisnik ne postoji',
@@ -132,10 +152,14 @@ class MemberController extends Controller
             'email.max' => 'Email ne može biti duži od 255 znakova',
             'phone.max' => 'Broj telefona ne može biti duži od 20 znakova',
             'address.max' => 'Adresa ne može biti duža od 500 znakova',
+            'profile_image.image' => 'Profilna slika mora biti slika.',
+            'profile_image.max' => 'Profilna slika je prevelika (max 2MB).',
         ]);
 
         $member->first_name = $request->first_name;
         $member->last_name = $request->last_name;
+        $member->title = $request->title;
+        $member->fathers_name = $request->fathers_name;
         $member->email = $request->email;
         $member->phone = $request->phone;
         $member->address = $request->address;
@@ -148,6 +172,13 @@ class MemberController extends Controller
         $member->country = $request->country;
         $member->user()->associate($request->user_id);
         $member->save();
+
+        if ($request->hasFile('profile_image')) {
+            $member->clearMediaCollection('profile_image');
+            $media = $member->addMediaFromRequest('profile_image')->toMediaCollection('profile_image');
+            $member->profile_image = $media->getUrl();
+            $member->save();
+        }
 
         return redirect()->route('members')->with('success', 'Član je uspješno ažuriran.');
     }
@@ -174,11 +205,14 @@ class MemberController extends Controller
         }
 
         $request->validate([
+            'title' => 'nullable|string|max:50',
+            'fathers_name' => 'nullable|string|max:255',
             'first_name' => 'nullable|string|max:255',
             'last_name' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
+            'profile_image' => 'nullable|image|max:2048',
         ], [
             'first_name.max' => 'Ime ne može biti duže od 255 znakova',
             'last_name.max' => 'Prezime ne može biti duže od 255 znakova',
@@ -186,10 +220,14 @@ class MemberController extends Controller
             'email.max' => 'Email ne može biti duži od 255 znakova',
             'phone.max' => 'Broj telefona ne može biti duži od 20 znakova',
             'address.max' => 'Adresa ne može biti duža od 500 znakova',
+            'profile_image.image' => 'Profilna slika mora biti slika.',
+            'profile_image.max' => 'Profilna slika je prevelika (max 2MB).',
         ]);
 
         $member->first_name = $request->first_name;
         $member->last_name = $request->last_name;
+        $member->title = $request->title;
+        $member->fathers_name = $request->fathers_name;
         $member->email = $request->email;
         $member->phone = $request->phone;
         $member->address = $request->address;
@@ -202,6 +240,21 @@ class MemberController extends Controller
         $member->country = $request->country;
         $member->save();
 
+        if ($request->hasFile('profile_image')) {
+            $member->clearMediaCollection('profile_image');
+            $media = $member->addMediaFromRequest('profile_image')->toMediaCollection('profile_image');
+            $member->profile_image = $media->getUrl();
+            $member->save();
+        }
+
         return redirect()->route('members.self')->with('success', 'Podaci su uspješno ažurirani.');
+    }
+
+    public function destroy(Request $request, Member $member)
+    {
+        $this->authorizeAdmin($request);
+        $member->delete();
+
+        return redirect()->route('members')->with('success', 'Član je uspješno obrisan.');
     }
 }
