@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarGroup, SidebarGroupLabel } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, DollarSign, Folder, LayoutGrid, User, HandCoins, Newspaper, BarChart2, Users, Heart, Book, ChevronDown } from 'lucide-react';
+import { BookOpen, DollarSign, Folder, LayoutGrid, User, HandCoins, Newspaper, BarChart2, Users, Heart, Book, ChevronDown, PieChart } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useState } from 'react';
 
@@ -31,6 +31,12 @@ export function AppSidebar() {
         title: 'Početna stranica',
         href: '/dashboard',
         icon: LayoutGrid,
+    };
+
+    const statsItem: NavItem = {
+        title: 'Statistika',
+        href: '/stats',
+        icon: PieChart,
     };
 
     const pollsItem: NavItem = {
@@ -105,7 +111,7 @@ export function AppSidebar() {
         icon: HandCoins
     };
 
-    let mainNavItems: NavItem[] = [dashboardItem, boardItem, projectsItem, memorialItem, mektebItem, dzematItem, duasHadithItem];
+    let mainNavItems: NavItem[] = [dashboardItem, statsItem, boardItem, projectsItem, memorialItem, mektebItem, dzematItem, duasHadithItem];
 
     if (role === 'admin') {
         mainNavItems = [...mainNavItems, membersItem, paymentsItem];

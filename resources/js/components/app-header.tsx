@@ -97,6 +97,12 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                     <Link href="/dashboard" prefetch className="flex items-center space-x-2">
                         <AppLogo />
                     </Link>
+                    <img src="/zastava.png" alt="Zastava" className="ml-2 h-5 w-auto md:hidden" />
+
+                    <div className="hidden flex-1 items-center justify-center gap-3 md:flex">
+                        <Breadcrumbs items={breadcrumbs} />
+                        <img src="/zastava.png" alt="Zastava" className="h-6 w-auto" />
+                    </div>
 
                     {/* Desktop Navigation */}
                     <div className="ml-6 hidden h-full items-center space-x-6 lg:flex">
