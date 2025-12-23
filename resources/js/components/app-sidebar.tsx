@@ -57,6 +57,12 @@ export function AppSidebar() {
         icon: Heart,
     };
 
+    const dzematItem: NavItem = {
+        title: 'Džemat Ljubija',
+        href: '/dzemat',
+        icon: BookOpen,
+    };
+
     const mektebItem: NavItem = {
         title: 'Mekteb',
         href: '/mekteb',
@@ -99,17 +105,15 @@ export function AppSidebar() {
         icon: HandCoins
     };
 
-    let mainNavItems: NavItem[] = [dashboardItem, boardItem, projectsItem, memorialItem, mektebItem, duasHadithItem];
+    let mainNavItems: NavItem[] = [dashboardItem, boardItem, projectsItem, memorialItem, mektebItem, dzematItem, duasHadithItem];
 
     if (role === 'admin') {
-        mainNavItems = [...mainNavItems, membersItem, paymentsItem, myMembershipItem, myPayments];
+        mainNavItems = [...mainNavItems, membersItem, paymentsItem];
     } else if (role === 'manager') {
-        mainNavItems = [...mainNavItems, paymentsItem, myMembershipItem, myPayments];
-    } else {
-        mainNavItems = [...mainNavItems, myMembershipItem, myPayments];
+        mainNavItems = [...mainNavItems, paymentsItem];
     }
 
-    mainNavItems = [...mainNavItems, pollsItem, articlesItem];
+    mainNavItems = [...mainNavItems, myMembershipItem, myPayments, pollsItem, articlesItem];
 
     return (
         <Sidebar collapsible="icon" variant="inset">

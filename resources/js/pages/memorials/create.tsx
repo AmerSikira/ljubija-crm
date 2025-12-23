@@ -14,7 +14,7 @@ import { DatePicker } from '@/components/date-picker';
 type FormState = {
     first_name: string;
     last_name: string;
-    status: 'preselio' | 'nestao';
+    status: 'preselio' | 'nestao' | 'nema_statusa';
     birth_date: string;
     status_date: string;
     birth_place: string;
@@ -37,7 +37,7 @@ export default function MemorialCreate() {
     const { data, setData, post, processing, errors } = useForm<FormState>({
         first_name: '',
         last_name: '',
-        status: 'preselio',
+        status: 'nema_statusa',
         birth_date: '',
         status_date: '',
         birth_place: '',
@@ -103,13 +103,14 @@ export default function MemorialCreate() {
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <Label>Status</Label>
-                                    <Select value={data.status} onValueChange={(v) => setData('status', v as 'preselio' | 'nestao')}>
+                                    <Select value={data.status} onValueChange={(v) => setData('status', v as FormState['status'])}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Odaberite status" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="preselio">Preselio</SelectItem>
                                             <SelectItem value="nestao">Nestao</SelectItem>
+                                            <SelectItem value="nema_statusa">Nema statusa</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

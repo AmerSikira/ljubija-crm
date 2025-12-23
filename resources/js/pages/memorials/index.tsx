@@ -3,12 +3,15 @@ import ContentHolder from '@/components/content-holder';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 
 type Memorial = {
     id: number;
     full_name: string;
+    status: string;
     status_label: string;
     status_date?: string | null;
     short_info_preview?: string | null;
@@ -16,10 +19,22 @@ type Memorial = {
     published: boolean;
 };
 
-export default function MemorialsIndex({ memorials }: { memorials: Memorial[] }) {
+export default function MemorialsIndex({
+    memorials,
+    filters,
+    statusOptions,
+}: {
+    memorials: Memorial[];
+    filters?: { search?: string; status?: string };
+    statusOptions?: Record<string, string>;
+}) {
     const { props } = usePage();
     const role = (props as any)?.auth?.user?.role ?? '';
     const isAdmin = role === 'admin';
+    const { data, setData, get } = useForm({
+        search: filters?.search ?? '',
+        status: filters?.status ?? 'all',
+    });
 
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Početna stranica', href: '/dashboard' },
@@ -30,20 +45,72 @@ export default function MemorialsIndex({ memorials }: { memorials: Memorial[] })
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Memorijal" />
             <ContentHolder>
-                <div className="mb-6 flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Memorijal</h1>
-                    {isAdmin && (
-                        <Button asChild>
-                            <Link href={route('memorials.create')}>Dodaj osobu</Link>
-                        </Button>
-                    )}
+                <div className="mb-6 space-y-3">
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-2xl font-bold">Memorijal</h1>
+                        {isAdmin && (
+                            <Button asChild>
+                                <Link href={route('memorials.create')}>Dodaj osobu</Link>
+                            </Button>
+                        )}
+                    </div>
+                    <form
+                        className="grid grid-cols-1 gap-2 md:grid-cols-3 md:items-center"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            get(
+                                route('memorials.index'),
+                                { search: data.search, status: data.status === 'all' ? '' : data.status },
+                                { preserveScroll: true, preserveState: true }
+                            );
+                        }}
+                    >
+                        <Input
+                            placeholder="Pretraga po imenu ili prezimenu"
+                            value={data.search}
+                            onChange={(e) => setData('search', e.target.value)}
+                        />
+                        <Select
+                            value={data.status}
+                            onValueChange={(val) => setData('status', val)}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Svi statusi" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">Svi statusi</SelectItem>
+                                {statusOptions &&
+                                    Object.entries(statusOptions).map(([key, label]) => (
+                                        <SelectItem key={key} value={key}>
+                                            {label}
+                                        </SelectItem>
+                                    ))}
+                            </SelectContent>
+                        </Select>
+                        <div className="flex gap-2">
+                            <Button type="submit" variant="secondary" className="w-full md:w-auto">
+                                Pretraži
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="w-full md:w-auto"
+                                onClick={() => {
+                                    setData({ search: '', status: 'all' });
+                                    get(route('memorials.index'), {}, { preserveScroll: true });
+                                }}
+                            >
+                                Reset
+                            </Button>
+                        </div>
+                    </form>
                 </div>
 
                 {memorials.length === 0 ? (
                     <p className="text-muted-foreground">Nema zapisa za prikaz.</p>
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                        {memorials.map((m) => (
+        {memorials.map((m) => (
                             <Card key={m.id} className={!m.published ? 'border-dashed' : ''}>
                                 <CardContent className="p-0">
                                     {m.main_image_url ? (

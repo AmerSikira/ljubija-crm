@@ -15,7 +15,7 @@ type Memorial = {
     id: number;
     first_name: string;
     last_name: string;
-    status: 'preselio' | 'nestao';
+    status: 'preselio' | 'nestao' | 'nema_statusa';
     birth_date?: string | null;
     status_date?: string | null;
     birth_place?: string | null;
@@ -103,13 +103,14 @@ export default function MemorialEdit({ memorial }: { memorial: Memorial }) {
                                 </div>
                                 <div className="flex flex-col gap-2">
                                     <Label>Status</Label>
-                                    <Select value={data.status} onValueChange={(v) => setData('status', v as 'preselio' | 'nestao')}>
+                                    <Select value={data.status} onValueChange={(v) => setData('status', v as Memorial['status'])}>
                                         <SelectTrigger>
                                             <SelectValue placeholder="Odaberite status" />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectItem value="preselio">Preselio</SelectItem>
                                             <SelectItem value="nestao">Nestao</SelectItem>
+                                            <SelectItem value="nema_statusa">Nema statusa</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

@@ -12,10 +12,13 @@ class MemorialController extends Controller
     private array $statusLabels = [
         'preselio' => 'Preselio',
         'nestao' => 'Nestao',
+        'nema_statusa' => 'Nema statusa',
     ];
 
     public function index(Request $request)
     {
+        $search = trim((string) $request->input('search', ''));
+        $status = $request->input('status', '');
         $query = Memorial::query()->orderByDesc('status_date')->orderBy('last_name');
 
         if (!$this->isAdmin($request)) {
@@ -23,11 +26,25 @@ class MemorialController extends Controller
         }
 
         $memorials = $query
+            ->when($search !== '', function ($q) use ($search) {
+                $q->where(function ($inner) use ($search) {
+                    $inner->where('first_name', 'like', "%{$search}%")
+                        ->orWhere('last_name', 'like', "%{$search}%");
+                });
+            })
+            ->when(in_array($status, array_keys($this->statusLabels), true), function ($q) use ($status) {
+                $q->where('status', $status);
+            })
             ->get()
             ->map(fn (Memorial $memorial) => $this->transformMemorial($memorial, true));
 
         return Inertia::render('memorials/index', [
             'memorials' => $memorials,
+            'filters' => [
+                'search' => $search,
+                'status' => in_array($status, array_keys($this->statusLabels), true) ? $status : '',
+            ],
+            'statusOptions' => $this->statusLabels,
         ]);
     }
 
@@ -107,7 +124,7 @@ class MemorialController extends Controller
             [
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
-                'status' => 'required|in:preselio,nestao',
+                'status' => 'required|in:preselio,nestao,nema_statusa',
                 'birth_date' => 'nullable|date',
                 'status_date' => 'nullable|date',
                 'birth_place' => 'nullable|string|max:255',

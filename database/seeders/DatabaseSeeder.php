@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
         
         $this->call([
             MemberSeeder::class,
+            MemorialSeeder::class,
+            // DzematPageSeeder::class, // optional
         ]);
     }
 }

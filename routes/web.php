@@ -76,6 +76,11 @@ Route::middleware([
     Route::post('memorials/{memorial}', [\App\Http\Controllers\MemorialController::class, 'update'])->name('memorials.update');
     Route::delete('memorials/{memorial}', [\App\Http\Controllers\MemorialController::class, 'destroy'])->name('memorials.destroy');
 
+    //Dzemat page
+    Route::get('dzemat', [\App\Http\Controllers\DzematPageController::class, 'show'])->name('dzemat.show');
+    Route::get('dzemat/edit', [\App\Http\Controllers\DzematPageController::class, 'edit'])->name('dzemat.edit');
+    Route::post('dzemat', [\App\Http\Controllers\DzematPageController::class, 'update'])->name('dzemat.update');
+
     //Mekteb
     Route::get('mekteb', [\App\Http\Controllers\MektebController::class, 'index'])->name('mekteb.index');
     Route::get('mekteb/create', [\App\Http\Controllers\MektebController::class, 'create'])->name('mekteb.create');
