@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Carbon\Carbon;
 
+/**
+ * Manages džemat board compositions, history, and membership assignments.
+ */
 class BoardController extends Controller
 {
     private array $roleLabels = [
@@ -19,6 +22,9 @@ class BoardController extends Controller
         'member' => 'Član',
     ];
 
+    /**
+     * Only admins/managers can create or edit boards.
+     */
     private function authorizeBoardManager(Request $request): void
     {
         $role = $request->user()?->role;
@@ -27,6 +33,9 @@ class BoardController extends Controller
         }
     }
 
+    /**
+     * Show current board and history with member assignments.
+     */
     public function index(Request $request)
     {
         $currentBoard = Board::with(['members.member'])

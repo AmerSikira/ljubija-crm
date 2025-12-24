@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
+/**
+ * Handles memorial records (public and admin CRUD with media).
+ */
 class MemorialController extends Controller
 {
     private array $statusLabels = [

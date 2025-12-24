@@ -9,6 +9,9 @@ use App\Models\User;
 use App\Models\Member;
 use Carbon\Carbon;
 
+/**
+ * Manages payments (admin/manager) and self-service payment views.
+ */
 class PaymentsController extends Controller
 {
     //

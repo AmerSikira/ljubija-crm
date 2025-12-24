@@ -6,8 +6,14 @@ use App\Models\DzematPage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+/**
+ * Manages single “Džemat Ljubija” info page with rich content and gallery.
+ */
 class DzematPageController extends Controller
 {
+    /**
+     * Public view of the dzemat page.
+     */
     public function show()
     {
         $page = DzematPage::with('media')->first();
@@ -17,6 +23,9 @@ class DzematPageController extends Controller
         ]);
     }
 
+    /**
+     * Admin edit form for dzemat page.
+     */
     public function edit(Request $request)
     {
         $this->authorizeAdmin($request);
@@ -27,6 +36,9 @@ class DzematPageController extends Controller
         ]);
     }
 
+    /**
+     * Persist dzemat page content and gallery updates.
+     */
     public function update(Request $request)
     {
         $this->authorizeAdmin($request);

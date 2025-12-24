@@ -7,10 +7,15 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+/**
+ * Admin-only controller for managing džemat members and self-service edits.
+ */
 class MemberController extends Controller
 {
-    //
 
+    /**
+     * Restrict member management to admins.
+     */
     protected function authorizeAdmin(Request $request)
     {
         $role = $request->user()?->role;

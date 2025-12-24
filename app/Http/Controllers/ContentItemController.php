@@ -7,6 +7,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
+/**
+ * CRUD controller for “Dove i hadisi” content items.
+ */
 class ContentItemController extends Controller
 {
     private array $typeLabels = [
@@ -14,6 +17,9 @@ class ContentItemController extends Controller
         'hadis' => 'Hadis',
     ];
 
+    /**
+     * List content with optional search/type filters.
+     */
     public function index(Request $request)
     {
         $search = trim((string) $request->input('search', ''));

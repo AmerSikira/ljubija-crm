@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
+/**
+ * Handles creation, voting, and lifecycle of polls (admin/manager).
+ */
 class PollController extends Controller
 {
     public function index()

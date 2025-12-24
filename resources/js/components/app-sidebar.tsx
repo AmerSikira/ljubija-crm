@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, SidebarGroup, SidebarGroupLabel } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, DollarSign, Folder, LayoutGrid, User, HandCoins, Newspaper, BarChart2, Users, Heart, Book, ChevronDown, PieChart } from 'lucide-react';
+import { BookOpen, DollarSign, Folder, LayoutGrid, User, HandCoins, Newspaper, BarChart2, Users, Heart, Book, ChevronDown, PieChart, FileText } from 'lucide-react';
 import AppLogo from './app-logo';
 import { useState } from 'react';
 
@@ -43,6 +43,12 @@ export function AppSidebar() {
         title: 'Ankete',
         href: '/polls',
         icon: BarChart2
+    };
+
+    const reportsItem: NavItem = {
+        title: 'Zapisnici',
+        href: '/reports',
+        icon: FileText,
     };
 
     const boardItem: NavItem = {
@@ -119,7 +125,7 @@ export function AppSidebar() {
         mainNavItems = [...mainNavItems, paymentsItem];
     }
 
-    mainNavItems = [...mainNavItems, myMembershipItem, myPayments, pollsItem, articlesItem];
+    mainNavItems = [...mainNavItems, myMembershipItem, myPayments, pollsItem, reportsItem, articlesItem];
 
     return (
         <Sidebar collapsible="icon" variant="inset">

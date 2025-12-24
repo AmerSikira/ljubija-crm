@@ -47,6 +47,15 @@ Route::middleware([
     Route::delete('polls/{poll}', [\App\Http\Controllers\PollController::class, 'destroy'])->name('polls.destroy');
     Route::post('polls/{poll}/vote', [\App\Http\Controllers\PollController::class, 'vote'])->name('polls.vote');
 
+    //Reports
+    Route::get('reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
+    Route::get('reports/create', [\App\Http\Controllers\ReportController::class, 'create'])->name('reports.create');
+    Route::post('reports', [\App\Http\Controllers\ReportController::class, 'store'])->name('reports.store');
+    Route::get('reports/{report}', [\App\Http\Controllers\ReportController::class, 'show'])->name('reports.show');
+    Route::get('reports/{report}/edit', [\App\Http\Controllers\ReportController::class, 'edit'])->name('reports.edit');
+    Route::post('reports/{report}', [\App\Http\Controllers\ReportController::class, 'update'])->name('reports.update');
+    Route::delete('reports/{report}', [\App\Http\Controllers\ReportController::class, 'destroy'])->name('reports.destroy');
+
     //Articles
     Route::get('articles', [\App\Http\Controllers\ArticleController::class, 'index'])->name('articles');
     Route::get('articles/create', [\App\Http\Controllers\ArticleController::class, 'create'])->name('articles.create');

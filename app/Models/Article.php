@@ -10,6 +10,9 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
+/**
+ * News article with media gallery support.
+ */
 class Article extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\ArticleFactory> */

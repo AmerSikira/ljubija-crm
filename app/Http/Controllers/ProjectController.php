@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
+/**
+ * Manages projects, their media, and user interests.
+ */
 class ProjectController extends Controller
 {
     public function index(Request $request)

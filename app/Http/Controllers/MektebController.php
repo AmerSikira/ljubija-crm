@@ -7,8 +7,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
 
+/**
+ * Handles mekteb entries (news-like posts) with media and publish state.
+ */
 class MektebController extends Controller
 {
+    /**
+     * List entries for public/admin; admins see unpublished.
+     */
     public function index(Request $request)
     {
         $query = MektebEntry::query()->orderByDesc('created_at');

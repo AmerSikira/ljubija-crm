@@ -5,8 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Article;
 
+/**
+ * Handles CRUD operations for news articles including media handling.
+ */
 class ArticleController extends Controller
 {
+    /**
+     * List articles with preview image for the dashboard/table.
+     */
     public function index ()
     {
         $articles = Article::with('media')->get()

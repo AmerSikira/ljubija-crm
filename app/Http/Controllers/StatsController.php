@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 
+/**
+ * Provides payment statistics for the current user and overall džemat.
+ */
 class StatsController extends Controller
 {
     public function index(Request $request)

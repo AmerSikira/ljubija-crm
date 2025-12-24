@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+/**
+ * Mekteb post with media gallery and publish flag.
+ */
 class MektebEntry extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;

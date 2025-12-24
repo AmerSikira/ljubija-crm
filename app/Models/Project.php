@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+/**
+ * Project with media, budget fields, and related interests.
+ */
 class Project extends Model implements HasMedia
 {
     use HasFactory;

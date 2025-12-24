@@ -6,10 +6,14 @@ use Illuminate\Http\Request;
 use App\Models\Article;
 use App\Models\ContentItem;
 
+/**
+ * Serves the main dashboard with recent articles and a random daily content item.
+ */
 class DashboardController extends Controller
 {
-    //
-
+    /**
+     * Build dashboard props (news preview + daily content).
+     */
     public function index() {
         $articles = Article::with('media')->latest()->take(5)->get()->map(function (Article $article) {
             return [
@@ -30,6 +34,9 @@ class DashboardController extends Controller
         ]);
     }
 
+    /**
+     * Pull a random dova/hadis to show as "uputa dana".
+     */
     private function randomContentItem(): ?array
     {
         $item = ContentItem::inRandomOrder()->first();

@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+/**
+    * Single-page info about the džemat with rich content and gallery.
+    */
 class DzematPage extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;

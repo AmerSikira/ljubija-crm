@@ -11,6 +11,9 @@ use App\Models\Payment;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+/**
+ * Represents a džemat member tied to a user account and profile media.
+ */
 class Member extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\MemberFactory> */

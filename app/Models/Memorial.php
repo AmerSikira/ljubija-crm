@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
+/**
+ * Memorial entry with optional media and derived gallery URLs.
+ */
 class Memorial extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia;
