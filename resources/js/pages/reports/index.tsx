@@ -14,7 +14,7 @@ type ReportListItem = {
     protocol_number: string;
     meeting_datetime: string;
     location?: string | null;
-    chairperson?: string | null;
+    chairperson_name?: string | null;
     quorum_note?: string | null;
 };
 
@@ -56,7 +56,7 @@ export default function ReportsIndex({ reports, filters }: { reports: ReportList
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <form onSubmit={handleSearch} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                         <Input
-                            placeholder="Pretraži po broju protokola, lokaciji ili zapisničaru"
+                            placeholder="Pretraži po broju protokola, lokaciji ili učesnicima"
                             value={data.search}
                             onChange={(e) => setData('search', e.target.value)}
                             className="w-full sm:w-80"
@@ -94,7 +94,7 @@ export default function ReportsIndex({ reports, filters }: { reports: ReportList
                                     <TableCell>{report.protocol_number}</TableCell>
                                     <TableCell>{formatDateTime(report.meeting_datetime)}</TableCell>
                                     <TableCell>{report.location || '-'}</TableCell>
-                                    <TableCell>{report.chairperson || '-'}</TableCell>
+                                    <TableCell>{report.chairperson_name || '-'}</TableCell>
                                     <TableCell>{report.quorum_note || '-'}</TableCell>
                                     {isAdmin && (
                                         <TableCell className="text-right">

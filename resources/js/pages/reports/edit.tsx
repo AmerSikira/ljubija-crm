@@ -4,6 +4,7 @@ import ContentHolder from '@/components/content-holder';
 import { Head, router, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { ReportForm, type ReportFormData, type DecisionForm } from './report-form';
+import { type MemberOption } from '@/components/member-autocomplete';
 
 type ReportPayload = ReportFormData & {
     id: number;
@@ -27,16 +28,16 @@ const toDateTimeLocal = (value?: string | null) => {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 };
 
-export default function EditReport({ report }: { report: ReportPayload }) {
+export default function EditReport({ report, boardMembers }: { report: ReportPayload; boardMembers: MemberOption[] }) {
     const { data, setData, post, processing, errors } = useForm<ReportFormData>({
         protocol_number: report.protocol_number,
         meeting_datetime: toDateTimeLocal(report.meeting_datetime),
         location: report.location ?? '',
-        recorder: report.recorder ?? '',
-        verifier_one: report.verifier_one ?? '',
-        verifier_two: report.verifier_two ?? '',
-        chairperson: report.chairperson ?? '',
-        board_members: report.board_members ?? '',
+        recorder_id: report.recorder_id ?? null,
+        verifier_one_id: report.verifier_one_id ?? null,
+        verifier_two_id: report.verifier_two_id ?? null,
+        chairperson_id: report.chairperson_id ?? null,
+        board_members: report.board_members ?? [],
         attendees_count: report.attendees_count ?? null,
         quorum_note: report.quorum_note ?? '',
         agenda: report.agenda && report.agenda.length ? report.agenda : [''],
@@ -59,7 +60,12 @@ export default function EditReport({ report }: { report: ReportPayload }) {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post(route('reports.update', { report: report.id }));
+        post(route('reports.update', { report: report.id }), {
+            data: {
+                ...data,
+                board_members: data.board_members.filter((id): id is number => typeof id === 'number'),
+            },
+        });
     };
 
     const handleDelete = () => {
@@ -82,6 +88,7 @@ export default function EditReport({ report }: { report: ReportPayload }) {
                     processing={processing}
                     submitLabel="Spremi promjene"
                     onDelete={handleDelete}
+                    memberOptions={boardMembers}
                 />
             </ContentHolder>
         </AppLayout>

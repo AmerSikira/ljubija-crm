@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import MemberAutocomplete, { type MemberOption } from '@/components/member-autocomplete';
 
 export type DecisionForm = {
     title: string;
@@ -18,11 +19,11 @@ export type ReportFormData = {
     protocol_number: string;
     meeting_datetime: string;
     location: string;
-    recorder: string;
-    verifier_one: string;
-    verifier_two: string;
-    chairperson: string;
-    board_members: string;
+    recorder_id: number | null;
+    verifier_one_id: number | null;
+    verifier_two_id: number | null;
+    chairperson_id: number | null;
+    board_members: Array<number | null>;
     attendees_count: number | null;
     quorum_note: string;
     agenda: string[];
@@ -42,11 +43,13 @@ type ReportFormProps = {
     processing?: boolean;
     submitLabel: string;
     onDelete?: () => void;
+    memberOptions: MemberOption[];
 };
 
-export function ReportForm({ data, errors, setData, onSubmit, processing, submitLabel, onDelete }: ReportFormProps) {
+export function ReportForm({ data, errors, setData, onSubmit, processing, submitLabel, onDelete, memberOptions }: ReportFormProps) {
     const agendaItems = data.agenda ?? [];
     const decisions = data.decisions ?? [];
+    const boardMemberIds = data.board_members ?? [];
 
     const updateAgendaItem = (index: number, value: string) => {
         const updated = [...agendaItems];
@@ -76,6 +79,22 @@ export function ReportForm({ data, errors, setData, onSubmit, processing, submit
     const removeDecision = (index: number) => {
         if (decisions.length <= 1) return;
         setData('decisions', decisions.filter((_, i) => i !== index));
+    };
+
+    const updateBoardMemberAt = (index: number, memberId: number | null) => {
+        const next = [...boardMemberIds];
+        next[index] = memberId;
+        setData('board_members', next);
+    };
+
+    const addBoardMember = () => {
+        setData('board_members', [...boardMemberIds, null]);
+    };
+
+    const removeBoardMember = (index: number) => {
+        const next = [...boardMemberIds];
+        next.splice(index, 1);
+        setData('board_members', next);
     };
 
     const parseNumberInput = (value: string) => (value === '' ? null : Number(value));
@@ -137,32 +156,78 @@ export function ReportForm({ data, errors, setData, onSubmit, processing, submit
                 <CardContent className="grid grid-cols-1 gap-4 md:grid-cols-2">
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="recorder">Zapisničar</Label>
-                        <Input id="recorder" value={data.recorder} onChange={(e) => setData('recorder', e.target.value)} />
-                        {errors.recorder && <span className="text-sm text-destructive">{errors.recorder}</span>}
+                        <MemberAutocomplete
+                            members={memberOptions}
+                            value={data.recorder_id}
+                            onChange={(val) => setData('recorder_id', val)}
+                            placeholder="Odaberite zapisničara"
+                        />
+                        {errors.recorder_id && <span className="text-sm text-destructive">{errors.recorder_id}</span>}
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="chairperson">Predsjedavajući (Mutavelija)</Label>
-                        <Input id="chairperson" value={data.chairperson} onChange={(e) => setData('chairperson', e.target.value)} />
-                        {errors.chairperson && <span className="text-sm text-destructive">{errors.chairperson}</span>}
+                        <MemberAutocomplete
+                            members={memberOptions}
+                            value={data.chairperson_id}
+                            onChange={(val) => setData('chairperson_id', val)}
+                            placeholder="Odaberite predsjedavajućeg"
+                        />
+                        {errors.chairperson_id && <span className="text-sm text-destructive">{errors.chairperson_id}</span>}
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="verifier_one">Ovjerovitelj 1</Label>
-                        <Input id="verifier_one" value={data.verifier_one} onChange={(e) => setData('verifier_one', e.target.value)} />
-                        {errors.verifier_one && <span className="text-sm text-destructive">{errors.verifier_one}</span>}
+                        <MemberAutocomplete
+                            members={memberOptions}
+                            value={data.verifier_one_id}
+                            onChange={(val) => setData('verifier_one_id', val)}
+                            placeholder="Odaberite ovjerovitelja"
+                        />
+                        {errors.verifier_one_id && <span className="text-sm text-destructive">{errors.verifier_one_id}</span>}
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="verifier_two">Ovjerovitelj 2</Label>
-                        <Input id="verifier_two" value={data.verifier_two} onChange={(e) => setData('verifier_two', e.target.value)} />
-                        {errors.verifier_two && <span className="text-sm text-destructive">{errors.verifier_two}</span>}
+                        <MemberAutocomplete
+                            members={memberOptions}
+                            value={data.verifier_two_id}
+                            onChange={(val) => setData('verifier_two_id', val)}
+                            placeholder="Odaberite ovjerovitelja"
+                        />
+                        {errors.verifier_two_id && <span className="text-sm text-destructive">{errors.verifier_two_id}</span>}
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="board_members">Članovi Izvršnog odbora</Label>
-                        <Textarea
-                            id="board_members"
-                            value={data.board_members}
-                            onChange={(e) => setData('board_members', e.target.value)}
-                            placeholder="Navesti prisutne članove odbora"
-                        />
+                        <div className="flex flex-col gap-3">
+                            {boardMemberIds.length === 0 && (
+                                <p className="text-sm text-muted-foreground">Dodajte člana odbora pomoću dugmeta ispod.</p>
+                            )}
+                            {boardMemberIds.map((memberId, index) => {
+                                const disabledIds = boardMemberIds
+                                    .map((id, idx) => (idx === index ? null : id))
+                                    .filter((id): id is number => typeof id === 'number');
+
+                                return (
+                                    <div key={index} className="flex items-center gap-2">
+                                        <MemberAutocomplete
+                                            members={memberOptions}
+                                            value={typeof memberId === 'number' ? memberId : null}
+                                            onChange={(val) => updateBoardMemberAt(index, val)}
+                                            disabledIds={disabledIds}
+                                            placeholder="Počnite kucati ime"
+                                        />
+                                        <Button
+                                            type="button"
+                                            variant="secondary"
+                                            onClick={() => removeBoardMember(index)}
+                                        >
+                                            Ukloni
+                                        </Button>
+                                    </div>
+                                );
+                            })}
+                            <Button type="button" variant="outline" onClick={addBoardMember}>
+                                Dodaj člana
+                            </Button>
+                        </div>
                         {errors.board_members && <span className="text-sm text-destructive">{errors.board_members}</span>}
                     </div>
                     <div className="flex flex-col gap-2">

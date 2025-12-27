@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Board;
+use App\Models\Member;
 use App\Models\Report;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -13,23 +15,33 @@ class ReportController extends Controller
         $search = $request->string('search')->toString();
 
         $reports = Report::query()
+            ->with(['chairperson'])
             ->when($search, function ($query) use ($search) {
                 $query->where(function ($sub) use ($search) {
                     $sub->where('protocol_number', 'like', '%' . $search . '%')
                         ->orWhere('location', 'like', '%' . $search . '%')
-                        ->orWhere('chairperson', 'like', '%' . $search . '%')
-                        ->orWhere('recorder', 'like', '%' . $search . '%');
+                        ->orWhereHas('chairperson', function ($chairQuery) use ($search) {
+                            $chairQuery->where('first_name', 'like', '%' . $search . '%')
+                                ->orWhere('last_name', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('recorder', function ($recorderQuery) use ($search) {
+                            $recorderQuery->where('first_name', 'like', '%' . $search . '%')
+                                ->orWhere('last_name', 'like', '%' . $search . '%');
+                        });
                 });
             })
             ->orderByDesc('meeting_datetime')
-            ->get([
-                'id',
-                'protocol_number',
-                'meeting_datetime',
-                'location',
-                'chairperson',
-                'quorum_note',
-            ]);
+            ->get()
+            ->map(function (Report $report) {
+                return [
+                    'id' => $report->id,
+                    'protocol_number' => $report->protocol_number,
+                    'meeting_datetime' => $report->meeting_datetime?->toISOString(),
+                    'location' => $report->location,
+                    'chairperson_name' => $report->chairperson ? $this->formatMemberName($report->chairperson) : null,
+                    'quorum_note' => $report->quorum_note,
+                ];
+            });
 
         return Inertia::render('reports/index', [
             'reports' => $reports,
@@ -43,7 +55,9 @@ class ReportController extends Controller
     {
         $this->authorizeAdmin($request);
 
-        return Inertia::render('reports/create');
+        return Inertia::render('reports/create', [
+            'boardMembers' => $this->boardMemberOptions(),
+        ]);
     }
 
     public function store(Request $request)
@@ -71,10 +85,30 @@ class ReportController extends Controller
     public function edit(Request $request, Report $report)
     {
         $this->authorizeAdmin($request);
-        $report->load('creator:id,name');
+        $report->load(['creator:id,name', 'recorder', 'verifierOne', 'verifierTwo', 'chairperson']);
 
         return Inertia::render('reports/edit', [
-            'report' => $report,
+            'report' => [
+                'id' => $report->id,
+                'protocol_number' => $report->protocol_number,
+                'meeting_datetime' => $report->meeting_datetime?->format('Y-m-d\TH:i'),
+                'location' => $report->location,
+                'recorder_id' => $report->recorder_id,
+                'verifier_one_id' => $report->verifier_one_id,
+                'verifier_two_id' => $report->verifier_two_id,
+                'chairperson_id' => $report->chairperson_id,
+                'board_members' => $report->board_members ?? [],
+                'attendees_count' => $report->attendees_count,
+                'quorum_note' => $report->quorum_note,
+                'agenda' => $report->agenda ?? [],
+                'digital_votes' => $report->digital_votes,
+                'urgent_consultations' => $report->urgent_consultations,
+                'discussion' => $report->discussion,
+                'decisions' => $report->decisions ?? [],
+                'ended_at' => $report->ended_at?->format('H:i'),
+                'attendance_notes' => $report->attendance_notes,
+            ],
+            'boardMembers' => $this->boardMemberOptions(),
         ]);
     }
 
@@ -102,11 +136,12 @@ class ReportController extends Controller
             'protocol_number' => 'required|string|max:50',
             'meeting_datetime' => 'required|date',
             'location' => 'nullable|string|max:255',
-            'recorder' => 'nullable|string|max:255',
-            'verifier_one' => 'nullable|string|max:255',
-            'verifier_two' => 'nullable|string|max:255',
-            'chairperson' => 'nullable|string|max:255',
-            'board_members' => 'nullable|string',
+            'recorder_id' => 'nullable|integer|exists:members,id',
+            'verifier_one_id' => 'nullable|integer|exists:members,id',
+            'verifier_two_id' => 'nullable|integer|exists:members,id',
+            'chairperson_id' => 'nullable|integer|exists:members,id',
+            'board_members' => 'nullable|array',
+            'board_members.*' => 'integer|exists:members,id',
             'attendees_count' => 'nullable|integer|min:0',
             'quorum_note' => 'nullable|string|max:255',
             'agenda' => 'nullable|array',
@@ -153,6 +188,10 @@ class ReportController extends Controller
                 ->all();
         }
 
+        $validated['board_members'] = isset($validated['board_members'])
+            ? collect($validated['board_members'])->filter()->unique()->values()->all()
+            : [];
+
         return $validated;
     }
 
@@ -161,5 +200,46 @@ class ReportController extends Controller
         if ($request->user()?->role !== 'admin') {
             abort(403, 'Nedovoljno privilegija.');
         }
+    }
+
+    private function boardMemberOptions(): array
+    {
+        $board = Board::with(['members.member'])
+            ->where('is_current', true)
+            ->first();
+
+        if (!$board) {
+            $board = Board::with(['members.member'])
+                ->orderByDesc('start_date')
+                ->first();
+        }
+
+        if (!$board) {
+            return [];
+        }
+
+        return $board->members
+            ->pluck('member')
+            ->filter()
+            ->unique('id')
+            ->map(function (Member $member) {
+                return [
+                    'id' => $member->id,
+                    'name' => $this->formatMemberName($member),
+                    'email' => $member->email,
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function formatMemberName(Member|string|null $member): string
+    {
+        if ($member instanceof Member) {
+            $fullName = trim(($member->title ? $member->title . ' ' : '') . ($member->first_name ?? '') . ' ' . ($member->last_name ?? ''));
+            return $fullName ?: ($member->email ?? 'Član #' . $member->id);
+        }
+
+        return is_string($member) ? trim($member) : '';
     }
 }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Member;
 
 class Report extends Model
 {
@@ -13,10 +14,10 @@ class Report extends Model
         'protocol_number',
         'meeting_datetime',
         'location',
-        'recorder',
-        'verifier_one',
-        'verifier_two',
-        'chairperson',
+        'recorder_id',
+        'verifier_one_id',
+        'verifier_two_id',
+        'chairperson_id',
         'board_members',
         'attendees_count',
         'quorum_note',
@@ -35,10 +36,31 @@ class Report extends Model
         'agenda' => 'array',
         'decisions' => 'array',
         'ended_at' => 'datetime:H:i',
+        'board_members' => 'array',
     ];
 
     public function creator()
     {
         return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function recorder()
+    {
+        return $this->belongsTo(Member::class, 'recorder_id');
+    }
+
+    public function verifierOne()
+    {
+        return $this->belongsTo(Member::class, 'verifier_one_id');
+    }
+
+    public function verifierTwo()
+    {
+        return $this->belongsTo(Member::class, 'verifier_two_id');
+    }
+
+    public function chairperson()
+    {
+        return $this->belongsTo(Member::class, 'chairperson_id');
     }
 }

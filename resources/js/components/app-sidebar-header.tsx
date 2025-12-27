@@ -8,7 +8,7 @@ export function AppSidebarHeader({ breadcrumbs = [] }: { breadcrumbs?: Breadcrum
             <div className="flex items-center gap-2 w-full justify-between">
                 <div className="flex items-center gap-2"><SidebarTrigger className="-ml-1" />
                     <Breadcrumbs breadcrumbs={breadcrumbs} /></div>
-                <img src="/zastava.png" alt="Zastava" className="h-12 w-auto " />
+
                 <div ></div>
             </div>
         </header>

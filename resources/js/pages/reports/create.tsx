@@ -4,6 +4,7 @@ import ContentHolder from '@/components/content-holder';
 import { Head, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { ReportForm, type ReportFormData } from './report-form';
+import { type MemberOption } from '@/components/member-autocomplete';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Početna stranica', href: '/dashboard' },
@@ -11,16 +12,16 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Novi zapisnik', href: '/reports/create' },
 ];
 
-export default function CreateReport() {
+export default function CreateReport({ boardMembers }: { boardMembers: MemberOption[] }) {
     const { data, setData, post, processing, errors } = useForm<ReportFormData>({
         protocol_number: '',
         meeting_datetime: '',
         location: '',
-        recorder: '',
-        verifier_one: '',
-        verifier_two: '',
-        chairperson: '',
-        board_members: '',
+        recorder_id: null,
+        verifier_one_id: null,
+        verifier_two_id: null,
+        chairperson_id: null,
+        board_members: [],
         attendees_count: null,
         quorum_note: '',
         agenda: [''],
@@ -34,7 +35,12 @@ export default function CreateReport() {
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        post(route('reports.store'));
+        post(route('reports.store'), {
+            data: {
+                ...data,
+                board_members: data.board_members.filter((id): id is number => typeof id === 'number'),
+            },
+        });
     };
 
     return (
@@ -52,6 +58,7 @@ export default function CreateReport() {
                     onSubmit={handleSubmit}
                     processing={processing}
                     submitLabel="Spremi zapisnik"
+                    memberOptions={boardMembers}
                 />
             </ContentHolder>
         </AppLayout>

@@ -17,11 +17,11 @@ return new class extends Migration
             $table->dateTime('meeting_datetime');
             $table->string('location')->nullable();
 
-            $table->string('recorder')->nullable();
-            $table->string('verifier_one')->nullable();
-            $table->string('verifier_two')->nullable();
-            $table->string('chairperson')->nullable();
-            $table->text('board_members')->nullable();
+            $table->foreignId('recorder_id')->nullable()->constrained('members')->nullOnDelete();
+            $table->foreignId('verifier_one_id')->nullable()->constrained('members')->nullOnDelete();
+            $table->foreignId('verifier_two_id')->nullable()->constrained('members')->nullOnDelete();
+            $table->foreignId('chairperson_id')->nullable()->constrained('members')->nullOnDelete();
+            $table->json('board_members')->nullable();
             $table->unsignedInteger('attendees_count')->nullable();
             $table->string('quorum_note')->nullable();
 
