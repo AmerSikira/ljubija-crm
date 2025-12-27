@@ -9,10 +9,20 @@ const OFFLINE_URLS = [
     '/build/app.css',
 ];
 
-// Install: cache core assets
+// Install: cache core assets (skip ones that fail to fetch so SW doesn't crash)
 self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => cache.addAll(OFFLINE_URLS))
+        caches.open(CACHE_NAME).then(async (cache) => {
+            await Promise.all(
+                OFFLINE_URLS.map((url) =>
+                    cache.add(url).catch(() => {
+                        // Ignore missing assets so install doesn't fail
+                        console.warn('[SW] Skip caching missing asset', url);
+                        return null;
+                    })
+                )
+            );
+        })
     );
 });
 
