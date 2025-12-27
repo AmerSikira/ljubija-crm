@@ -1,6 +1,6 @@
 // public/service-worker.js
 
-const CACHE_NAME = 'myapp-cache-v1';
+const CACHE_NAME = 'myapp-cache-v2';
 const OFFLINE_URLS = [
     '/',              // homepage
     '/offline',       // optional offline page if you create it
