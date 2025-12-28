@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Member;
 use App\Models\Payments;
+use App\Models\Expense;
+use App\Http\Controllers\ExpenseController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Inertia\Inertia;
@@ -17,7 +19,12 @@ class StatsController extends Controller
     {
         $startInput = $request->input('start_date');
         $endInput = $request->input('end_date');
-        $typeInput = $request->input('type', '');
+        $typeInputRaw = $request->input('type', 'all');
+        $typeFilter = $typeInputRaw === 'all' ? null : $typeInputRaw;
+        $mode = $request->input('mode', 'payments');
+        if (!in_array($mode, ['payments', 'expenses'], true)) {
+            $mode = 'payments';
+        }
 
         $startDate = $startInput ? Carbon::parse($startInput)->startOfDay() : Carbon::now()->startOfYear();
         $endDate = $endInput ? Carbon::parse($endInput)->endOfDay() : Carbon::now()->endOfDay();
@@ -28,11 +35,11 @@ class StatsController extends Controller
         $userBreakdown = [];
         $userTotal = 0;
         $userPeriods = [];
-        if ($memberId) {
+        if ($memberId && $mode === 'payments') {
             $userPayments = Payments::query()
                 ->where('member_id', $memberId)
                 ->whereBetween('date_of_payment', [$startDate, $endDate])
-                ->when($typeInput !== '', fn ($q) => $q->where('type_of_payment', $typeInput))
+                ->when($typeFilter, fn ($q) => $q->where('type_of_payment', $typeFilter))
                 ->get(['type_of_payment', 'amount', 'date_of_payment']);
 
             $userBreakdown = $userPayments
@@ -51,35 +58,60 @@ class StatsController extends Controller
             $userPeriods = $this->groupByPeriod($userPayments, $startDate, $endDate);
         }
 
-        $overallPayments = Payments::query()
-            ->whereBetween('date_of_payment', [$startDate, $endDate])
-            ->when($typeInput !== '', fn ($q) => $q->where('type_of_payment', $typeInput))
-            ->get(['type_of_payment', 'amount', 'date_of_payment']);
+        if ($mode === 'expenses') {
+            $overallExpenses = Expense::query()
+                ->whereBetween('paid_at', [$startDate, $endDate])
+                ->when($typeFilter, fn ($q) => $q->where('type', $typeFilter))
+                ->get(['type', 'amount', 'paid_at']);
 
-        $overallBreakdown = $overallPayments
-            ->groupBy('type_of_payment')
-            ->map(function ($group, $label) {
-                $sum = (int) $group->sum('amount');
-                return [
-                    'label' => $label ?: 'Ostalo',
-                    'amount' => $sum,
-                ];
-            })
-            ->values()
-            ->all();
+            $overallBreakdown = $overallExpenses
+                ->groupBy('type')
+                ->map(function ($group, $label) {
+                    $sum = (int) $group->sum('amount');
+                    return [
+                        'label' => $label ?: 'Rashod',
+                        'amount' => $sum,
+                    ];
+                })
+                ->values()
+                ->all();
 
-        $overallTotal = collect($overallBreakdown)->sum('amount');
-        $overallPeriods = $this->groupByPeriod($overallPayments, $startDate, $endDate);
+            $overallTotal = collect($overallBreakdown)->sum('amount');
+            $overallPeriods = $this->groupByPeriod($overallExpenses, $startDate, $endDate, 'paid_at');
+            $types = ExpenseController::expenseTypes();
+        } else {
+            $overallPayments = Payments::query()
+                ->whereBetween('date_of_payment', [$startDate, $endDate])
+                ->when($typeFilter, fn ($q) => $q->where('type_of_payment', $typeFilter))
+                ->get(['type_of_payment', 'amount', 'date_of_payment']);
 
-        $types = ['Članarina', 'Donacija', 'Vakuf', 'Sergija', 'Ostalo'];
+            $overallBreakdown = $overallPayments
+                ->groupBy('type_of_payment')
+                ->map(function ($group, $label) {
+                    $sum = (int) $group->sum('amount');
+                    return [
+                        'label' => $label ?: 'Ostalo',
+                        'amount' => $sum,
+                    ];
+                })
+                ->values()
+                ->all();
+
+            $overallTotal = collect($overallBreakdown)->sum('amount');
+            $overallPeriods = $this->groupByPeriod($overallPayments, $startDate, $endDate);
+
+            $types = ['Članarina', 'Donacija', 'Vakuf', 'Sergija', 'Ostalo'];
+        }
 
         return Inertia::render('stats/index', [
             'filters' => [
                 'start_date' => $startDate->toDateString(),
                 'end_date' => $endDate->toDateString(),
-                'type' => $typeInput,
+                'type' => $typeInputRaw ?: 'all',
+                'mode' => $mode,
             ],
             'types' => $types,
+            'mode' => $mode,
             'userBreakdown' => $userBreakdown,
             'userTotal' => $userTotal,
             'userPeriods' => $userPeriods,
@@ -90,13 +122,13 @@ class StatsController extends Controller
         ]);
     }
 
-    private function groupByPeriod($payments, Carbon $start, Carbon $end): array
+    private function groupByPeriod($items, Carbon $start, Carbon $end, string $dateField = 'date_of_payment'): array
     {
         $diffInDays = $start->diffInDays($end);
         $useYears = $diffInDays > 365;
-        return $payments
-            ->groupBy(function ($payment) use ($useYears) {
-                $date = Carbon::parse($payment->date_of_payment);
+        return $items
+            ->groupBy(function ($item) use ($useYears, $dateField) {
+                $date = Carbon::parse($item->{$dateField});
                 return $useYears ? $date->format('Y') : $date->format('Y-m');
             })
             ->map(function ($group, $label) {

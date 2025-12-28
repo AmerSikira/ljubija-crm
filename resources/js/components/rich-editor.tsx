@@ -19,33 +19,52 @@ type RichEditorProps = {
     value: string;
     onChange: (val: string) => void;
     error?: string;
+    enableImages?: boolean;
+    uploadUrl?: string;
 };
 
-export function RichEditor({ label, value, onChange, error }: RichEditorProps) {
-    const config = useMemo(
-        () => ({
-            toolbar: [
-                'heading',
-                '|',
-                'bold',
-                'italic',
-                'underline',
-                'link',
-                '|',
-                'bulletedList',
-                'numberedList',
-                '|',
-                'insertTable',
-                '|',
-                'undo',
-                'redo',
-            ],
+export function RichEditor({ label, value, onChange, error, enableImages = false, uploadUrl }: RichEditorProps) {
+    const config = useMemo(() => {
+        const toolbar: string[] = [
+            'heading',
+            '|',
+            'bold',
+            'italic',
+            'underline',
+            'link',
+        ];
+
+        if (enableImages) {
+            toolbar.push('imageUpload', '|');
+        } else {
+            toolbar.push('|');
+        }
+
+        toolbar.push(
+            'bulletedList',
+            'numberedList',
+            '|',
+            'insertTable',
+            '|',
+            'undo',
+            'redo'
+        );
+
+        return {
+            toolbar,
             table: {
                 contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'],
             },
-        }),
-        []
-    );
+            ...(enableImages && uploadUrl
+                ? {
+                    simpleUpload: {
+                        uploadUrl,
+                        withCredentials: true,
+                    },
+                }
+                : {}),
+        };
+    }, [enableImages, uploadUrl]);
 
     const [editorBundle, setEditorBundle] = useState<EditorBundle | null>(null);
 
@@ -74,6 +93,25 @@ export function RichEditor({ label, value, onChange, error }: RichEditorProps) {
                     config={config}
                     onChange={(_, editor) => onChange(editor.getData())}
                     onReady={(editor) => {
+                        if (enableImages) {
+                            // Simple Base64 upload adapter so images embed directly into content.
+                            editor.plugins.get('FileRepository').createUploadAdapter = (loader: any) => {
+                                return {
+                                    upload: () =>
+                                        loader.file.then(
+                                            (file: File) =>
+                                                new Promise((resolve, reject) => {
+                                                    const reader = new FileReader();
+                                                    reader.onload = () => resolve({ default: reader.result as string });
+                                                    reader.onerror = (err) => reject(err);
+                                                    reader.readAsDataURL(file);
+                                                })
+                                        ),
+                                    abort: () => {},
+                                };
+                            };
+                        }
+
                         editor.editing.view.change((writer) => {
                             const root = editor.editing.view.document.getRoot();
                             if (root) {

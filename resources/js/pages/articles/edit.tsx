@@ -67,7 +67,7 @@ export default function Edit ({article}: any) {
                         <Label htmlFor="title">
                                 Uvod
                         </Label>
-                        <RichEditor label={undefined} value={data.intro} onChange={changeIntro} error={errors.intro} />
+                        <RichEditor label={undefined} value={data.intro} onChange={changeIntro} error={errors.intro} enableImages />
                         {errors.intro && <div className="text-red-500">{errors.intro}</div>}
                     </div>
 
@@ -75,7 +75,7 @@ export default function Edit ({article}: any) {
                         <Label htmlFor="title">
                                 Glavni tekst
                         </Label>
-                        <RichEditor label={undefined} value={data.main_text} onChange={changeMainText} error={errors.main_text} />
+                        <RichEditor label={undefined} value={data.main_text} onChange={changeMainText} error={errors.main_text} enableImages />
                     </div>
                     <div className="flex flex-col gap-2">
                         <Label htmlFor="title">

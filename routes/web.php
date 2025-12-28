@@ -37,6 +37,19 @@ Route::middleware([
     //My Payments
     Route::get('my-payments', [\App\Http\Controllers\PaymentsController::class, 'myPaymentsIndex'])->name('my-payments');
 
+    //Unverified users
+    Route::get('unverified-users', [\App\Http\Controllers\UnverifiedUserController::class, 'index'])->name('unverified-users');
+    Route::delete('unverified-users/{user}', [\App\Http\Controllers\UnverifiedUserController::class, 'destroy'])->name('unverified-users.destroy');
+
+    //Expenses
+    Route::get('expenses', [\App\Http\Controllers\ExpenseController::class, 'index'])->name('expenses.index');
+    Route::get('expenses/create', [\App\Http\Controllers\ExpenseController::class, 'create'])->name('expenses.create');
+    Route::post('expenses', [\App\Http\Controllers\ExpenseController::class, 'store'])->name('expenses.store');
+    Route::get('expenses/{expense}', [\App\Http\Controllers\ExpenseController::class, 'show'])->name('expenses.show');
+    Route::get('expenses/{expense}/edit', [\App\Http\Controllers\ExpenseController::class, 'edit'])->name('expenses.edit');
+    Route::post('expenses/{expense}', [\App\Http\Controllers\ExpenseController::class, 'update'])->name('expenses.update');
+    Route::delete('expenses/{expense}', [\App\Http\Controllers\ExpenseController::class, 'destroy'])->name('expenses.destroy');
+
     //Polls
     Route::get('polls', [\App\Http\Controllers\PollController::class, 'index'])->name('polls');
     Route::get('polls/create', [\App\Http\Controllers\PollController::class, 'create'])->name('polls.create');
@@ -92,6 +105,7 @@ Route::middleware([
     Route::get('dzemat', [\App\Http\Controllers\DzematPageController::class, 'show'])->name('dzemat.show');
     Route::get('dzemat/edit', [\App\Http\Controllers\DzematPageController::class, 'edit'])->name('dzemat.edit');
     Route::post('dzemat', [\App\Http\Controllers\DzematPageController::class, 'update'])->name('dzemat.update');
+    Route::post('dzemat/upload', [\App\Http\Controllers\DzematPageController::class, 'upload'])->name('dzemat.upload');
 
     //Mekteb
     Route::get('mekteb', [\App\Http\Controllers\MektebController::class, 'index'])->name('mekteb.index');

@@ -60,7 +60,7 @@ export default function Create () {
                         <Label htmlFor="title">
                                 Uvod
                         </Label>
-                        <RichEditor label={undefined} value={data.intro} onChange={changeIntro} error={errors.intro} />
+                        <RichEditor label={undefined} value={data.intro} onChange={changeIntro} error={errors.intro} enableImages />
                         {errors.intro && <div className="text-red-500">{errors.intro}</div>}
                     </div>
 
@@ -68,7 +68,7 @@ export default function Create () {
                         <Label htmlFor="title">
                                 Glavni tekst
                         </Label>
-                        <RichEditor label={undefined} value={data.main_text} onChange={(val) => setData('main_text', val)} error={errors.main_text} />
+                        <RichEditor label={undefined} value={data.main_text} onChange={(val) => setData('main_text', val)} error={errors.main_text} enableImages />
                         {errors.main_text && <div className="text-red-500">{errors.main_text}</div>}
                     </div>
                     <div className="flex flex-col gap-2">

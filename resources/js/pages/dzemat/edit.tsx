@@ -59,7 +59,13 @@ export default function DzematEdit({ page }: { page: DzematPage | null }) {
                             </div>
                             <div className="flex flex-col gap-2">
                                 <Label>Sadržaj</Label>
-                                <RichEditor value={data.content} onChange={(val) => setData('content', val)} error={errors.content} />
+                                <RichEditor
+                                    value={data.content}
+                                    onChange={(val) => setData('content', val)}
+                                    error={errors.content}
+                                    enableImages
+                                    uploadUrl={route('dzemat.upload')}
+                                />
                             </div>
                             <div className="flex flex-col gap-2">
                                 <Label>Galerija</Label>

@@ -3,6 +3,8 @@
 namespace App\Http\Middleware;
 
 use App\Models\Member;
+use App\Models\Payments;
+use App\Models\Expense;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -48,6 +50,7 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'memberCount' => Member::count(),
+            'accountBalance' => $this->accountBalance(),
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
@@ -58,5 +61,23 @@ class HandleInertiaRequests extends Middleware
                 'error' => $request->session()->get('error'),
             ],
         ];
+    }
+
+    private function accountBalance(): float
+    {
+        $base = 0.0;
+        $balanceFile = storage_path('app/account_balance.json');
+        if (file_exists($balanceFile)) {
+            $raw = file_get_contents($balanceFile);
+            $data = json_decode($raw, true);
+            if (is_array($data) && isset($data['base'])) {
+                $base = (float) $data['base'];
+            }
+        }
+
+        $paymentsTotal = Payments::sum('amount'); // stored in cents
+        $expensesTotal = Expense::sum('amount'); // stored in cents
+
+        return $base + (($paymentsTotal - $expensesTotal) / 100);
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DzematPage;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
+use Illuminate\Http\UploadedFile;
 
 /**
  * Manages single “Džemat Ljubija” info page with rich content and gallery.
@@ -47,7 +48,8 @@ class DzematPageController extends Controller
             'title' => 'required|string|max:255',
             'content' => 'required|string',
             'gallery' => 'array',
-            'gallery.*' => 'string',
+            'gallery.*.id' => 'nullable|integer',
+            'gallery.*.url' => 'nullable|string',
             'gallery_uploads' => 'array',
             'gallery_uploads.*' => 'image|max:4096',
             'removed_media_ids' => 'array',
@@ -71,6 +73,30 @@ class DzematPageController extends Controller
         }
 
         return redirect()->route('dzemat.show')->with('success', 'Podaci su sačuvani.');
+    }
+
+    /**
+     * Handle image uploads from the rich editor.
+     */
+    public function upload(Request $request)
+    {
+        $this->authorizeAdmin($request);
+        $request->validate([
+            'upload' => 'required|image|max:4096',
+        ]);
+
+        /** @var UploadedFile $file */
+        $file = $request->file('upload');
+        $page = DzematPage::first() ?? DzematPage::create([
+            'title' => 'Džemat Ljubija',
+            'content' => '',
+        ]);
+
+        $media = $page->addMedia($file)->toMediaCollection('content');
+
+        return response()->json([
+            'url' => $media->getUrl(),
+        ]);
     }
 
     private function authorizeAdmin(Request $request): void
