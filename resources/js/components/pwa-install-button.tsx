@@ -30,6 +30,7 @@ export function PwaInstallButton() {
 
         const handleAppInstalled = () => {
             setDeferredPrompt(null);
+            setIsStandalone(true);
         };
 
         window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
@@ -59,30 +60,27 @@ export function PwaInstallButton() {
 
     if (isStandalone) return null;
 
-    if (!deferredPrompt) {
-        if (!isIos) return null;
-
-        return (
-            <div className="flex w-full items-center space-x-2 rounded-md bg-amber-100 px-3 py-2 text-xs font-medium text-neutral-700 shadow-sm ring-1 ring-amber-300 sm:text-sm">
-                <Share className="h-4 w-4 shrink-0" />
-                <span>Na iOS-u: otvorite Share meni i odaberite “Add to Home Screen”.</span>
-            </div>
-        );
-    }
-
     return (
-        <div className="flex w-full items-center space-x-2 bg-amber-200">
+        <div className="flex w-full flex-col items-start gap-2 rounded-md bg-amber-100 px-3 py-2 text-xs font-medium text-neutral-700 shadow-sm ring-1 ring-amber-300 sm:text-sm">
             <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                onClick={handleInstallClick}
-                disabled={isInstalling}
-                className="flex w-full h-10"
+                onClick={deferredPrompt ? handleInstallClick : undefined}
+                disabled={!deferredPrompt || isInstalling}
+                className="flex h-10 w-full justify-start"
             >
                 <Download className="h-4 w-4" />
                 Instalirajte aplikaciju
             </Button>
+            {isIos ? (
+                <div className="flex items-center gap-2">
+                    <Share className="h-4 w-4 shrink-0" />
+                    <span>Na iOS-u: otvorite Share meni i odaberite “Add to Home Screen”.</span>
+                </div>
+            ) : (
+                !deferredPrompt && <span>Opcija instalacije pojavit će se u vašem pregledniku.</span>
+            )}
         </div>
     );
 }
