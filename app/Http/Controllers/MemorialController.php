@@ -15,6 +15,7 @@ class MemorialController extends Controller
     private array $statusLabels = [
         'preselio' => 'Preselio',
         'nestao' => 'Nestao',
+        'logoras' => 'Logoraš',
         'nema_statusa' => 'Nema statusa',
     ];
 
@@ -127,7 +128,7 @@ class MemorialController extends Controller
             [
                 'first_name' => 'required|string|max:255',
                 'last_name' => 'required|string|max:255',
-                'status' => 'required|in:preselio,nestao,nema_statusa',
+                'status' => 'required|in:preselio,nestao,logoras,nema_statusa',
                 'birth_date' => 'nullable|date',
                 'status_date' => 'nullable|date',
                 'birth_place' => 'nullable|string|max:255',

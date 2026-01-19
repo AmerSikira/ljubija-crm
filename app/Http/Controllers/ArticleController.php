@@ -33,11 +33,13 @@ class ArticleController extends Controller
     //
     public function create ()
     {
+        $this->authorizeManage();
         return inertia('articles/create');
     }
 
     public function store (Request $request)
     {
+        $this->authorizeManage();
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'intro' => 'required|string',
@@ -66,6 +68,7 @@ class ArticleController extends Controller
 
     public function edit (Article $article)
     {
+        $this->authorizeManage();
         $article->load('media');
 
         return inertia('articles/edit', [
@@ -87,6 +90,7 @@ class ArticleController extends Controller
 
     public function update (Request $request, Article $article)
     {
+        $this->authorizeManage();
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'intro' => 'required|string',
@@ -145,6 +149,14 @@ class ArticleController extends Controller
     private function authorizeAdmin(Request $request): void
     {
         if ($request->user()?->role !== 'admin') {
+            abort(403, 'Nedovoljno privilegija.');
+        }
+    }
+
+    private function authorizeManage(): void
+    {
+        $role = auth()->user()?->role;
+        if (!in_array($role, ['admin', 'manager'], true)) {
             abort(403, 'Nedovoljno privilegija.');
         }
     }

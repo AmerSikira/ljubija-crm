@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
-            $table->enum('status', ['preselio', 'nestao']);
+            $table->enum('status', ['preselio', 'nestao', 'logoras']);
             $table->date('birth_date')->nullable();
             $table->date('status_date')->nullable();
             $table->string('birth_place')->nullable();

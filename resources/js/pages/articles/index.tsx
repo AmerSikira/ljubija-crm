@@ -26,19 +26,22 @@ export default function Index({ articles }: Member[] | any) {
     const { props } = usePage();
     const role = (props as any)?.auth?.user?.role ?? '';
     const isAdmin = role === 'admin';
+    const isManager = role === 'admin' || role === 'manager';
     
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Vijesti" />
             <ContentHolder>
-                <div className="flex items-center justify-end">
-                    <Button asChild>
-                        <Link href={route('articles.create')}>
-                            <PlusIcon className="w-4 h-4 mr-2" />
-                            Dodaj vijest
-                        </Link>
-                    </Button>
-                </div>
+                {isManager && (
+                    <div className="flex items-center justify-end">
+                        <Button asChild>
+                            <Link href={route('articles.create')}>
+                                <PlusIcon className="w-4 h-4 mr-2" />
+                                Dodaj vijest
+                            </Link>
+                        </Button>
+                    </div>
+                )}
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -69,11 +72,15 @@ export default function Index({ articles }: Member[] | any) {
                                                             label: 'Detalji',
                                                             href: route('articles.show', { article: article.id }),
                                                         },
-                                                        {
-                                                            type: 'item',
-                                                            label: 'Uredi',
-                                                            href: route('articles.edit', { article: article.id }),
-                                                        },
+                                                        ...(isManager
+                                                            ? [
+                                                                {
+                                                                    type: 'item' as const,
+                                                                    label: 'Uredi',
+                                                                    href: route('articles.edit', { article: article.id }),
+                                                                },
+                                                            ]
+                                                            : []),
                                                         ...(isAdmin
                                                             ? [
                                                                 { type: 'separator' as const },

@@ -12,6 +12,7 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorizeAdmin($request);
         $search = $request->string('search')->toString();
 
         $reports = Report::query()
@@ -73,8 +74,9 @@ class ReportController extends Controller
         return redirect()->route('reports.index')->with('success', 'Zapisnik je kreiran.');
     }
 
-    public function show(Report $report)
+    public function show(Request $request, Report $report)
     {
+        $this->authorizeAdmin($request);
         $report->load('creator:id,name');
 
         return Inertia::render('reports/show', [

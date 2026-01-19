@@ -17,6 +17,11 @@ class StatsController extends Controller
 {
     public function index(Request $request)
     {
+        $role = $request->user()?->role;
+        if (!in_array($role, ['admin', 'manager'], true)) {
+            abort(403, 'Nedovoljno privilegija.');
+        }
+
         $startInput = $request->input('start_date');
         $endInput = $request->input('end_date');
         $typeInputRaw = $request->input('type', 'all');

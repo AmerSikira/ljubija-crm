@@ -38,19 +38,22 @@ export default function Index({ polls }: { polls: Poll[] }) {
     const { props } = usePage();
     const role = (props as any)?.auth?.user?.role ?? '';
     const isAdmin = role === 'admin';
+    const isManager = role === 'admin' || role === 'manager';
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Ankete" />
             <ContentHolder>
-                <div className="flex items-center justify-end">
-                    <Button asChild>
-                        <Link href={route("polls.create")}>
-                            <PlusIcon className="w-4 h-4 mr-2" />
-                            Dodaj anketu
-                        </Link>
-                    </Button>
-                </div>
+                {isManager && (
+                    <div className="flex items-center justify-end">
+                        <Button asChild>
+                            <Link href={route("polls.create")}>
+                                <PlusIcon className="w-4 h-4 mr-2" />
+                                Dodaj anketu
+                            </Link>
+                        </Button>
+                    </div>
+                )}
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -83,12 +86,16 @@ export default function Index({ polls }: { polls: Poll[] }) {
                                                     label: 'Detalji',
                                                     href: route("polls.show", { poll: poll.id }),
                                                 },
-                                                {
-                                                    type: 'item',
-                                                    label: 'Uredi',
-                                                    href: route("polls.edit", { poll: poll.id }),
-                                                    disabled: !!poll.finished_at,
-                                                },
+                                                ...(isManager
+                                                    ? [
+                                                        {
+                                                            type: 'item' as const,
+                                                            label: 'Uredi',
+                                                            href: route("polls.edit", { poll: poll.id }),
+                                                            disabled: !!poll.finished_at,
+                                                        },
+                                                    ]
+                                                    : []),
                                                 ...(isAdmin && !poll.finished_at
                                                     ? [
                                                         { type: 'separator' as const },

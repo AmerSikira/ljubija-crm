@@ -16,7 +16,7 @@ return new class extends Migration
 
         // MySQL syntax; SQLite is handled with table rebuild below.
         if ($driver === 'mysql') {
-            DB::statement("ALTER TABLE memorials MODIFY status ENUM('preselio','nestao','nema_statusa') NOT NULL DEFAULT 'nema_statusa'");
+            DB::statement("ALTER TABLE memorials MODIFY status ENUM('preselio','nestao','logoras','nema_statusa') NOT NULL DEFAULT 'nema_statusa'");
             DB::table('memorials')->update(['status' => 'nema_statusa']);
             return;
         }
@@ -67,7 +67,7 @@ return new class extends Migration
         $driver = DB::getDriverName();
 
         if ($driver === 'mysql') {
-            DB::statement("ALTER TABLE memorials MODIFY status ENUM('preselio','nestao') NOT NULL DEFAULT 'preselio'");
+            DB::statement("ALTER TABLE memorials MODIFY status ENUM('preselio','nestao','logoras') NOT NULL DEFAULT 'preselio'");
         }
         // For SQLite/others, we leave the flexible string column as-is in down().
     }

@@ -14,7 +14,7 @@ import { DatePicker } from '@/components/date-picker';
 type FormState = {
     first_name: string;
     last_name: string;
-    status: 'preselio' | 'nestao' | 'nema_statusa';
+    status: 'preselio' | 'nestao' | 'logoras' | 'nema_statusa';
     birth_date: string;
     status_date: string;
     birth_place: string;
@@ -110,6 +110,7 @@ export default function MemorialCreate() {
                                         <SelectContent>
                                             <SelectItem value="preselio">Preselio</SelectItem>
                                             <SelectItem value="nestao">Nestao</SelectItem>
+                                            <SelectItem value="logoras">Logoraš</SelectItem>
                                             <SelectItem value="nema_statusa">Nema statusa</SelectItem>
                                         </SelectContent>
                                     </Select>

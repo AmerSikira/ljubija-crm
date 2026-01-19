@@ -37,7 +37,7 @@ export function AppContent({ variant = 'header', children, ...props }: AppConten
         return (
             <SidebarInset {...props}>
                 <FlashMessage />
-                                        <PwaInstallButton />
+                <PwaInstallButton />
 
                 {children}
             </SidebarInset>
@@ -48,6 +48,7 @@ export function AppContent({ variant = 'header', children, ...props }: AppConten
         <main className="mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl" {...props}>
             <FlashMessage />
             {children}
+
         </main>
     );
 }

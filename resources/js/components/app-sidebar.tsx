@@ -29,7 +29,7 @@ export function AppSidebar() {
             label: 'Pregled',
             items: [
                 { title: 'Početna stranica', href: '/dashboard', icon: LayoutGrid },
-                { title: 'Statistika', href: '/stats', icon: PieChart },
+                ...(role === 'admin' || role === 'manager' ? [{ title: 'Statistika', href: '/stats', icon: PieChart }] : []),
             ],
         },
         {
@@ -45,6 +45,7 @@ export function AppSidebar() {
                 { title: 'Džemat Ljubija', href: '/dzemat', icon: MoonStar },
                 { title: 'Mekteb', href: '/mekteb', icon: Book },
                 { title: 'Memorijal', href: '/memorials', icon: Heart },
+                { title: 'Poruke', href: '/tickets', icon: FileText },
             ],
         },
         {
@@ -52,15 +53,16 @@ export function AppSidebar() {
             items: [
                 { title: 'Projekti', href: '/projects', icon: Folder },
                 { title: 'Upravni odbor', href: '/boards', icon: Users },
-                { title: 'Zapisnici', href: '/reports', icon: FileText },
+                ...(role === 'admin' ? [{ title: 'Zapisnici', href: '/reports', icon: FileText }] : []),
                 { title: 'Ankete', href: '/polls', icon: BarChart2 },
+                ...(role === 'admin' ? [{ title: 'Poruke (admin)', href: '/admin/tickets', icon: FileText }] : []),
             ],
         },
         {
             label: 'Članstvo',
             items: [
                 ...(role === 'admin' ? [{ title: 'Članovi', href: '/members', icon: User }] : []),
-                { title: 'Neverifikovani članovi', href: '/unverified-users', icon: User },
+                ...(role === 'admin' ? [{ title: 'Neverifikovani članovi', href: '/unverified-users', icon: User }] : []),
                 { title: 'Moj profil člana', href: '/my-membership', icon: User },
             ],
         },
@@ -131,7 +133,24 @@ export function AppSidebar() {
                             <SidebarMenuButton asChild tooltip={{ children: 'Pravilnik' }}>
                                 <a href="/Pravilnik_o_ustrojstvu_medzlisa_i_dzemata_2019.pdf" target="_blank" rel="noreferrer">
                                     <PaperIcon />
-                                    <span>Pravilnik</span>
+                                    <span>Pravilnik o ustrojstvu medžlisa i džemata</span>
+                                </a>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip={{ children: 'Pravilnik' }}>
+                                <a href="/Pravilnik_rada_IZLJ.pdf" target="_blank" rel="noreferrer">
+                                    <PaperIcon />
+                                    <span>Pravilnik rada DELBA</span>
+                                </a>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip={{ children: 'Pravilnik' }}>
+                                <a href="/Radni_zadatak_imama_2025.pdf" target="_blank" rel="noreferrer">
+                                    <PaperIcon />
+                                    <span>Radni zadataka imama</span>
                                 </a>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

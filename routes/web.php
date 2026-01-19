@@ -50,6 +50,22 @@ Route::middleware([
     Route::post('expenses/{expense}', [\App\Http\Controllers\ExpenseController::class, 'update'])->name('expenses.update');
     Route::delete('expenses/{expense}', [\App\Http\Controllers\ExpenseController::class, 'destroy'])->name('expenses.destroy');
 
+    //Tickets (user)
+    Route::get('tickets', [\App\Http\Controllers\TicketController::class, 'index'])->name('tickets.index');
+    Route::get('tickets/create', [\App\Http\Controllers\TicketController::class, 'create'])->name('tickets.create');
+    Route::post('tickets', [\App\Http\Controllers\TicketController::class, 'store'])->name('tickets.store');
+    Route::get('tickets/{ticket}', [\App\Http\Controllers\TicketController::class, 'show'])->name('tickets.show');
+    Route::post('tickets/{ticket}/messages', [\App\Http\Controllers\TicketController::class, 'storeMessage'])->name('tickets.messages.store');
+    Route::delete('tickets/{ticket}', [\App\Http\Controllers\TicketController::class, 'destroy'])->name('tickets.destroy');
+
+    //Tickets (admin)
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::get('tickets', [\App\Http\Controllers\Admin\TicketController::class, 'index'])->name('tickets.index');
+        Route::get('tickets/{ticket}', [\App\Http\Controllers\Admin\TicketController::class, 'show'])->name('tickets.show');
+        Route::post('tickets/{ticket}/reply', [\App\Http\Controllers\Admin\TicketController::class, 'reply'])->name('tickets.reply');
+        Route::delete('tickets/{ticket}', [\App\Http\Controllers\Admin\TicketController::class, 'destroy'])->name('tickets.destroy');
+    });
+
     //Polls
     Route::get('polls', [\App\Http\Controllers\PollController::class, 'index'])->name('polls');
     Route::get('polls/create', [\App\Http\Controllers\PollController::class, 'create'])->name('polls.create');
