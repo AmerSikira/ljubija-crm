@@ -89,6 +89,45 @@ Napomena: Zapisnici (Reports) su dostupni samo adminima.
 1. Otvorite **Poruke (admin)** za pregled korisnickih zahtjeva.
 2. Odgovorite na poruke i zatvorite tiket kada je rijesen.
 
+## Kako urediti sadrzaj (kratki vodič)
+
+Napomena: Uredjivanje je dostupno samo admin/manager korisnicima (osim gdje je posebno navedeno).
+
+### Uredjivanje vijesti
+1. Otvorite **Vijesti**.
+2. Kliknite na vijest koju zelite urediti i odaberite **Uredi**.
+3. Izmijenite naslov, uvod, tekst ili slike.
+4. Kliknite **Spremite vijest**.
+
+### Uredjivanje anketa (admin/manager)
+1. Otvorite **Ankete**.
+2. Odaberite anketu i kliknite **Uredi**.
+3. Azurirajte naslov, opis ili opcije.
+4. Po zelji oznacite zavrsetak ankete i sacuvajte.
+
+### Uredjivanje memorijala (admin)
+1. Otvorite **Memorijal**.
+2. Odaberite osobu i kliknite **Uredi**.
+3. Azurirajte status, datume, mjesta i ostale podatke.
+4. Kliknite **Sacuvaj**.
+
+### Uredjivanje projekata
+1. Otvorite **Projekti**.
+2. Odaberite projekat i kliknite **Uredi**.
+3. Izmijenite detalje i status projekta.
+4. Sacuvajte promjene.
+
+### Uredjivanje clanstva (admin)
+1. Otvorite **Clanovi**.
+2. Odaberite clana i kliknite **Uredi**.
+3. Azurirajte licne podatke i sacuvajte izmjene.
+
+### Finansije: uplate i rashodi (admin/manager)
+1. Otvorite **Uplate** ili **Rashodi**.
+2. Odaberite zapis i kliknite **Uredi**.
+3. Izmijenite iznos, datum i opis.
+4. Sacuvajte promjene.
+
 ## Preporuceni tok rada za nove korisnike
 1. Prijavite se i otvorite **Moj profil clana** da provjerite podatke.
 2. Pregledajte **Vijesti** i **Dzemat** za najnovije informacije.
