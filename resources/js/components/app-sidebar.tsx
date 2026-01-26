@@ -61,6 +61,7 @@ export function AppSidebar() {
         {
             label: 'Članstvo',
             items: [
+                ...(role === 'admin' ? [{ title: 'Korisnici', href: '/users', icon: Users }] : []),
                 ...(role === 'admin' ? [{ title: 'Članovi', href: '/members', icon: User }] : []),
                 ...(role === 'admin' ? [{ title: 'Neverifikovani članovi', href: '/unverified-users', icon: User }] : []),
                 { title: 'Moj profil člana', href: '/my-membership', icon: User },

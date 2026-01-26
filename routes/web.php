@@ -41,6 +41,11 @@ Route::middleware([
     Route::get('unverified-users', [\App\Http\Controllers\UnverifiedUserController::class, 'index'])->name('unverified-users');
     Route::delete('unverified-users/{user}', [\App\Http\Controllers\UnverifiedUserController::class, 'destroy'])->name('unverified-users.destroy');
 
+    //Users
+    Route::get('users', [\App\Http\Controllers\UserController::class, 'index'])->name('users.index');
+    Route::get('users/{user}', [\App\Http\Controllers\UserController::class, 'edit'])->name('users.edit');
+    Route::post('users/{user}', [\App\Http\Controllers\UserController::class, 'update'])->name('users.update');
+
     //Expenses
     Route::get('expenses', [\App\Http\Controllers\ExpenseController::class, 'index'])->name('expenses.index');
     Route::get('expenses/create', [\App\Http\Controllers\ExpenseController::class, 'create'])->name('expenses.create');
