@@ -11,7 +11,7 @@ export default function ContentHolder({ children, className }: ContentHolderProp
       {children}
 
       <div className="text-center mt-8">
-        Made by <a href="https://axiom.ba" className="text-green-600">Axiom doo</a> | Donirano od strane <a href="https://prosilva.eu" className="text-green-600">ProSilva</a>
+        Made by <a href="https://axiom.ba" className="text-green-600">Axiom doo</a> | Powered by <a href="https://prosilva.eu" className="text-green-600">ProSilva doo</a>
       </div>
     </div>
   )
