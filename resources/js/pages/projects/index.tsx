@@ -6,6 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ActionsMenu } from '@/components/actions-menu';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
+import { formatDateEU } from '@/lib/utils';
 
 type Project = {
     id: number;
@@ -71,7 +72,7 @@ export default function ProjectsIndex({ projects }: { projects: Paginated<Projec
                                             <TableCell className="font-semibold">{project.name}</TableCell>
                                             <TableCell className="text-muted-foreground">{project.description_preview}</TableCell>
                                             <TableCell>{project.interests_count}</TableCell>
-                                            <TableCell>{project.start_date || '-'}</TableCell>
+                                            <TableCell>{formatDateEU(project.start_date) || '-'}</TableCell>
                                             <TableCell className="text-right">
                                                 <ActionsMenu
                                                     actions={[

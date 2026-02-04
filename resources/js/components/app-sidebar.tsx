@@ -1,9 +1,9 @@
 import { NavFooter } from '@/components/nav-footer';
 import { NavUser } from '@/components/nav-user';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarGroup, SidebarGroupLabel } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarGroup, SidebarGroupLabel, SidebarMenuBadge } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, DollarSign, Folder, LayoutGrid, User, HandCoins, Newspaper, BarChart2, Users, Heart, Book, PieChart, FileText, MoonStar, FileText as PaperIcon } from 'lucide-react';
+import { BookOpen, DollarSign, Folder, LayoutGrid, User, HandCoins, Newspaper, BarChart2, Users, Heart, Book, PieChart, FileText, MoonStar, FileText as PaperIcon, MapPin } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const footerNavItems: NavItem[] = [
@@ -23,6 +23,24 @@ export function AppSidebar() {
     const page = usePage();
     const role = (page.props as any)?.auth?.user?.role ?? 'subscriber';
     const memberCount = (page.props as any)?.memberCount;
+    const menuCounts = (page.props as any)?.menuCounts ?? {};
+
+    const countByHref: Record<string, number | undefined> = {
+        '/articles': menuCounts.articles,
+        '/content-items': menuCounts.content_items,
+        '/mekteb': menuCounts.mekteb,
+        '/memorials': menuCounts.memorials,
+        '/tickets': menuCounts.tickets,
+        '/projects': menuCounts.projects,
+        '/polls': menuCounts.polls,
+        '/admin/tickets': menuCounts.admin_tickets,
+        '/users': menuCounts.users,
+        '/members': menuCounts.members,
+        '/unverified-users': menuCounts.unverified_users,
+        '/payments': menuCounts.payments,
+        '/expenses': menuCounts.expenses,
+        '/my-payments': menuCounts.my_payments,
+    };
 
     const groups: Array<{ label: string; items: NavItem[] }> = [
         {
@@ -45,6 +63,7 @@ export function AppSidebar() {
                 { title: 'Džemat Ljubija', href: '/dzemat', icon: MoonStar },
                 { title: 'Mekteb', href: '/mekteb', icon: Book },
                 { title: 'Memorijal', href: '/memorials', icon: Heart },
+                { title: 'Zauzeće mezara', href: '/graves', icon: MapPin },
                 { title: 'Poruke', href: '/tickets', icon: FileText },
             ],
         },
@@ -106,6 +125,9 @@ export function AppSidebar() {
                                             <span>{item.title}</span>
                                         </Link>
                                     </SidebarMenuButton>
+                                    {typeof countByHref[item.href] === 'number' && (
+                                        <SidebarMenuBadge>{countByHref[item.href]}</SidebarMenuBadge>
+                                    )}
                                 </SidebarMenuItem>
                             ))}
                         </SidebarMenu>

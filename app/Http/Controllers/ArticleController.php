@@ -24,6 +24,7 @@ class ArticleController extends Controller
                 'main_text'  => $article->main_text,
                 // change 'images' to your media collection if needed
                 'image_url'  => $article->getFirstMediaUrl('images', 'preview'),
+                'created_at' => $article->created_at?->toDateString(),
             ];
         });
 

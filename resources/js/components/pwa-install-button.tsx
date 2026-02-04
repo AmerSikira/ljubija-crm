@@ -11,6 +11,7 @@ export function PwaInstallButton() {
     const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
     const [isInstalling, setIsInstalling] = useState(false);
     const [isStandalone, setIsStandalone] = useState(false);
+    const [isInstalled, setIsInstalled] = useState(false);
 
     const isIos = useMemo(() => {
         if (typeof window === 'undefined') return false;
@@ -22,6 +23,20 @@ export function PwaInstallButton() {
 
         const standalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone;
         setIsStandalone(standalone);
+
+        const checkInstalled = async () => {
+            if (typeof (navigator as any).getInstalledRelatedApps !== 'function') return;
+            try {
+                const relatedApps = await (navigator as any).getInstalledRelatedApps();
+                if (Array.isArray(relatedApps) && relatedApps.length > 0) {
+                    setIsInstalled(true);
+                }
+            } catch {
+                // ignore
+            }
+        };
+
+        checkInstalled();
 
         const handleBeforeInstallPrompt = (event: Event) => {
             event.preventDefault();
@@ -58,7 +73,7 @@ export function PwaInstallButton() {
         }
     }, [deferredPrompt]);
 
-    if (isStandalone) return null;
+    if (isStandalone || isInstalled) return null;
 
     return (
         <div className="flex w-full flex-col items-start gap-2 rounded-md bg-amber-100 px-3 py-2 text-xs font-medium text-neutral-700 shadow-sm ring-1 ring-amber-300 sm:text-sm">

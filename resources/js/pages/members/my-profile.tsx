@@ -98,6 +98,13 @@ export default function MyProfile({ member }: { member: any }) {
         );
     };
 
+    const removeFamilyMember = (index: number) => {
+        setData(
+            "family_members",
+            data.family_members.filter((_, i) => i !== index)
+        );
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         post(route('members.self.update'));
@@ -229,75 +236,90 @@ export default function MyProfile({ member }: { member: any }) {
 
                     <hr className='my-5' />
                     <div className="flex flex-col gap-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className='font-bold text-xl'>Ukoliko član ima više članova u porodici</h3>
+                        <div className="flex items-center justify-between flex-col md:flex-row">
+                            <h3 className='font-bold text-xl mb-2 md:mb-0'>Ukoliko član ima više članova u porodici</h3>
                             <Button variant="secondary" onClick={addFamilyMember}>
-                                <PlusIcon className="w-4 h-4 mr-2" />
+                                <PlusIcon className="w-4 h-4 mb:mr-2 w-full" />
                                 Dodaj člana porodice
                             </Button>
                         </div>
 
-                        <div className="grid grid-cols-1 gap-x-3 gap-y-4">
+                        <div className="grid grid-cols-1 gap-4">
                             {data.family_members.map((familyMember, index) => (
-                                <div key={index} className="grid grid-cols-1 lg:grid-cols-3 gap-x-3 gap-y-4">
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor='first_name'>
-                                            Ime
-                                        </Label>
-                                        <Input type="text" name="first_name" placeholder='npr. Osman' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.first_name || ''} />
-                                    </div>
-
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor='last_name'>
-                                            Prezime
-                                        </Label>
-                                        <Input type="text" name="last_name" placeholder='npr. Ljubinac' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.last_name || ''} />
-                                    </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label>Odnos</Label>
-                                        <Select
-                                            value={familyMember.relation || ""}
-                                            onValueChange={(val) => changeFamilyMember('relation', val, index)}
+                                <div key={index} className="rounded-lg border bg-card p-4 shadow-sm">
+                                    <div className="mb-3 flex items-center justify-between">
+                                        <div className="text-sm font-semibold text-muted-foreground">
+                                            Član porodice #{index + 1}
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="sm"
+                                            onClick={() => removeFamilyMember(index)}
                                         >
-                                            <SelectTrigger>
-                                                <SelectValue placeholder="Odaberite odnos" />
-                                            </SelectTrigger>
-                                            <SelectContent>
-                                                <SelectItem value="otac">Otac</SelectItem>
-                                                <SelectItem value="majka">Majka</SelectItem>
-                                                <SelectItem value="sin">Sin</SelectItem>
-                                                <SelectItem value="kćerka">Kćerka</SelectItem>
-                                                <SelectItem value="supruga">Supruga</SelectItem>
-                                                <SelectItem value="punac">Punac</SelectItem>
-                                                <SelectItem value="punica">Punica</SelectItem>
-                                                <SelectItem value="druga rodbina">Druga rodbina</SelectItem>
-                                            </SelectContent>
-                                        </Select>
+                                            Ukloni
+                                        </Button>
                                     </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor='birthdate'>
-                                            Datum rođenja
-                                        </Label>
-                                        <DatePicker selected={convertDate(familyMember.birthdate)} handleChange={(date: any) => changeFamilyMember('birthdate', date, index)} />
-                                    </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor='email'>
-                                            Email
-                                        </Label>
-                                        <Input type="text" name="email" placeholder='npr. osman.ljubinac@gmail.com' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.email || ''} />
-                                    </div>
+                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-x-3 gap-y-4">
+                                        <div className="flex flex-col gap-2">
+                                            <Label htmlFor='first_name'>
+                                                Ime
+                                            </Label>
+                                            <Input type="text" name="first_name" placeholder='npr. Osman' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.first_name || ''} />
+                                        </div>
 
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor='phone'>
-                                            Telefon
-                                        </Label>
-                                        <Input type="text" name="phone" placeholder='npr. +387 61 123 456' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.phone || ''} />
-                                    </div>
-                                    <div className="flex flex-col gap-2">
-                                        <Label htmlFor='address'>
-                                            Adresa
-                                        </Label>
-                                        <Input type="text" name="address" placeholder='npr. Gornja mahala 54' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.address || ''} />
+                                        <div className="flex flex-col gap-2">
+                                            <Label htmlFor='last_name'>
+                                                Prezime
+                                            </Label>
+                                            <Input type="text" name="last_name" placeholder='npr. Ljubinac' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.last_name || ''} />
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <Label>Odnos</Label>
+                                            <Select
+                                                value={familyMember.relation || ""}
+                                                onValueChange={(val) => changeFamilyMember('relation', val, index)}
+                                            >
+                                                <SelectTrigger>
+                                                    <SelectValue placeholder="Odaberite odnos" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    <SelectItem value="otac">Otac</SelectItem>
+                                                    <SelectItem value="majka">Majka</SelectItem>
+                                                    <SelectItem value="sin">Sin</SelectItem>
+                                                    <SelectItem value="kćerka">Kćerka</SelectItem>
+                                                    <SelectItem value="supruga">Supruga</SelectItem>
+                                                    <SelectItem value="punac">Punac</SelectItem>
+                                                    <SelectItem value="punica">Punica</SelectItem>
+                                                    <SelectItem value="druga rodbina">Druga rodbina</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <Label htmlFor='birthdate'>
+                                                Datum rođenja
+                                            </Label>
+                                            <DatePicker selected={convertDate(familyMember.birthdate)} handleChange={(date: any) => changeFamilyMember('birthdate', date, index)} />
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <Label htmlFor='email'>
+                                                Email
+                                            </Label>
+                                            <Input type="text" name="email" placeholder='npr. osman.ljubinac@gmail.com' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.email || ''} />
+                                        </div>
+
+                                        <div className="flex flex-col gap-2">
+                                            <Label htmlFor='phone'>
+                                                Telefon
+                                            </Label>
+                                            <Input type="text" name="phone" placeholder='npr. +387 61 123 456' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.phone || ''} />
+                                        </div>
+                                        <div className="flex flex-col gap-2">
+                                            <Label htmlFor='address'>
+                                                Adresa
+                                            </Label>
+                                            <Input type="text" name="address" placeholder='npr. Gornja mahala 54' onChange={(e) => changeFamilyMember(e.target.name as keyof FamilyMember, e.target.value, index)} value={familyMember.address || ''} />
+                                        </div>
                                     </div>
                                 </div>
                             ))}

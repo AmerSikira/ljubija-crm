@@ -5,6 +5,7 @@ import { Head } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ActionsMenu } from '@/components/actions-menu';
+import { formatDateEU } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Početna stranica', href: '/dashboard' },
@@ -20,12 +21,7 @@ type User = {
     created_at?: string;
 };
 
-const formatDate = (value?: string) => {
-    if (!value) return '-';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleDateString('bs-BA');
-};
+const formatDate = (value?: string) => formatDateEU(value) || '-';
 
 export default function UsersIndex({ users = [], roleLabels = {} }: { users: User[]; roleLabels: Record<string, string> }) {
     return (

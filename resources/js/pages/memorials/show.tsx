@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
+import { formatDateEU } from '@/lib/utils';
 
 type Memorial = {
     id: number;
@@ -97,9 +98,9 @@ export default function MemorialShow({ memorial, isAdmin }: { memorial: Memorial
                             <CardTitle>Ključne informacije</CardTitle>
                         </CardHeader>
                         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                            <InfoItem label="Datum rođenja" value={memorial.birth_date} />
+                            <InfoItem label="Datum rođenja" value={formatDateEU(memorial.birth_date) || '-'} />
                             <InfoItem label="Status" value={memorial.status_label} />
-                            <InfoItem label="Datum smrti ili nestanka" value={memorial.status_date} />
+                            <InfoItem label="Datum smrti ili nestanka" value={formatDateEU(memorial.status_date) || '-'} />
                             <InfoItem label="Mjesto rođenja" value={memorial.birth_place} />
                             <InfoItem label="Mjesto smrti ili nestanka" value={memorial.status_place} />
                         </CardContent>

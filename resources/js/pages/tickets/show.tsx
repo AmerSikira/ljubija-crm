@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import InputError from '@/components/input-error';
+import { formatDateTimeEU } from '@/lib/utils';
 
 type Ticket = {
     id: number;
@@ -28,11 +29,7 @@ type Message = {
     created_at: string;
 };
 
-const formatDateTime = (value: string | null) => {
-    if (!value) return '-';
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? value : d.toLocaleString('bs-BA');
-};
+const formatDateTime = (value: string | null) => formatDateTimeEU(value) || '-';
 
 const statusLabel = (status: string) => {
     switch (status) {

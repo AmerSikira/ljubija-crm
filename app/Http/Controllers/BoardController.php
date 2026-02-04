@@ -17,7 +17,6 @@ class BoardController extends Controller
     private array $roleLabels = [
         'president' => 'Predsjednik',
         'vice_president' => 'Potpredsjednik',
-        'mutevelija' => 'Mutevelija',
         'finance' => 'Finansije',
         'member' => 'Član',
     ];
@@ -90,11 +89,15 @@ class BoardController extends Controller
             'end_date' => 'nullable|string',
             'is_current' => 'boolean',
             'roles.president' => 'nullable|integer|exists:members,id',
+            'roles.president_name' => 'nullable|string|max:255',
             'roles.vice_president' => 'nullable|integer|exists:members,id',
-            'roles.mutevelija' => 'nullable|integer|exists:members,id',
+            'roles.vice_president_name' => 'nullable|string|max:255',
             'roles.finance' => 'nullable|integer|exists:members,id',
+            'roles.finance_name' => 'nullable|string|max:255',
             'roles.members' => 'array',
             'roles.members.*' => 'integer|exists:members,id',
+            'roles.external_members' => 'array',
+            'roles.external_members.*' => 'string|max:255',
         ]);
 
         $startDate = $this->parseDate($validated['start_date']);
@@ -140,12 +143,20 @@ class BoardController extends Controller
                 ];
             });
 
+        $president = $board->members->firstWhere('role', 'president');
+        $vice = $board->members->firstWhere('role', 'vice_president');
+        $finance = $board->members->firstWhere('role', 'finance');
+        $memberEntries = $board->members->where('role', 'member')->values();
+
         $roles = [
-            'president' => $board->members->firstWhere('role', 'president')?->member_id,
-            'vice_president' => $board->members->firstWhere('role', 'vice_president')?->member_id,
-            'mutevelija' => $board->members->firstWhere('role', 'mutevelija')?->member_id,
-            'finance' => $board->members->firstWhere('role', 'finance')?->member_id,
-            'members' => $board->members->where('role', 'member')->pluck('member_id')->values()->all(),
+            'president' => $president?->member_id,
+            'president_name' => $president?->external_name,
+            'vice_president' => $vice?->member_id,
+            'vice_president_name' => $vice?->external_name,
+            'finance' => $finance?->member_id,
+            'finance_name' => $finance?->external_name,
+            'members' => $memberEntries->pluck('member_id')->filter()->values()->all(),
+            'external_members' => $memberEntries->pluck('external_name')->filter()->values()->all(),
         ];
 
         return Inertia::render('boards/edit', [
@@ -174,11 +185,15 @@ class BoardController extends Controller
             'end_date' => 'nullable|string',
             'is_current' => 'boolean',
             'roles.president' => 'nullable|integer|exists:members,id',
+            'roles.president_name' => 'nullable|string|max:255',
             'roles.vice_president' => 'nullable|integer|exists:members,id',
-            'roles.mutevelija' => 'nullable|integer|exists:members,id',
+            'roles.vice_president_name' => 'nullable|string|max:255',
             'roles.finance' => 'nullable|integer|exists:members,id',
+            'roles.finance_name' => 'nullable|string|max:255',
             'roles.members' => 'array',
             'roles.members.*' => 'integer|exists:members,id',
+            'roles.external_members' => 'array',
+            'roles.external_members.*' => 'string|max:255',
         ]);
 
         $startDate = $this->parseDate($validated['start_date']);
@@ -212,7 +227,9 @@ class BoardController extends Controller
             'is_current' => (bool) $board->is_current,
             'members' => $board->members->map(function ($boardMember) {
                 $member = $boardMember->member;
-                $fullName = trim(($member->first_name ?? '') . ' ' . ($member->last_name ?? '')) ?: $member->email;
+                $fullName = $member
+                    ? trim(($member->first_name ?? '') . ' ' . ($member->last_name ?? '')) ?: $member->email
+                    : ($boardMember->external_name ?? '');
                 return [
                     'id' => $boardMember->id,
                     'role' => $boardMember->role,
@@ -245,8 +262,18 @@ class BoardController extends Controller
     {
         $board->members()->delete();
 
-        $singleRoles = ['president', 'vice_president', 'mutevelija', 'finance'];
+        $singleRoles = ['president', 'vice_president', 'finance'];
         foreach ($singleRoles as $role) {
+            $nameKey = "{$role}_name";
+            if (!empty($roles[$nameKey])) {
+                BoardMember::create([
+                    'board_id' => $board->id,
+                    'member_id' => null,
+                    'external_name' => $roles[$nameKey],
+                    'role' => $role,
+                ]);
+                continue;
+            }
             if (!empty($roles[$role])) {
                 BoardMember::create([
                     'board_id' => $board->id,
@@ -260,6 +287,18 @@ class BoardController extends Controller
             BoardMember::create([
                 'board_id' => $board->id,
                 'member_id' => $memberId,
+                'role' => 'member',
+            ]);
+        }
+
+        foreach ($roles['external_members'] ?? [] as $name) {
+            if (!trim((string) $name)) {
+                continue;
+            }
+            BoardMember::create([
+                'board_id' => $board->id,
+                'member_id' => null,
+                'external_name' => $name,
                 'role' => 'member',
             ]);
         }

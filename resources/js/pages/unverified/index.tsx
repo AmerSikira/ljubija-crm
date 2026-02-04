@@ -5,6 +5,7 @@ import { Head, router } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
+import { formatDateEU } from '@/lib/utils';
 
 type UnverifiedUser = {
     id: number;
@@ -19,12 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Neverifikovani članovi', href: '/unverified-users' },
 ];
 
-const formatDate = (value?: string) => {
-    if (!value) return '-';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleDateString('bs-BA');
-};
+const formatDate = (value?: string) => formatDateEU(value) || '-';
 
 export default function UnverifiedIndex({ users = [], isAdmin }: { users: UnverifiedUser[]; isAdmin: boolean }) {
     return (

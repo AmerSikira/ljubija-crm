@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
+import { formatDateEU } from '@/lib/utils';
 
 type Project = {
     id: number;
@@ -147,8 +148,8 @@ export default function ProjectShow({
                             )}
                             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <InfoItem label="Budžet" value={project.budget ? `${project.budget} KM` : '-'} />
-                                <InfoItem label="Početak projekta" value={project.start_date || '-'} />
-                                <InfoItem label="Kraj projekta" value={project.end_date || '-'} />
+                                <InfoItem label="Početak projekta" value={formatDateEU(project.start_date) || '-'} />
+                                <InfoItem label="Kraj projekta" value={formatDateEU(project.end_date) || '-'} />
                                 <InfoItem label="Finalni budžet" value={project.final_budget ? `${project.final_budget} KM` : '-'} />
                                 <InfoItem label="Vrijeme završetka" value={project.completion_time || '-'} />
                             </div>

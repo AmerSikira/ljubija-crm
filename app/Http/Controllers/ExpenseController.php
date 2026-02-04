@@ -145,6 +145,7 @@ class ExpenseController extends Controller
             'Održavanje imamske kuće',
             'Održavanje džematskih prostorija',
             'Nabavka opreme',
+            'Naknada za paljenje kandilja',
         ];
     }
 }

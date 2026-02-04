@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { formatDateEU } from '@/lib/utils';
 
 type Memorial = {
     id: number;
@@ -129,7 +130,9 @@ export default function MemorialsIndex({
                                             <h3 className="text-lg font-semibold">{m.full_name}</h3>
                                             <Badge>{m.status_label}</Badge>
                                         </div>
-                                        {m.status_date && <p className="text-sm text-muted-foreground">{m.status_date}</p>}
+                                        {m.status_date && (
+                                            <p className="text-sm text-muted-foreground">{formatDateEU(m.status_date)}</p>
+                                        )}
                                         <p className="text-sm text-muted-foreground">{m.short_info_preview || '...'}</p>
                                         {!m.published && isAdmin && (
                                             <p className="text-xs font-semibold text-amber-600">Nije objavljeno</p>

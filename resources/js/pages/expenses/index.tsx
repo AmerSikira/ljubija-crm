@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { PlusIcon } from 'lucide-react';
 import { ActionsMenu } from '@/components/actions-menu';
+import { formatDateEU } from '@/lib/utils';
 
 type Expense = {
     id: number;
@@ -96,7 +97,7 @@ export default function ExpensesIndex({ expenses, filters }: { expenses: Expense
                                     </TableCell>
                                     <TableCell className="max-w-md truncate">{expense.description || '-'}</TableCell>
                                     <TableCell>{formatMoney(expense.amount)}</TableCell>
-                                    <TableCell>{expense.paid_at ?? '-'}</TableCell>
+                                    <TableCell>{formatDateEU(expense.paid_at) || '-'}</TableCell>
                                     <TableCell>{expense.created_by ?? '-'}</TableCell>
                                     <TableCell className="text-right">
                                         <ActionsMenu

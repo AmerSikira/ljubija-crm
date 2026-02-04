@@ -32,7 +32,7 @@ export default function Dashboard({ articles, daily_content }: any) {
             { label: 'Ljubija', tz: 'Europe/Sarajevo' },
             { label: 'Istanbul', tz: 'Europe/Istanbul' },
             { label: 'Mecca', tz: 'Asia/Riyadh' },
-            { label: 'Damascus', tz: 'Asia/Damascus' },
+            { label: 'Doha', tz: 'Asia/Qatar' },
             { label: 'Tokyo', tz: 'Asia/Tokyo' },
             { label: 'Moscow', tz: 'Europe/Moscow' },
         ],

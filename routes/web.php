@@ -37,6 +37,11 @@ Route::middleware([
     //My Payments
     Route::get('my-payments', [\App\Http\Controllers\PaymentsController::class, 'myPaymentsIndex'])->name('my-payments');
 
+    //Grave reservations
+    Route::get('graves', [\App\Http\Controllers\GraveReservationController::class, 'index'])->name('graves.index');
+    Route::post('graves/reserve', [\App\Http\Controllers\GraveReservationController::class, 'reserve'])->name('graves.reserve');
+    Route::post('graves/{reservation}/remove', [\App\Http\Controllers\GraveReservationController::class, 'remove'])->name('graves.remove');
+
     //Unverified users
     Route::get('unverified-users', [\App\Http\Controllers\UnverifiedUserController::class, 'index'])->name('unverified-users');
     Route::delete('unverified-users/{user}', [\App\Http\Controllers\UnverifiedUserController::class, 'destroy'])->name('unverified-users.destroy');

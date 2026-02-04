@@ -1,13 +1,5 @@
 import * as React from "react"
-import { ChevronDownIcon } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Calendar } from "@/components/ui/calendar"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
+import { Input } from "@/components/ui/input"
 
 // Define props type
 type DatePickerProps = {
@@ -16,9 +8,23 @@ type DatePickerProps = {
 }
 
 export function DatePicker({ handleChange, selected }: DatePickerProps) {
-  const [open, setOpen] = React.useState(false)
   const normalize = (d?: Date | null) =>
-    d ? new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12) : undefined
+    d ? new Date(d.getFullYear(), d.getMonth(), d.getDate()) : undefined
+
+  const formatValue = (d?: Date) => {
+    if (!d) return ""
+    const year = d.getFullYear()
+    const month = String(d.getMonth() + 1).padStart(2, "0")
+    const day = String(d.getDate()).padStart(2, "0")
+    return `${year}-${month}-${day}`
+  }
+
+  const parseValue = (value: string) => {
+    if (!value) return undefined
+    const [year, month, day] = value.split("-").map(Number)
+    if (!year || !month || !day) return undefined
+    return new Date(year, month - 1, day)
+  }
 
   const [date, setDate] = React.useState<Date | undefined>(normalize(selected))
 
@@ -27,37 +33,15 @@ export function DatePicker({ handleChange, selected }: DatePickerProps) {
   }, [selected])
 
   return (
-      
-      <Popover open={open} onOpenChange={setOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            variant="outline"
-            id="date"
-            className="w-full justify-between font-normal"
-          >
-            {date ? date.toLocaleDateString('en-GB') : "Odaberite datum"}
-            <ChevronDownIcon />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto overflow-hidden p-0" align="start">
-          <Calendar
-            mode="single"
-            selected={date}
-            defaultMonth={date}
-            captionLayout="dropdown"
-            fromYear={1900}
-            toYear={2100}
-            className="w-72"
-            disabled={{ before: new Date(1900, 0, 1) }}
-            
-            onSelect={(newDate) => {
-              const normalized = normalize(newDate)
-              setDate(normalized)
-              handleChange(normalized) // 🔑 send back to parent
-              setOpen(false)
-            }}
-          />
-        </PopoverContent>
-      </Popover>
+    <Input
+      id="date"
+      type="date"
+      value={formatValue(date)}
+      onChange={(event) => {
+        const next = parseValue(event.target.value)
+        setDate(next)
+        handleChange(next)
+      }}
+    />
   )
 }

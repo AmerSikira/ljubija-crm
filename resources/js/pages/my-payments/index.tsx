@@ -6,6 +6,7 @@ import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import ContentHolder from "@/components/content-holder";
+import { formatDateEU } from "@/lib/utils";
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -29,12 +30,7 @@ type Payment = {
 };
 
 export default function Index({ payments }: { payments: Payment[] }) {
-    const formatDate = (value?: string | null) => {
-        if (!value) return '';
-        const d = new Date(value);
-        if (isNaN(d.getTime())) return value;
-        return d.toLocaleDateString('en-GB'); // dd/mm/yyyy
-    };
+    const formatDate = (value?: string | null) => formatDateEU(value) || '';
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>

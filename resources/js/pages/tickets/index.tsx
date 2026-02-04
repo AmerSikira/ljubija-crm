@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ActionsMenu } from '@/components/actions-menu';
+import { formatDateTimeEU } from '@/lib/utils';
 
 type Ticket = {
     id: number;
@@ -24,11 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Poruke', href: '/tickets' },
 ];
 
-const formatDateTime = (value: string | null) => {
-    if (!value) return '-';
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? value : d.toLocaleString('bs-BA');
-};
+const formatDateTime = (value: string | null) => formatDateTimeEU(value) || '-';
 
 const statusLabel = (status: string) => {
     switch (status) {

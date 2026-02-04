@@ -20,6 +20,7 @@ export interface NavItem {
     href: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
+    count?: number;
 }
 
 export interface SharedData {
@@ -27,6 +28,7 @@ export interface SharedData {
     quote: { message: string; author: string };
     auth: Auth;
     memberCount?: number;
+    menuCounts?: Record<string, number>;
     ziggy: Config & { location: string };
     sidebarOpen: boolean;
     [key: string]: unknown;

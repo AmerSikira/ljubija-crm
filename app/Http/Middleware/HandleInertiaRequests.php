@@ -5,6 +5,14 @@ namespace App\Http\Middleware;
 use App\Models\Member;
 use App\Models\Payments;
 use App\Models\Expense;
+use App\Models\Article;
+use App\Models\ContentItem;
+use App\Models\MektebEntry;
+use App\Models\Memorial;
+use App\Models\Ticket;
+use App\Models\Project;
+use App\Models\Poll;
+use App\Models\User;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -41,6 +49,8 @@ class HandleInertiaRequests extends Middleware
     public function share(Request $request): array
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
+        $user = $request->user();
+        $memberId = $user?->member?->id;
 
         return [
             ...parent::share($request),
@@ -50,6 +60,22 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
             ],
             'memberCount' => Member::count(),
+            'menuCounts' => [
+                'articles' => Article::count(),
+                'content_items' => ContentItem::count(),
+                'mekteb' => MektebEntry::count(),
+                'memorials' => Memorial::count(),
+                'tickets' => $user ? Ticket::where('user_id', $user->id)->count() : 0,
+                'projects' => Project::count(),
+                'polls' => Poll::count(),
+                'admin_tickets' => Ticket::count(),
+                'users' => User::count(),
+                'members' => Member::count(),
+                'unverified_users' => User::whereDoesntHave('member')->where('role', '!=', 'admin')->count(),
+                'payments' => Payments::count(),
+                'expenses' => Expense::count(),
+                'my_payments' => $memberId ? Payments::where('member_id', $memberId)->count() : 0,
+            ],
             'accountBalance' => $this->accountBalance(),
             'ziggy' => fn (): array => [
                 ...(new Ziggy)->toArray(),
@@ -59,6 +85,7 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
+                'reservation_result' => $request->session()->get('reservation_result'),
             ],
         ];
     }

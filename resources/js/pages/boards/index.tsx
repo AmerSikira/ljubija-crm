@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Link, usePage } from '@inertiajs/react';
+import { formatDateEU } from '@/lib/utils';
 
 type BoardMember = {
     id: number;
@@ -41,7 +42,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-const orderedRoles = ['president', 'vice_president', 'mutevelija', 'finance', 'member'];
+const orderedRoles = ['president', 'vice_president', 'finance', 'member'];
 
 export default function BoardsIndex({
     currentBoard,
@@ -76,8 +77,8 @@ export default function BoardsIndex({
 
     const periodLabel = (board: Board | null) => {
         if (!board) return 'Nema podataka o mandatu';
-        const start = board.start_date ?? 'Nepoznato';
-        const end = board.end_date ?? 'Nepoznato';
+        const start = formatDateEU(board.start_date) || 'Nepoznato';
+        const end = formatDateEU(board.end_date) || 'Nepoznato';
         return `Period mandata: ${start} - ${end}`;
     };
 
@@ -146,7 +147,7 @@ export default function BoardsIndex({
                                         )}
                                         {historyBoards.map((board) => (
                                             <SelectItem key={board.id} value={board.id.toString()}>
-                                                {board.start_date} - {board.end_date ?? 'Nepoznato'}
+                                                {formatDateEU(board.start_date) || 'Nepoznato'} - {formatDateEU(board.end_date) || 'Nepoznato'}
                                             </SelectItem>
                                         ))}
                                     </SelectContent>

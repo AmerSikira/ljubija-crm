@@ -5,6 +5,7 @@ import { Head, Link } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { formatDateEU, formatDateTimeEU } from '@/lib/utils';
 
 type Expense = {
     id: number;
@@ -34,7 +35,9 @@ export default function ExpenseShow({ expense }: { expense: Expense }) {
                 <div className="mb-4 flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold">{expense.title}</h1>
-                        <p className="text-sm text-muted-foreground">Isplaćeno: {expense.paid_at ?? '-'}</p>
+                        <p className="text-sm text-muted-foreground">
+                            Isplaćeno: {formatDateEU(expense.paid_at) || '-'}
+                        </p>
                     </div>
                     <Button variant="ghost" asChild>
                         <Link href={route('expenses.index')}>Nazad</Link>
@@ -60,7 +63,7 @@ export default function ExpenseShow({ expense }: { expense: Expense }) {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                             <div>
                                 <p className="text-sm text-muted-foreground">Datum isplate</p>
-                                <p>{expense.paid_at ?? '-'}</p>
+                                <p>{formatDateEU(expense.paid_at) || '-'}</p>
                             </div>
                             <div>
                                 <p className="text-sm text-muted-foreground">Evidentirao</p>
@@ -69,7 +72,7 @@ export default function ExpenseShow({ expense }: { expense: Expense }) {
                         </div>
                         <div>
                             <p className="text-sm text-muted-foreground">Kreirano</p>
-                            <p>{expense.created_at ?? '-'}</p>
+                            <p>{formatDateTimeEU(expense.created_at) || '-'}</p>
                         </div>
                     </CardContent>
                 </Card>

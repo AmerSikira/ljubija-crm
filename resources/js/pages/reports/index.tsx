@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PlusIcon } from 'lucide-react';
 import { ActionsMenu } from '@/components/actions-menu';
+import { formatDateTimeEU } from '@/lib/utils';
 
 type ReportListItem = {
     id: number;
@@ -23,12 +24,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Zapisnici', href: '/reports' },
 ];
 
-const formatDateTime = (value?: string | null) => {
-    if (!value) return '-';
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return value;
-    return date.toLocaleString('bs-BA');
-};
+const formatDateTime = (value?: string | null) => formatDateTimeEU(value ?? null) || '-';
 
 export default function ReportsIndex({ reports, filters }: { reports: ReportListItem[]; filters?: { search?: string } }) {
     const { props } = usePage();

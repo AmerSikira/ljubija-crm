@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Input } from '@/components/ui/input';
 import { DatePicker } from '@/components/date-picker';
 import MemberAutocomplete, { type MemberOption } from '@/components/member-autocomplete';
 import { XIcon } from 'lucide-react';
@@ -18,10 +19,13 @@ type BoardPayload = {
     is_current: boolean;
     roles: {
         president?: number | null;
+        president_name?: string | null;
         vice_president?: number | null;
-        mutevelija?: number | null;
+        vice_president_name?: string | null;
         finance?: number | null;
+        finance_name?: string | null;
         members: number[];
+        external_members?: string[];
     };
 };
 
@@ -31,7 +35,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Uredi odbor', href: '/boards' },
 ];
 
-const roleOrder = ['president', 'vice_president', 'mutevelija', 'finance'];
+const roleOrder = ['president', 'vice_president', 'finance'];
 
 export default function EditBoard({
     board,
@@ -51,10 +55,13 @@ export default function EditBoard({
         is_current: board.is_current,
         roles: {
             president: board.roles.president || null,
+            president_name: board.roles.president_name || '',
             vice_president: board.roles.vice_president || null,
-            mutevelija: board.roles.mutevelija || null,
+            vice_president_name: board.roles.vice_president_name || '',
             finance: board.roles.finance || null,
+            finance_name: board.roles.finance_name || '',
             members: (board.roles.members || []) as Array<number | null>,
+            external_members: (board.roles.external_members || []) as string[],
         },
     });
 
@@ -108,6 +115,22 @@ export default function EditBoard({
         setData('roles', { ...data.roles, members: next });
     };
 
+    const addExternalMemberField = () => {
+        setData('roles', { ...data.roles, external_members: [...(data.roles.external_members ?? []), ''] });
+    };
+
+    const updateExternalMemberAt = (index: number, value: string) => {
+        const next = [...(data.roles.external_members ?? [])];
+        next[index] = value;
+        setData('roles', { ...data.roles, external_members: next });
+    };
+
+    const removeExternalMemberField = (index: number) => {
+        const next = [...(data.roles.external_members ?? [])];
+        next.splice(index, 1);
+        setData('roles', { ...data.roles, external_members: next });
+    };
+
     const setDateValue = (key: 'start_date' | 'end_date', value?: Date) => {
         if (key === 'start_date') setStartDate(value);
         if (key === 'end_date') setEndDate(value);
@@ -154,8 +177,25 @@ export default function EditBoard({
                                     <MemberAutocomplete
                                         members={members}
                                         value={(data.roles[roleKey as keyof typeof data.roles] as number | null) ?? null}
-                                        onChange={(val) => setData('roles', { ...data.roles, [roleKey]: val })}
+                                        onChange={(val) =>
+                                            setData('roles', {
+                                                ...data.roles,
+                                                [roleKey]: val,
+                                                [`${roleKey}_name`]: val ? '' : (data.roles as any)[`${roleKey}_name`],
+                                            })
+                                        }
                                         placeholder="Počnite kucati ime"
+                                    />
+                                    <Input
+                                        placeholder="Upišite ime ako osoba nije član"
+                                        value={(data.roles as any)[`${roleKey}_name`] ?? ''}
+                                        onChange={(e) =>
+                                            setData('roles', {
+                                                ...data.roles,
+                                                [`${roleKey}_name`]: e.target.value,
+                                                [roleKey]: e.target.value ? null : (data.roles as any)[roleKey],
+                                            })
+                                        }
                                     />
                                 </div>
                             ))}
@@ -196,6 +236,39 @@ export default function EditBoard({
                                     <Button type="button" variant="outline" onClick={addMemberField}>
                                         Dodaj novog člana
                                     </Button>
+                                </div>
+                                <div className="pt-2">
+                                    <Label>Vanjski članovi (nisu članovi džemata)</Label>
+                                    {(data.roles.external_members ?? []).length === 0 && (
+                                        <p className="text-sm text-muted-foreground">
+                                            Dodajte vanjskog člana pomoću dugmeta ispod.
+                                        </p>
+                                    )}
+                                    <div className="mt-2 flex flex-col gap-3">
+                                        {(data.roles.external_members ?? []).map((name, index) => (
+                                            <div key={index} className="flex items-center gap-2">
+                                                <Input
+                                                    value={name}
+                                                    placeholder="Ime i prezime"
+                                                    onChange={(e) => updateExternalMemberAt(index, e.target.value)}
+                                                />
+                                                <Button
+                                                    type="button"
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    onClick={() => removeExternalMemberField(index)}
+                                                    aria-label="Ukloni člana"
+                                                >
+                                                    <XIcon className="size-4" />
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    <div className="mt-2">
+                                        <Button type="button" variant="outline" onClick={addExternalMemberField}>
+                                            Dodaj vanjskog člana
+                                        </Button>
+                                    </div>
                                 </div>
                             </div>
                         </CardContent>

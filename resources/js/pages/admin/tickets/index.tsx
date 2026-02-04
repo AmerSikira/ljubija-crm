@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ActionsMenu } from '@/components/actions-menu';
+import { formatDateTimeEU } from '@/lib/utils';
 
 type Ticket = {
     id: number;
@@ -25,11 +26,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Poruke (admin)', href: '/admin/tickets' },
 ];
 
-const formatDateTime = (value: string | null) => {
-    if (!value) return '-';
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? value : d.toLocaleString('bs-BA');
-};
+const formatDateTime = (value: string | null) => formatDateTimeEU(value) || '-';
 
 const statusLabel = (status: string) => {
     switch (status) {
@@ -99,7 +96,7 @@ export default function AdminTicketsIndex({ tickets, filters }: { tickets: Ticke
                             <TableHead>Korisnik</TableHead>
                             <TableHead>Status</TableHead>
                             <TableHead>Zadnja aktivnost</TableHead>
-                            <TableHead>Stvoreno</TableHead>
+                            <TableHead>Kreirano</TableHead>
                             <TableHead className="text-right">Akcije</TableHead>
                         </TableRow>
                     </TableHeader>

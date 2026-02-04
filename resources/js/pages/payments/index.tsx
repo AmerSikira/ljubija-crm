@@ -9,6 +9,7 @@ import ContentHolder from "@/components/content-holder";
 import { Input } from "@/components/ui/input";
 import { DatePicker } from "@/components/date-picker";
 import { ActionsMenu } from "@/components/actions-menu";
+import { formatDateEU } from "@/lib/utils";
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -45,12 +46,7 @@ type Pagination<T> = {
 };
 
 export default function Index({ payments, filters }: { payments: Pagination<Payment>; filters: { name?: string; amount?: string; date?: string } }) {
-    const formatDate = (value?: string | null) => {
-        if (!value) return '';
-        const d = new Date(value);
-        if (isNaN(d.getTime())) return value;
-        return d.toLocaleDateString('en-GB'); // dd/mm/yyyy
-    };
+    const formatDate = (value?: string | null) => formatDateEU(value) || '';
 
     const formatPickerDate = (date?: Date | null) => {
         if (!date) return '';
