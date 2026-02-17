@@ -72,14 +72,14 @@ export default function AdminTicketShow({ ticket, messages }: { ticket: Ticket; 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={ticket.subject} />
             <ContentHolder className="space-y-6">
-                <div className="flex items-center justify-between gap-3">
-                    <div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="min-w-0">
                         <h1 className="text-2xl font-bold">{ticket.subject}</h1>
-                        <div className="text-sm text-muted-foreground">
+                        <div className="text-sm text-muted-foreground break-words">
                             Korisnik: {ticket.user.name} • Zadnja aktivnost: {formatDateTime(ticket.last_activity_at)}
                         </div>
                     </div>
-                    <Badge variant={ticket.status === 'odgovoreno' ? 'secondary' : 'default'}>
+                    <Badge variant={ticket.status === 'odgovoreno' ? 'secondary' : 'default'} className="w-fit">
                         {statusLabel(ticket.status)}
                     </Badge>
                 </div>
@@ -98,7 +98,7 @@ export default function AdminTicketShow({ ticket, messages }: { ticket: Ticket; 
                                             message.author_type === 'admin' ? 'bg-slate-50' : 'bg-white'
                                         }`}
                                     >
-                                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                                        <div className="flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
                                             <span>{message.author_type === 'admin' ? 'Admin' : message.author_name}</span>
                                             <span>{formatDateTime(message.created_at)}</span>
                                         </div>
@@ -119,16 +119,16 @@ export default function AdminTicketShow({ ticket, messages }: { ticket: Ticket; 
                                 minLength={5}
                             />
                             <InputError message={errors.message} />
-                            <div className="flex justify-between">
-                                <div className="flex gap-2">
-                                    <Button variant="ghost" asChild>
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex flex-col gap-2 sm:flex-row">
+                                    <Button variant="ghost" asChild className="w-full sm:w-auto">
                                         <Link href={route('admin.tickets.index')}>Nazad na listu</Link>
                                     </Button>
-                                    <Button variant="destructive" type="button" onClick={handleTicketDelete}>
+                                    <Button variant="destructive" type="button" className="w-full sm:w-auto" onClick={handleTicketDelete}>
                                         Obriši poruku
                                     </Button>
                                 </div>
-                                <Button type="submit" disabled={processing}>
+                                <Button type="submit" className="w-full sm:w-auto" disabled={processing}>
                                     Pošalji odgovor
                                 </Button>
                             </div>

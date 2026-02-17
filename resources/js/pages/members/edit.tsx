@@ -6,6 +6,7 @@ import ContentHolder from "@/components/content-holder";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusIcon } from 'lucide-react';
 import { DatePicker } from '@/components/date-picker';
 import MemberAutocomplete from '@/components/member-autocomplete';
@@ -21,13 +22,12 @@ const breadcrumbs: BreadcrumbItem[] = [
                 href: '/members',
         },
         {
-                title: 'Dodaj člana',
-                href: '/members/create',
+                title: 'Uredi člana',
+                href: '/members',
         }
 ];
 
 export default function Edit({ member, users }: { member:any, users: any }) {
-        console.log(member.family_members);
         const userOptions = useMemo(
                 () =>
                         users.map((u: any) => ({
@@ -88,6 +88,13 @@ export default function Edit({ member, users }: { member:any, users: any }) {
                 );
         };
 
+        const removeFamilyMember = (index: number) => {
+                setData(
+                        "family_members",
+                        data.family_members.filter((_, i) => i !== index)
+                );
+        };
+
         const handleSelectUser = (value: number | null) => {
                 const user = users.find((u: any) => u.id === value);
 
@@ -133,22 +140,27 @@ export default function Edit({ member, users }: { member:any, users: any }) {
         }
 
         const convertDate = (dateString: string) => {
-                const date = new Date(dateString);
-               return date;
-        }
+                if (!dateString) return undefined as any;
+                return new Date(dateString);
+        };
         return (
                 <AppLayout breadcrumbs={breadcrumbs}>
                         <Head title="Članovi" />
                         <ContentHolder>
-                                <div className="flex justify-end">
-                                        <Button asChild>
-                                                <Link href={route('payments.create', member.id)}>
-                                                        <PlusIcon className="w-4 h-4 mr-2" />
-                                                        Dodajte uplatu
-                                                </Link>
-                                        </Button>
-                                </div>
-                                <form className="grid grid-cols-1" onSubmit={handleSubmit}>
+                                <Card>
+                                        <CardHeader>
+                                                <CardTitle>Uredi člana</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                                <div className="flex justify-end">
+                                                        <Button asChild className="w-full sm:w-auto">
+                                                                <Link href={route('payments.create', member.id)}>
+                                                                        <PlusIcon className="w-4 h-4 mr-2" />
+                                                                        Dodajte uplatu
+                                                                </Link>
+                                                        </Button>
+                                                </div>
+                                                <form className="mt-5 grid grid-cols-1 gap-5" onSubmit={handleSubmit}>
                                         <div className="mb-6 flex flex-col items-center gap-3">
                                                 <div className="h-24 w-24 overflow-hidden rounded-full border bg-muted">
                                                         {previewUrl ? (
@@ -164,7 +176,7 @@ export default function Edit({ member, users }: { member:any, users: any }) {
                                                         name="profile_image"
                                                         id="profile_image"
                                                         accept="image/*"
-                                                        className="w-56 cursor-pointer text-center"
+                                                        className="w-full max-w-xs cursor-pointer text-center"
                                                         onChange={(e) => {
                                                                 const file = e.target.files?.[0] ?? null;
                                                                 setData('profile_image' as any, file);
@@ -182,7 +194,7 @@ export default function Edit({ member, users }: { member:any, users: any }) {
                                                 />
                                         </div>
                                         <hr className='my-5' />
-                                        <h3 className='font-bold text-xl'>Osnovne informacije o članu</h3>
+                                        <h3 className='font-bold text-lg sm:text-xl'>Osnovne informacije o članu</h3>
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3 gap-y-4">
                                                 <div className="flex flex-col gap-2">
                                                         <Label htmlFor='first_name'>
@@ -236,7 +248,7 @@ export default function Edit({ member, users }: { member:any, users: any }) {
                                                 </div>
                                         </div>
                                         <hr className='my-5' />
-                                        <h3 className='font-bold text-xl'>Ukoliko član živi u inostranstvu</h3>
+                                        <h3 className='font-bold text-lg sm:text-xl'>Ukoliko član živi u inostranstvu</h3>
                                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3 gap-y-4">
                                                 <div className="flex flex-col gap-2">
                                                         <Label htmlFor='address_abroad'>
@@ -273,9 +285,9 @@ export default function Edit({ member, users }: { member:any, users: any }) {
                                         </div>
 
                                         <hr className='my-5' />
-                                        <h3 className='font-bold text-xl'>Ukoliko član ima više članova u porodici</h3>
+                                        <h3 className='font-bold text-lg sm:text-xl'>Ukoliko član ima više članova u porodici</h3>
                                         <div className="flex justify-end">
-                                                <Button variant="secondary" onClick={(e) => addFamilyMember(e)}>
+                                                <Button className="w-full sm:w-auto" variant="secondary" onClick={(e) => addFamilyMember(e)}>
                                                         <PlusIcon className="w-4 h-4 mr-2" />
                                                         Dodaj člana porodice
                                                 </Button>
@@ -283,7 +295,20 @@ export default function Edit({ member, users }: { member:any, users: any }) {
 
                                         <div className="grid grid-cols-1 gap-x-3 gap-y-4">
                                                 {data.family_members.map((member, index) => (
-                                                        <div key={index} className="grid grid-cols-1 lg:grid-cols-3 gap-x-3 gap-y-4">
+                                                        <div key={index} className="grid grid-cols-1 gap-x-3 gap-y-4 rounded-md border p-3 lg:grid-cols-3">
+                                                                <div className="col-span-full flex items-center justify-between gap-2">
+                                                                        <div className="text-sm font-semibold text-muted-foreground">
+                                                                                Član porodice #{index + 1}
+                                                                        </div>
+                                                                        <Button
+                                                                                type="button"
+                                                                                size="sm"
+                                                                                variant="destructive"
+                                                                                onClick={() => removeFamilyMember(index)}
+                                                                        >
+                                                                                Ukloni
+                                                                        </Button>
+                                                                </div>
                                                                 <div className="flex flex-col gap-2">
                                                                         <Label htmlFor='first_name'>
                                                                                 Ime
@@ -348,11 +373,13 @@ export default function Edit({ member, users }: { member:any, users: any }) {
                                         </div>
                                         <hr className='my-5' />
                                         <div className="flex justify-end">
-                                                <Button type='submit'>
+                                                <Button type='submit' className="w-full sm:w-auto">
                                                         Spremite info o članu
                                                 </Button>
                                         </div>
-                                </form>
+                                                </form>
+                                        </CardContent>
+                                </Card>
                         </ContentHolder>
                 </AppLayout>
         )

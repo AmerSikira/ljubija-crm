@@ -1,14 +1,13 @@
-import React from "react";
+import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
-import ContentHolder from "@/components/content-holder";
-import { Input } from "@/components/ui/input";
-import { ActionsMenu } from "@/components/actions-menu";
-
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import ContentHolder from '@/components/content-holder';
+import { Input } from '@/components/ui/input';
+import { ActionsMenu } from '@/components/actions-menu';
+import { Card, CardContent } from '@/components/ui/card';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,8 +19,6 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/members',
     },
 ];
-
-
 
 type Member = {
     id: number;
@@ -47,6 +44,7 @@ export default function Index({ members, filters }: { members: Pagination<Member
     const { data, setData } = useForm({
         search: filters?.search ?? '',
     });
+
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         router.get(route('members'), { search: data.search }, { preserveState: true, preserveScroll: true });
@@ -56,19 +54,29 @@ export default function Index({ members, filters }: { members: Pagination<Member
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Članovi" />
             <ContentHolder>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <form onSubmit={handleSearch} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                <div className="mb-4 space-y-3">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <h1 className="text-2xl font-bold">Članovi</h1>
+                        <Button asChild>
+                            <Link href={route('members.create')}>Dodaj novo</Link>
+                        </Button>
+                    </div>
+
+                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:items-center">
                         <Input
                             placeholder="Pretraga po imenu, emailu ili telefonu"
                             value={data.search}
                             onChange={(e) => setData('search', e.target.value)}
-                            className="w-full sm:w-72"
                         />
-                        <div className="flex gap-2">
-                            <Button type="submit" variant="secondary">Pretraži</Button>
+
+                        <div className="flex items-center gap-2">
+                            <Button type="submit" variant="secondary" className="w-full sm:w-auto">
+                                Pretraži
+                            </Button>
                             <Button
                                 type="button"
                                 variant="outline"
+                                className="w-full sm:w-auto"
                                 onClick={() => {
                                     setData('search', '');
                                     router.get(route('members'), {}, { preserveScroll: true });
@@ -78,82 +86,82 @@ export default function Index({ members, filters }: { members: Pagination<Member
                             </Button>
                         </div>
                     </form>
-                    <Button asChild>
-                        <Link href={route('members.create')}>
-                            <PlusIcon className="w-4 h-4 mr-2" />
-                            Dodaj člana
-                        </Link>
-                    </Button>
                 </div>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Ime i prezime</TableHead>
-                            <TableHead>Ime oca</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Telefon</TableHead>
-                            <TableHead className="text-right">Akcije</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {members.data.length > 0 ? (
-                            members.data.map((member) => (
-                                <TableRow key={member.id}>
-                                    <TableCell>{member.id}</TableCell>
-                                    <TableCell className="flex items-center gap-2">
-                                        {member.profile_image_url && (
-                                            <img
-                                                src={member.profile_image_url}
-                                                alt={`${member.first_name} ${member.last_name}`}
-                                                className="h-8 w-8 rounded-full object-cover"
-                                            />
-                                        )}
-                                        <span>{member.title ? `${member.title} ` : ''}{member.first_name} {member.last_name}</span>
-                                    </TableCell>
-                                    <TableCell>{member.fathers_name || '-'}</TableCell>
-                                    <TableCell>{member.email}</TableCell>
-                                    <TableCell>{member.phone}</TableCell>
-                                    <TableCell className="text-right">
-                                        <ActionsMenu
-                                            actions={[
-                                                {
-                                                    type: 'item',
-                                                    label: 'Detalji',
-                                                    href: route('members.edit', { member: member.id }),
-                                                },
-                                                {
-                                                    type: 'item',
-                                                    label: 'Uredi',
-                                                    href: route('members.edit', { member: member.id }),
-                                                },
-                                                { type: 'separator' },
-                                                {
-                                                    type: 'item',
-                                                    label: 'Obriši',
-                                                    variant: 'destructive',
-                                                    onSelect: () => router.delete(route('members.destroy', { member: member.id })),
-                                                },
-                                            ]}
-                                        />
-                                    </TableCell>
+
+                <Card>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>ID</TableHead>
+                                    <TableHead>Ime i prezime</TableHead>
+                                    <TableHead>Ime oca</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Telefon</TableHead>
+                                    <TableHead className="w-40 text-right">Opcije</TableHead>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={6} className="text-center">
-                                    Nema članova
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-                <div className="flex justify-end gap-2 mt-4">
+                            </TableHeader>
+                            <TableBody>
+                                {members.data.length > 0 ? (
+                                    members.data.map((member) => (
+                                        <TableRow key={member.id}>
+                                            <TableCell>{member.id}</TableCell>
+                                            <TableCell className="flex items-center gap-2">
+                                                {member.profile_image_url && (
+                                                    <img
+                                                        src={member.profile_image_url}
+                                                        alt={`${member.first_name} ${member.last_name}`}
+                                                        className="h-8 w-8 rounded-full object-cover"
+                                                    />
+                                                )}
+                                                <span>{member.title ? `${member.title} ` : ''}{member.first_name} {member.last_name}</span>
+                                            </TableCell>
+                                            <TableCell>{member.fathers_name || '-'}</TableCell>
+                                            <TableCell>{member.email}</TableCell>
+                                            <TableCell>{member.phone}</TableCell>
+                                            <TableCell className="text-right">
+                                                <ActionsMenu
+                                                    actions={[
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Detalji',
+                                                            href: route('members.edit', { member: member.id }),
+                                                        },
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Uredi',
+                                                            href: route('members.edit', { member: member.id }),
+                                                        },
+                                                        { type: 'separator' },
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Obriši',
+                                                            variant: 'destructive',
+                                                            onSelect: () => router.delete(route('members.destroy', { member: member.id })),
+                                                        },
+                                                    ]}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="text-center text-muted-foreground">
+                                            Nema članova
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+
+                <div className="mt-4 flex justify-end gap-2">
                     {members.links.map((link, index) => (
                         <Button
                             key={index}
                             asChild
-                            variant={link.active ? "secondary" : "outline"}
+                            variant={link.active ? 'secondary' : 'outline'}
                             disabled={!link.url}
                         >
                             <Link
@@ -165,7 +173,6 @@ export default function Index({ members, filters }: { members: Pagination<Member
                     ))}
                 </div>
             </ContentHolder>
-
         </AppLayout>
     );
 }

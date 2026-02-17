@@ -158,6 +158,29 @@ class ProjectController extends Controller
         return back()->with('success', 'Interesovanje potvrđeno.');
     }
 
+    public function destroyInterest(Request $request, Project $project, ProjectInterest $interest)
+    {
+        if ($interest->project_id !== $project->id) {
+            abort(404);
+        }
+
+        $user = $request->user();
+        if (!$user) {
+            abort(403, 'Morate biti prijavljeni.');
+        }
+
+        $isAdmin = $user->role === 'admin';
+        $isOwnPendingInterest = (int) $interest->user_id === (int) $user->id && $interest->confirmed_at === null;
+
+        if (!$isAdmin && !$isOwnPendingInterest) {
+            abort(403, 'Nedovoljno privilegija.');
+        }
+
+        $interest->delete();
+
+        return back()->with('success', 'Interesovanje je uklonjeno.');
+    }
+
     private function authorizeAdmin(Request $request): void
     {
         $role = $request->user()?->role;

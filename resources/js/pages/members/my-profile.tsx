@@ -3,6 +3,7 @@ import { FamilyMember, type BreadcrumbItem, type Member } from '@/types';
 import { Head, useForm } from '@inertiajs/react';
 
 import ContentHolder from '@/components/content-holder';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -120,7 +121,12 @@ export default function MyProfile({ member }: { member: any }) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Moj profil člana" />
             <ContentHolder>
-                <form className="grid grid-cols-1" onSubmit={handleSubmit}>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Detalji člana</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                <form className="grid grid-cols-1 gap-5" onSubmit={handleSubmit}>
                     <div className="mb-6 flex flex-col items-center gap-3">
                         <div className="h-24 w-24 overflow-hidden rounded-full border bg-muted">
                             {previewUrl ? (
@@ -136,7 +142,7 @@ export default function MyProfile({ member }: { member: any }) {
                             name="profile_image"
                             id="profile_image"
                             accept="image/*"
-                            className="w-56 cursor-pointer text-center"
+                            className="w-full max-w-xs cursor-pointer text-center"
                             onChange={(e) => {
                                 const file = e.target.files?.[0] ?? null;
                                 handleChange('profile_image' as any, file);
@@ -144,7 +150,7 @@ export default function MyProfile({ member }: { member: any }) {
                             }}
                         />
                     </div>
-                    <h3 className='font-bold text-xl mb-4'>Osnovne informacije o članu</h3>
+                    <h3 className='mb-4 text-lg font-bold sm:text-xl'>Osnovne informacije o članu</h3>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3 gap-y-4">
                         <div className="flex flex-col gap-2">
                             <Label htmlFor='first_name'>
@@ -198,7 +204,7 @@ export default function MyProfile({ member }: { member: any }) {
                         </div>
                     </div>
                     <hr className='my-5' />
-                    <h3 className='font-bold text-xl'>Ukoliko član živi u inostranstvu</h3>
+                    <h3 className='text-lg font-bold sm:text-xl'>Ukoliko član živi u inostranstvu</h3>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3 gap-y-4">
                         <div className="flex flex-col gap-2">
                             <Label htmlFor='address_abroad'>
@@ -236,10 +242,10 @@ export default function MyProfile({ member }: { member: any }) {
 
                     <hr className='my-5' />
                     <div className="flex flex-col gap-4">
-                        <div className="flex items-center justify-between flex-col md:flex-row">
-                            <h3 className='font-bold text-xl mb-2 md:mb-0'>Ukoliko član ima više članova u porodici</h3>
-                            <Button variant="secondary" onClick={addFamilyMember}>
-                                <PlusIcon className="w-4 h-4 mb:mr-2 w-full" />
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <h3 className='mb-2 text-lg font-bold sm:text-xl md:mb-0'>Ukoliko član ima više članova u porodici</h3>
+                            <Button className="w-full md:w-auto" variant="secondary" onClick={addFamilyMember}>
+                                <PlusIcon className="mr-2 h-4 w-4" />
                                 Dodaj člana porodice
                             </Button>
                         </div>
@@ -255,6 +261,7 @@ export default function MyProfile({ member }: { member: any }) {
                                             type="button"
                                             variant="destructive"
                                             size="sm"
+                                            className="w-full sm:w-auto"
                                             onClick={() => removeFamilyMember(index)}
                                         >
                                             Ukloni
@@ -327,11 +334,13 @@ export default function MyProfile({ member }: { member: any }) {
                     </div>
                     <hr className='my-5' />
                     <div className="flex justify-end">
-                        <Button type='submit'>
+                        <Button type='submit' className="w-full sm:w-auto">
                             Spremite info o članu
                         </Button>
                     </div>
                 </form>
+                    </CardContent>
+                </Card>
             </ContentHolder>
         </AppLayout>
     );

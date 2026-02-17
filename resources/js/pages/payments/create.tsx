@@ -1,12 +1,12 @@
 import AppLayout from '@/layouts/app-layout';
-import { FamilyMember, type BreadcrumbItem, type Member } from '@/types';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { type BreadcrumbItem, type Member } from '@/types';
+import { Head, useForm } from '@inertiajs/react';
 
-import ContentHolder from "@/components/content-holder";
+import ContentHolder from '@/components/content-holder';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { PlusIcon } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DatePicker } from '@/components/date-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MemberAutocomplete from '@/components/member-autocomplete';
@@ -17,17 +17,16 @@ const breadcrumbs: BreadcrumbItem[] = [
                 href: '/dashboard',
         },
         {
-                title: 'Članovi',
-                href: '/members',
+                title: 'Uplate',
+                href: '/payments',
         },
         {
-                title: 'Dodaj člana',
-                href: '/members/create',
+                title: 'Dodaj uplatu',
+                href: '/payments/create',
         }
 ];
 
 export default function Create({ members = [], memberId }: { members: any, memberId: number | null }) {
-        console.log(memberId, "MEMBERS");
         const typesOfPayments = ['Članarina', 'Donacija', 'Vakuf', 'Sergija', 'Ostalo'];
         const { data, setData, post } = useForm<Member>({
                 id: 0,
@@ -88,77 +87,84 @@ export default function Create({ members = [], memberId }: { members: any, membe
                 <AppLayout breadcrumbs={breadcrumbs}>
                         <Head title="Uplate" />
                         <ContentHolder>
-                                <form className="grid grid-cols-1" onSubmit={handleSubmit}>
-                                        <div className="flex w-full flex-col">
-                                                <Label className="mb-3">Odaberite korisnika</Label>
-                                                <MemberAutocomplete
-                                                        members={memberOptions}
-                                                        value={data.member_id || null}
-                                                        onChange={handleSelectMember}
-                                                        placeholder="Počnite kucati ime člana"
-                                                />
-                                        </div>
-                                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-3 gap-y-4">
-                                                <div className="flex flex-col gap-2">
-                                                        <Label htmlFor='amount'>
-                                                                Iznos (u KM)
-                                                        </Label>
-                                                        <Input type="number" name="amount" id="amount" placeholder='123.30' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.amount} step="0.1"/>
-                                                </div>
+                                <Card>
+                                        <CardHeader>
+                                                <CardTitle>Detalji uplate</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                                <form className="grid grid-cols-1 gap-4" onSubmit={handleSubmit}>
+                                                        <div className="flex w-full flex-col">
+                                                                <Label className="mb-3">Odaberite korisnika</Label>
+                                                                <MemberAutocomplete
+                                                                        members={memberOptions}
+                                                                        value={data.member_id || null}
+                                                                        onChange={handleSelectMember}
+                                                                        placeholder="Počnite kucati ime člana"
+                                                                />
+                                                        </div>
+                                                        <div className="grid grid-cols-1 gap-x-3 gap-y-4 lg:grid-cols-2">
+                                                                <div className="flex flex-col gap-2">
+                                                                        <Label htmlFor='amount'>
+                                                                                Iznos (u KM)
+                                                                        </Label>
+                                                                        <Input type="number" name="amount" id="amount" placeholder='123.30' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.amount} step="0.1"/>
+                                                                </div>
 
-                                                <div className="flex flex-col gap-2">
-                                                        <Label className="">Vrsta uplate</Label>
-                                                <Select onValueChange={handleTypeOfPayment}>
-                                                        <SelectTrigger className='w-full'>
-                                                                <SelectValue placeholder="Odaberite vrstu uplate" />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                                {
-                                                                        typesOfPayments.map((type, index) => {
-                                                                                return (
-                                                                                        <SelectItem key={index} value={type}>{type}</SelectItem>
-                                                                                )
-                                                                        })
-                                                                }
-                                                        </SelectContent>
-                                                </Select>
-                                                </div>
+                                                                <div className="flex flex-col gap-2">
+                                                                        <Label className="">Vrsta uplate</Label>
+                                                                <Select onValueChange={handleTypeOfPayment}>
+                                                                        <SelectTrigger className='w-full'>
+                                                                                <SelectValue placeholder="Odaberite vrstu uplate" />
+                                                                        </SelectTrigger>
+                                                                        <SelectContent>
+                                                                                {
+                                                                                        typesOfPayments.map((type, index) => {
+                                                                                                return (
+                                                                                                        <SelectItem key={index} value={type}>{type}</SelectItem>
+                                                                                                )
+                                                                                        })
+                                                                                }
+                                                                        </SelectContent>
+                                                                </Select>
+                                                                </div>
 
-                                                <div className="flex flex-col gap-2">
-                                                        <Label htmlFor='birthdate'>
-                                                                Datum uplate
-                                                        </Label>
-                                                        <DatePicker handleChange={(date: any) => handleDateChange('date_of_payment', date)} />
-                                                </div>
+                                                                <div className="flex flex-col gap-2">
+                                                                        <Label htmlFor='birthdate'>
+                                                                                Datum uplate
+                                                                        </Label>
+                                                                        <DatePicker handleChange={(date: any) => handleDateChange('date_of_payment', date)} />
+                                                                </div>
 
-                                                <div className="flex flex-col gap-2">
-                                                        <Label htmlFor='paid_from'>
-                                                                Plaćeno od
-                                                        </Label>
-                                                        <DatePicker handleChange={(date: any) => handleDateChange('paid_from', date)} />
-                                                </div>
+                                                                <div className="flex flex-col gap-2">
+                                                                        <Label htmlFor='paid_from'>
+                                                                                Plaćeno od
+                                                                        </Label>
+                                                                        <DatePicker handleChange={(date: any) => handleDateChange('paid_from', date)} />
+                                                                </div>
 
-                                                <div className="flex flex-col gap-2">
-                                                        <Label htmlFor='paid_to'>
-                                                                Plaćeno do
-                                                        </Label>
-                                                        <DatePicker handleChange={(date: any) => handleDateChange('paid_to', date)} />
-                                                </div>
+                                                                <div className="flex flex-col gap-2">
+                                                                        <Label htmlFor='paid_to'>
+                                                                                Plaćeno do
+                                                                        </Label>
+                                                                        <DatePicker handleChange={(date: any) => handleDateChange('paid_to', date)} />
+                                                                </div>
 
-                                                <div className="flex flex-col gap-2">
-                                                        <Label htmlFor='note'>
-                                                                Bilješka
-                                                        </Label>
-                                                        <Input type="text" name="note" id="note" placeholder='npr. Uplatio putem bankovne transakcije' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.note}/>
-                                                </div>
-                                        </div>
-                                        
-                                        <div className="flex justify-end">
-                                                <Button type='submit'>
-                                                        Dodajte članarinu
-                                                </Button>
-                                        </div>
-                                </form>
+                                                                <div className="flex flex-col gap-2">
+                                                                        <Label htmlFor='note'>
+                                                                                Bilješka
+                                                                        </Label>
+                                                                        <Input type="text" name="note" id="note" placeholder='npr. Uplatio putem bankovne transakcije' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.note}/>
+                                                                </div>
+                                                        </div>
+
+                                                        <div className="flex justify-end">
+                                                                <Button type='submit'>
+                                                                        Dodajte članarinu
+                                                                </Button>
+                                                        </div>
+                                                </form>
+                                        </CardContent>
+                                </Card>
                         </ContentHolder>
                 </AppLayout>
         )

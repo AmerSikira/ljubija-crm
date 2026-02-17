@@ -60,7 +60,7 @@ export function AppSidebar() {
         {
             label: 'Zajednica',
             items: [
-                { title: 'Džemat Ljubija', href: '/dzemat', icon: MoonStar },
+                { title: 'Džemat Donja Ljubija', href: '/dzemat', icon: MoonStar },
                 { title: 'Mekteb', href: '/mekteb', icon: Book },
                 { title: 'Memorijal', href: '/memorials', icon: Heart },
                 { title: 'Zauzeće mezara', href: '/graves', icon: MapPin },

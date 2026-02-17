@@ -4,7 +4,6 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { type BreadcrumbItem } from '@/types';
@@ -49,6 +48,7 @@ export default function ProjectShow({
 }) {
     const { props } = usePage();
     const role = (props as any)?.auth?.user?.role ?? '';
+    const currentUserId = (props as any)?.auth?.user?.id ?? null;
     const isAdmin = role === 'admin';
     const { data, setData } = useForm({
         search: filters?.search ?? '',
@@ -72,7 +72,17 @@ export default function ProjectShow({
         router.post(route('projects.interests.confirm', { project: project.id, interest: interestId }));
     };
 
+    const handleRemoveInterest = (interestId: number) => {
+        if (!confirm('Da li ste sigurni da želite ukloniti ovo interesovanje?')) return;
+        router.delete(route('projects.interests.destroy', { project: project.id, interest: interestId }), {
+            preserveScroll: true,
+        });
+    };
+
     const statusLabel = (interest: Interest) => (interest.confirmed_at ? 'Potvrđeno' : 'Na čekanju');
+    const canShowActionsColumn = isAdmin || (!!currentInterest && !currentInterest.confirmed_at);
+    const canManageInterest = (interest: Interest) =>
+        isAdmin || (!!currentUserId && Number(interest.user?.id) === Number(currentUserId) && !interest.confirmed_at);
 
     return (
         <AppLayout breadcrumbs={[...breadcrumbs, { title: project.name, href: `/projects/${project.id}` }]}>
@@ -81,10 +91,10 @@ export default function ProjectShow({
                 <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-bold">{project.name}</h1>
                     {!currentInterest && (
-                        <Button onClick={handleJoin}>Uključujem se i ja</Button>
+                        <Button className="w-full md:w-auto" onClick={handleJoin}>Uključujem se i ja</Button>
                     )}
                     {currentInterest && (
-                        <Badge variant="secondary">
+                        <Badge variant="secondary" className="w-fit">
                             {currentInterest.confirmed_at ? 'Već potvrđeni' : 'Već ste se uključili'}
                         </Badge>
                     )}
@@ -102,7 +112,7 @@ export default function ProjectShow({
                                         <img
                                             src={images[galleryIndex]!}
                                             alt={`Slika ${galleryIndex + 1}`}
-                                            className="h-72 w-full rounded-md object-cover md:h-96"
+                                            className="h-56 w-full rounded-md object-cover sm:h-72 md:h-96"
                                         />
                                         {images.length > 1 && (
                                             <>
@@ -210,7 +220,7 @@ export default function ProjectShow({
                                         <SelectItem value="pending">Nepotvrđeni</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <div className="flex items-center gap-2">
+                                <div className="flex flex-col items-stretch gap-2 sm:flex-row sm:items-center">
                                     <Button type="submit" variant="secondary" className="w-full md:w-auto">
                                         Pretraži
                                     </Button>
@@ -230,19 +240,20 @@ export default function ProjectShow({
                         </div>
                     </CardHeader>
                     <CardContent className="p-0">
+                        <div className="overflow-x-auto">
                         <Table>
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>Ime i prezime</TableHead>
                                     <TableHead>Kontakt</TableHead>
                                     <TableHead>Status</TableHead>
-                                    {isAdmin && <TableHead className="text-right">Opcije</TableHead>}
+                                    {canShowActionsColumn && <TableHead className="text-right">Opcije</TableHead>}
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
                                 {interests.length === 0 ? (
                                     <TableRow>
-                                        <TableCell colSpan={isAdmin ? 4 : 3} className="text-center text-muted-foreground">
+                                        <TableCell colSpan={canShowActionsColumn ? 4 : 3} className="text-center text-muted-foreground">
                                             Nema zainteresovanih.
                                         </TableCell>
                                     </TableRow>
@@ -259,12 +270,23 @@ export default function ProjectShow({
                                                     {statusLabel(interest)}
                                                 </Badge>
                                             </TableCell>
-                                            {isAdmin && (
+                                            {canShowActionsColumn && (
                                                 <TableCell className="text-right">
-                                                    {!interest.confirmed_at && (
-                                                        <Button size="sm" onClick={() => handleConfirm(interest.id)}>
-                                                            Potvrdi
-                                                        </Button>
+                                                    {canManageInterest(interest) && (
+                                                        <div className="flex flex-col justify-end gap-2 sm:flex-row">
+                                                            {isAdmin && !interest.confirmed_at && (
+                                                                <Button size="sm" onClick={() => handleConfirm(interest.id)}>
+                                                                    Potvrdi
+                                                                </Button>
+                                                            )}
+                                                            <Button
+                                                                size="sm"
+                                                                variant="destructive"
+                                                                onClick={() => handleRemoveInterest(interest.id)}
+                                                            >
+                                                                Ukloni
+                                                            </Button>
+                                                        </div>
                                                     )}
                                                 </TableCell>
                                             )}
@@ -273,6 +295,7 @@ export default function ProjectShow({
                                 )}
                             </TableBody>
                         </Table>
+                        </div>
                     </CardContent>
                 </Card>
             </ContentHolder>

@@ -1,15 +1,14 @@
-import React from "react";
+import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Member } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import ContentHolder from "@/components/content-holder";
-import { PlusIcon } from "lucide-react";
-import { ActionsMenu } from "@/components/actions-menu";
-import { Input } from "@/components/ui/input";
-import { formatDateEU } from "@/lib/utils";
-
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import ContentHolder from '@/components/content-holder';
+import { ActionsMenu } from '@/components/actions-menu';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { formatDateEU } from '@/lib/utils';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -22,8 +21,6 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-
-
 export default function Index({ articles }: Member[] | any) {
     const { props } = usePage();
     const role = (props as any)?.auth?.user?.role ?? '';
@@ -33,9 +30,6 @@ export default function Index({ articles }: Member[] | any) {
     const [date, setDate] = React.useState('');
 
     const stripHtml = (value?: string) => (value ? value.replace(/<[^>]*>/g, '') : '');
-    const truncate = (value: string, max = 140) =>
-        value.length > max ? `${value.slice(0, max).trim()}…` : value;
-
     const filteredArticles = React.useMemo(() => {
         const query = search.trim().toLowerCase();
         return (articles ?? []).filter((article: any) => {
@@ -54,126 +48,141 @@ export default function Index({ articles }: Member[] | any) {
             return matchesQuery && matchesDate;
         });
     }, [articles, date, search]);
-    
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Vijesti" />
             <ContentHolder>
-                <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex flex-1 flex-wrap items-center gap-3">
-                        <Input
-                            placeholder="Pretraga po naslovu ili sadržaju..."
-                            value={search}
-                            onChange={(event) => setSearch(event.target.value)}
-                            className="min-w-[220px] flex-1"
-                        />
-                        <Input
-                            type="date"
-                            value={date}
-                            onChange={(event) => setDate(event.target.value)}
-                            className="w-[170px]"
-                        />
-                        {(search || date) && (
-                            <Button
-                                type="button"
-                                variant="secondary"
-                                onClick={() => {
-                                    setSearch('');
-                                    setDate('');
-                                }}
-                            >
-                                Resetuj
-                            </Button>
-                        )}
-                    </div>
-                    {isManager && (
-                        <Button asChild>
-                            <Link href={route('articles.create')}>
-                                <PlusIcon className="w-4 h-4 mr-2" />
-                                Dodaj vijest
-                            </Link>
-                        </Button>
-                    )}
-                </div>
-                <Table className="mt-4 overflow-hidden rounded-lg border">
-                    <TableHeader>
-                        <TableRow className="bg-muted/40">
-                            <TableHead>ID</TableHead>
-                            <TableHead>Slika</TableHead>
-                            <TableHead>Naslov</TableHead>
-                            <TableHead>Uvod</TableHead>
-                            <TableHead>Datum</TableHead>
-                            <TableHead className="text-right">Akcije</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {
-                            filteredArticles.length > 0 ? (
-                                filteredArticles.map((article: any, index: number) => {
-                                    return (
-                                        <TableRow key={index} className="hover:bg-muted/40">
-                                            <TableCell>{article.id}</TableCell>
-                                            <TableCell>
-                                                <img
-                                                    src={article.image_url}
-                                                    className="h-16 w-16 rounded-md object-cover"
-                                                    alt={article.title ?? 'Vijest'}
-                                                />
-                                            </TableCell>
-                                            <TableCell className="font-medium">{article.title}</TableCell>
-                                            <TableCell className="max-w-[360px] text-sm text-muted-foreground">
-                                                {truncate(stripHtml(article.intro))}
-                                            </TableCell>
-                                            <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                                                {article.created_at ? formatDateEU(article.created_at) : '-'}
-                                            </TableCell>
-                                            <TableCell className="text-right">
-                                                <ActionsMenu
-                                                    actions={[
-                                                        {
-                                                            type: 'item',
-                                                            label: 'Detalji',
-                                                            href: route('articles.show', { article: article.id }),
-                                                        },
-                                                        ...(isManager
-                                                            ? [
-                                                                {
-                                                                    type: 'item' as const,
-                                                                    label: 'Uredi',
-                                                                    href: route('articles.edit', { article: article.id }),
-                                                                },
-                                                            ]
-                                                            : []),
-                                                        ...(isAdmin
-                                                            ? [
-                                                                { type: 'separator' as const },
-                                                                {
-                                                                    type: 'item' as const,
-                                                                    label: 'Obriši',
-                                                                    variant: 'destructive',
-                                                                    onSelect: () =>
-                                                                        router.delete(route('articles.destroy', { article: article.id })),
-                                                                },
-                                                            ]
-                                                            : []),
-                                                    ]}
-                                                />
-                                            </TableCell>
-                                        </TableRow>
-                                    );
-                                })
-                            ) : (
+                <Card>
+                    <CardHeader className="space-y-3">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <CardTitle>Vijesti</CardTitle>
+                            {isManager && (
+                                <Button asChild>
+                                    <Link href={route('articles.create')}>Dodaj novo</Link>
+                                </Button>
+                            )}
+                        </div>
+                        <form
+                            className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:items-center"
+                            onSubmit={(e) => {
+                                e.preventDefault();
+                            }}
+                        >
+                            <Input
+                                placeholder="Pretraga po naslovu ili sadržaju..."
+                                value={search}
+                                onChange={(event) => setSearch(event.target.value)}
+                            />
+                            <Input
+                                type="date"
+                                value={date}
+                                onChange={(event) => setDate(event.target.value)}
+                            />
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    variant="secondary"
+                                    type="submit"
+                                    className="w-full sm:w-auto"
+                                >
+                                    Pretraži
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full sm:w-auto"
+                                    onClick={() => {
+                                        setSearch('');
+                                        setDate('');
+                                    }}
+                                >
+                                    Reset
+                                </Button>
+                            </div>
+                        </form>
+                    </CardHeader>
+                    <CardContent className="p-0 pt-0">
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={6} className="text-center text-muted-foreground">
-                                        {search || date ? 'Nema rezultata pretrage' : 'Nema vijesti'}
-                                    </TableCell>
+                                    <TableHead>ID</TableHead>
+                                    <TableHead>Slika</TableHead>
+                                    <TableHead>Naslov</TableHead>
+                                    <TableHead>Uvod</TableHead>
+                                    <TableHead>Datum</TableHead>
+                                    <TableHead className="w-40 text-right">Opcije</TableHead>
                                 </TableRow>
-                            )
-                        }
-                    </TableBody>
-                </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {filteredArticles.length > 0 ? (
+                                    filteredArticles.map((article: any) => {
+                                        return (
+                                            <TableRow key={article.id}>
+                                                <TableCell>{article.id}</TableCell>
+                                                <TableCell>
+                                                    <img
+                                                        src={article.image_url}
+                                                        className="h-16 w-16 rounded-md object-cover"
+                                                        alt={article.title ?? 'Vijest'}
+                                                    />
+                                                </TableCell>
+                                                <TableCell className="font-medium">{article.title}</TableCell>
+                                                <TableCell className="max-w-[360px] text-sm text-muted-foreground">
+                                                    <div
+                                                        className="max-h-20 overflow-hidden"
+                                                        dangerouslySetInnerHTML={{ __html: article.intro ?? '' }}
+                                                    />
+                                                </TableCell>
+                                                <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
+                                                    {article.created_at ? formatDateEU(article.created_at) : '-'}
+                                                </TableCell>
+                                                <TableCell className="text-right">
+                                                    <ActionsMenu
+                                                        actions={[
+                                                            {
+                                                                type: 'item',
+                                                                label: 'Detalji',
+                                                                href: route('articles.show', { article: article.id }),
+                                                            },
+                                                            ...(isManager
+                                                                ? [
+                                                                    {
+                                                                        type: 'item' as const,
+                                                                        label: 'Uredi',
+                                                                        href: route('articles.edit', { article: article.id }),
+                                                                    },
+                                                                ]
+                                                                : []),
+                                                            ...(isAdmin
+                                                                ? [
+                                                                    { type: 'separator' as const },
+                                                                    {
+                                                                        type: 'item' as const,
+                                                                        label: 'Obriši',
+                                                                        variant: 'destructive',
+                                                                        onSelect: () =>
+                                                                            router.delete(route('articles.destroy', { article: article.id })),
+                                                                    },
+                                                                ]
+                                                                : []),
+                                                        ]}
+                                                    />
+                                                </TableCell>
+                                            </TableRow>
+                                        );
+                                    })
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="text-center text-muted-foreground">
+                                            {search || date ? 'Nema rezultata pretrage' : 'Nema vijesti'}
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
             </ContentHolder>
-
         </AppLayout>
     );
 }

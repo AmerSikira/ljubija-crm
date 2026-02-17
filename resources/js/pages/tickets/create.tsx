@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import InputError from '@/components/input-error';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -30,48 +31,51 @@ export default function TicketCreate() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Nova poruka" />
             <ContentHolder className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold">Nova poruka</h1>
-                    <Button variant="ghost" asChild>
-                        <Link href={route('tickets.index')}>Nazad na tikete</Link>
-                    </Button>
-                </div>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="subject">Naslov</Label>
-                        <Input
-                            id="subject"
-                            value={data.subject}
-                            onChange={(e) => setData('subject', e.target.value)}
-                            required
-                            maxLength={150}
-                        />
-                        <InputError message={errors.subject} />
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="message">Poruka</Label>
-                        <Textarea
-                            id="message"
-                            value={data.message}
-                            onChange={(e) => setData('message', e.target.value)}
-                            required
-                            minLength={5}
-                            rows={5}
-                            placeholder="Opišite upit ili problem..."
-                        />
-                        <InputError message={errors.message} />
-                    </div>
-
-                    <div className="flex justify-end gap-2">
-                        <Button variant="outline" type="button" asChild>
-                            <Link href={route('tickets.index')}>Otkaži</Link>
+                <Card>
+                    <CardHeader className="flex flex-row items-center justify-between">
+                        <CardTitle>Nova poruka</CardTitle>
+                        <Button variant="ghost" asChild>
+                            <Link href={route('tickets.index')}>Nazad na tikete</Link>
                         </Button>
-                        <Button type="submit" disabled={processing}>
-                            Pošalji poruku
-                        </Button>
-                    </div>
-                </form>
+                    </CardHeader>
+                    <CardContent>
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="subject">Naslov</Label>
+                                <Input
+                                    id="subject"
+                                    value={data.subject}
+                                    onChange={(e) => setData('subject', e.target.value)}
+                                    required
+                                    maxLength={150}
+                                />
+                                <InputError message={errors.subject} />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="message">Poruka</Label>
+                                <Textarea
+                                    id="message"
+                                    value={data.message}
+                                    onChange={(e) => setData('message', e.target.value)}
+                                    required
+                                    minLength={5}
+                                    rows={5}
+                                    placeholder="Opišite upit ili problem..."
+                                />
+                                <InputError message={errors.message} />
+                            </div>
+
+                            <div className="flex justify-end gap-2">
+                                <Button variant="outline" type="button" asChild>
+                                    <Link href={route('tickets.index')}>Otkaži</Link>
+                                </Button>
+                                <Button type="submit" disabled={processing}>
+                                    Pošalji poruku
+                                </Button>
+                            </div>
+                        </form>
+                    </CardContent>
+                </Card>
             </ContentHolder>
         </AppLayout>
     );

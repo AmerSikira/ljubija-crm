@@ -3,6 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import ContentHolder from '@/components/content-holder';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
+import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -65,84 +66,88 @@ export default function AdminTicketsIndex({ tickets, filters }: { tickets: Ticke
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Poruke (admin)" />
             <ContentHolder>
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-2xl font-bold">Poruke</h1>
-                    <Badge variant="secondary">Nepročitani: {tickets.filter((t) => t.admin_unread).length}</Badge>
-                </div>
+                <div className="mb-4 space-y-3">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <h1 className="text-2xl font-bold">Poruke</h1>
+                        <Badge variant="secondary">Nepročitani: {tickets.filter((t) => t.admin_unread).length}</Badge>
+                    </div>
 
-                <form onSubmit={handleSearch} className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
-                    <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:items-center">
                         <Input
                             placeholder="Pretraži po naslovu"
                             value={data.search}
                             onChange={(e) => setData('search', e.target.value)}
-                            className="w-full sm:w-72"
                         />
-                        <div className="flex gap-2">
-                            <Button type="submit" variant="secondary">
+
+                        <div className="flex items-center gap-2">
+                            <Button type="submit" variant="secondary" className="w-full sm:w-auto">
                                 Pretraži
                             </Button>
-                            <Button type="button" variant="outline" onClick={handleReset}>
-                                Resetuj
+                            <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleReset}>
+                                Reset
                             </Button>
                         </div>
-                    </div>
-                </form>
+                    </form>
+                </div>
 
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Naslov</TableHead>
-                            <TableHead>Korisnik</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead>Zadnja aktivnost</TableHead>
-                            <TableHead>Kreirano</TableHead>
-                            <TableHead className="text-right">Akcije</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {tickets.length ? (
-                            tickets.map((ticket) => (
-                                <TableRow key={ticket.id} className={ticket.admin_unread ? 'bg-primary/5' : ''}>
-                                    <TableCell>
-                                        <Link href={route('admin.tickets.show', { ticket: ticket.id })} className="font-medium hover:underline">
-                                            {ticket.subject}
-                                        </Link>
-                                    </TableCell>
-                                    <TableCell>{ticket.user.name}</TableCell>
-                                    <TableCell>
-                                        <Badge variant={ticket.status === 'odgovoreno' ? 'secondary' : 'default'}>
-                                            {statusLabel(ticket.status)}
-                                        </Badge>
-                                    </TableCell>
-                                    <TableCell>{formatDateTime(ticket.last_activity_at)}</TableCell>
-                                    <TableCell>{formatDateTime(ticket.created_at)}</TableCell>
-                                    <TableCell className="text-right">
-                                        <ActionsMenu
-                                            actions={[
-                                                { type: 'item', label: 'Odgovori', href: route('admin.tickets.show', { ticket: ticket.id }) },
-                                                { type: 'item', label: 'Pogledaj', href: route('admin.tickets.show', { ticket: ticket.id }) },
-                                                { type: 'separator' },
-                                                {
-                                                    type: 'item',
-                                                    label: 'Izbriši',
-                                                    variant: 'destructive',
-                                                    onSelect: () => handleDelete(ticket.id),
-                                                },
-                                            ]}
-                                        />
-                                    </TableCell>
+                <Card>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>Naslov</TableHead>
+                                    <TableHead>Korisnik</TableHead>
+                                    <TableHead>Status</TableHead>
+                                    <TableHead>Zadnja aktivnost</TableHead>
+                                    <TableHead>Kreirano</TableHead>
+                                    <TableHead className="w-40 text-right">Opcije</TableHead>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={6} className="text-center text-muted-foreground">
-                                    Nema tiketa.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {tickets.length ? (
+                                    tickets.map((ticket) => (
+                                        <TableRow key={ticket.id} className={ticket.admin_unread ? 'bg-primary/5' : ''}>
+                                            <TableCell>
+                                                <Link href={route('admin.tickets.show', { ticket: ticket.id })} className="font-medium hover:underline">
+                                                    {ticket.subject}
+                                                </Link>
+                                            </TableCell>
+                                            <TableCell>{ticket.user.name}</TableCell>
+                                            <TableCell>
+                                                <Badge variant={ticket.status === 'odgovoreno' ? 'secondary' : 'default'}>
+                                                    {statusLabel(ticket.status)}
+                                                </Badge>
+                                            </TableCell>
+                                            <TableCell>{formatDateTime(ticket.last_activity_at)}</TableCell>
+                                            <TableCell>{formatDateTime(ticket.created_at)}</TableCell>
+                                            <TableCell className="text-right">
+                                                <ActionsMenu
+                                                    actions={[
+                                                        { type: 'item', label: 'Odgovori', href: route('admin.tickets.show', { ticket: ticket.id }) },
+                                                        { type: 'item', label: 'Pogledaj', href: route('admin.tickets.show', { ticket: ticket.id }) },
+                                                        { type: 'separator' },
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Izbriši',
+                                                            variant: 'destructive',
+                                                            onSelect: () => handleDelete(ticket.id),
+                                                        },
+                                                    ]}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="text-center text-muted-foreground">
+                                            Nema tiketa.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
             </ContentHolder>
         </AppLayout>
     );

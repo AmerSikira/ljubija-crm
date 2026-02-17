@@ -1,9 +1,8 @@
-import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link } from '@inertiajs/react';
-import { Button } from "@/components/ui/button";
-import ContentHolder from "@/components/content-holder";
+import { Button } from '@/components/ui/button';
+import ContentHolder from '@/components/content-holder';
 import { useEffect, useMemo, useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -23,18 +22,18 @@ export default function Dashboard({ articles, daily_content }: any) {
 
     const cities = useMemo(
         () => [
-            { label: 'Perth', tz: 'Australia/Perth' },
-            { label: 'Sydney', tz: 'Australia/Sydney' },
             { label: 'San Francisco', tz: 'America/Los_Angeles' },
             { label: 'Chicago', tz: 'America/Chicago' },
             { label: 'New York', tz: 'America/New_York' },
             { label: 'London', tz: 'Europe/London' },
             { label: 'Ljubija', tz: 'Europe/Sarajevo' },
-            { label: 'Istanbul', tz: 'Europe/Istanbul' },
+            { label: 'Cairo', tz: 'Africa/Cairo' },
             { label: 'Mecca', tz: 'Asia/Riyadh' },
-            { label: 'Doha', tz: 'Asia/Qatar' },
+            { label: 'Karachi', tz: 'Asia/Karachi' },
+            { label: 'Kuala Lumpur', tz: 'Asia/Kuala_Lumpur' },
+            { label: 'Perth', tz: 'Australia/Perth' },
             { label: 'Tokyo', tz: 'Asia/Tokyo' },
-            { label: 'Moscow', tz: 'Europe/Moscow' },
+            { label: 'Sydney', tz: 'Australia/Sydney' },
         ],
         []
     );
@@ -50,7 +49,7 @@ export default function Dashboard({ articles, daily_content }: any) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Početna stranica" />
-           <ContentHolder>
+            <ContentHolder>
                 <div className="mb-6 space-y-2">
                     <div className="rounded-lg border bg-card p-3 shadow-sm">
                         <h2 className="mb-2 text-lg font-semibold">Trenutna vremena</h2>
@@ -58,7 +57,11 @@ export default function Dashboard({ articles, daily_content }: any) {
                             {cities.map((city) => (
                                 <div
                                     key={city.label}
-                                    className="flex items-center justify-between rounded-md border bg-background px-3 py-2 shadow-xs"
+                                    className={`flex items-center justify-between rounded-md border px-3 py-2 shadow-xs ${
+                                        city.label === 'Ljubija'
+                                            ? 'border-primary/30 bg-primary/5'
+                                            : 'bg-background'
+                                    }`}
                                 >
                                     <div className="text-sm font-medium">{city.label}</div>
                                     <div className="text-lg font-semibold tabular-nums">{formatTime(city.tz)}</div>
@@ -68,10 +71,10 @@ export default function Dashboard({ articles, daily_content }: any) {
                     </div>
                 </div>
                 <div className="mb-8 rounded-lg border bg-card p-4 shadow-sm">
-                    <div className="mb-2 flex items-center justify-between">
+                    <div className="mb-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                         <h2 className="text-xl font-semibold">Uputa dana</h2>
                         {daily_content?.type_label && (
-                            <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
+                            <span className="w-fit rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
                                 {daily_content.type_label}
                             </span>
                         )}
@@ -86,52 +89,51 @@ export default function Dashboard({ articles, daily_content }: any) {
                     )}
                 </div>
                 <h1 className="mb-4 font-bold text-2xl">Vijesti iz džemata</h1>
-                <div className="grid grid-cols-5">
-            {articles.length === 0 && (
-                <div className="col-span-5">
-                    <div className="h-48 w-full border rounded-lg flex items-center justify-center text-gray-600">
-                        Ovdje će biti objavljene vijesti
-                    </div>
-                </div>
-            )}
-
-            {articles.map((article: any) => (
-                <a href={`/articles/show/${article.id}`} key={article.id} className="p-4">
-                    <div className="border rounded-lg overflow-hidden shadow-lg">
-                        {article.image_url ? (
-                            <img
-                                src={article.image_url}
-                                alt={article.title}
-                                className="w-full h-48 object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-48 bg-gray-200 flex items-center justify-center">
-                                <span className="text-gray-500">Nema slike</span>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+                    {articles.length === 0 && (
+                        <div className="sm:col-span-2 xl:col-span-3 2xl:col-span-4">
+                            <div className="flex h-48 w-full items-center justify-center rounded-lg border text-gray-600">
+                                Ovdje će biti objavljene vijesti
                             </div>
-                        )}
-                        <div className="p-4">
-                            <h2 className="font-bold text-xl mb-2">{article.title}</h2>
-                            <p className="text-gray-700 text-base">
-                                {article.intro.length > 100 ? article.intro.substring(0, 100) + '...' : article.intro}
-                            </p>
                         </div>
-                    </div>
-                </a>
-            ))}
-           </div>
-            {articles.length > 0 && (
-                <div className="flex justify-center">
-                    <Button asChild>
-                    <Link href={route('articles')}>
-                        Pogledaj sve vijesti
-                    </Link>
-                </Button>
+                    )}
+
+                    {articles.map((article: any) => (
+                        <a href={`/articles/show/${article.id}`} key={article.id} className="block">
+                            <div className="overflow-hidden rounded-lg border shadow-lg">
+                                {article.image_url ? (
+                                    <img
+                                        src={article.image_url}
+                                        alt={article.title}
+                                        className="h-48 w-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="flex h-48 w-full items-center justify-center bg-gray-200">
+                                        <span className="text-gray-500">Nema slike</span>
+                                    </div>
+                                )}
+                                <div className="p-4">
+                                    <h2 className="mb-2 text-xl font-bold">{article.title}</h2>
+                                    <div
+                                        className="max-h-24 overflow-hidden text-base text-gray-700"
+                                        dangerouslySetInnerHTML={{ __html: article.intro ?? '' }}
+                                    />
+                                </div>
+                            </div>
+                        </a>
+                    ))}
                 </div>
-            )}
-           <hr className="my-6" />
-           </ContentHolder>
-           
-           
+                {articles.length > 0 && (
+                    <div className="mt-6 flex justify-center">
+                        <Button asChild className="w-full sm:w-auto">
+                            <Link href={route('articles')}>
+                                Pogledaj sve vijesti
+                            </Link>
+                        </Button>
+                    </div>
+                )}
+                <hr className="my-6" />
+            </ContentHolder>
         </AppLayout>
     );
 }

@@ -4,6 +4,7 @@ import { type BreadcrumbItem } from "@/types";
 import { Head, useForm } from "@inertiajs/react";
 import ContentHolder from "@/components/content-holder";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 type PollItem = {
     id: number;
@@ -50,48 +51,51 @@ export default function Show({ poll }: { poll: Poll }) {
         <AppLayout breadcrumbs={breadcrumbs(poll.id)}>
             <Head title={`Anketa #${poll.id}`} />
             <ContentHolder>
-                <div className="space-y-4">
-                    <div>
-                        <h1 className="text-2xl font-bold">{poll.title}</h1>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{poll.title}</CardTitle>
                         {poll.description && <p className="text-muted-foreground mt-2">{poll.description}</p>}
-                    </div>
-
-                    <div>
-                        <h2 className="text-lg font-semibold mb-2">Opcije</h2>
-                        {poll.finished_at && (
-                            <div className="text-sm text-red-600 mb-2">Glasanje je završeno.</div>
-                        )}
-                        <form onSubmit={handleSubmit} className="space-y-3">
-                            <div className="space-y-2">
-                                {poll.items.map((item) => (
-                                    <label
-                                        key={item.id}
-                                        className="flex items-center justify-between border rounded-md px-3 py-2 cursor-pointer"
-                                    >
-                                        <div className="flex items-center gap-2">
-                                            <input
-                                            type="radio"
-                                            name="poll_item_id"
-                                            value={item.id}
-                                            checked={data.poll_item_id === item.id}
-                                            onChange={() => setData("poll_item_id", item.id)}
-                                            disabled={!!poll.finished_at}
-                                        />
-                                        <span>{item.title}</span>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            <div>
+                                <h2 className="text-lg font-semibold mb-2">Opcije</h2>
+                                {poll.finished_at && (
+                                    <div className="text-sm text-red-600 mb-2">Glasanje je završeno.</div>
+                                )}
+                                <form onSubmit={handleSubmit} className="space-y-3">
+                                    <div className="space-y-2">
+                                        {poll.items.map((item) => (
+                                            <label
+                                                key={item.id}
+                                                className="flex items-center justify-between border rounded-md px-3 py-2 cursor-pointer"
+                                            >
+                                                <div className="flex items-center gap-2">
+                                                    <input
+                                                        type="radio"
+                                                        name="poll_item_id"
+                                                        value={item.id}
+                                                        checked={data.poll_item_id === item.id}
+                                                        onChange={() => setData("poll_item_id", item.id)}
+                                                        disabled={!!poll.finished_at}
+                                                    />
+                                                    <span>{item.title}</span>
+                                                </div>
+                                                <span className="text-sm text-muted-foreground">Glasova: {item.votes_count}</span>
+                                            </label>
+                                        ))}
                                     </div>
-                                    <span className="text-sm text-muted-foreground">Glasova: {item.votes_count}</span>
-                                </label>
-                            ))}
+                                    {errors.poll_item_id && <div className="text-red-500">{errors.poll_item_id}</div>}
+                                    {!poll.finished_at && (
+                                        <Button type="submit" disabled={processing || !data.poll_item_id}>
+                                            Glasaj
+                                        </Button>
+                                    )}
+                                </form>
                             </div>
-                            {errors.poll_item_id && <div className="text-red-500">{errors.poll_item_id}</div>}
-                            {!poll.finished_at && (
-                                <Button type="submit" disabled={processing || !data.poll_item_id}>
-                                    Glasaj
-                                </Button>
-                            )}
-                        </form>
-                    </div>
-                </div>
+                        </div>
+                    </CardContent>
+                </Card>
             </ContentHolder>
         </AppLayout>
     );

@@ -1,15 +1,15 @@
-import React from "react";
+import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head, Link, useForm, router } from '@inertiajs/react';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { PlusIcon } from "lucide-react";
-import ContentHolder from "@/components/content-holder";
-import { Input } from "@/components/ui/input";
-import { DatePicker } from "@/components/date-picker";
-import { ActionsMenu } from "@/components/actions-menu";
-import { formatDateEU } from "@/lib/utils";
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import ContentHolder from '@/components/content-holder';
+import { Input } from '@/components/ui/input';
+import { DatePicker } from '@/components/date-picker';
+import { ActionsMenu } from '@/components/actions-menu';
+import { Card, CardContent } from '@/components/ui/card';
+import { formatDateEU } from '@/lib/utils';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -78,8 +78,17 @@ export default function Index({ payments, filters }: { payments: Pagination<Paym
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Uplate" />
             <ContentHolder>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-5 sm:items-center sm:gap-3">
+                <div className="mb-4 space-y-3">
+                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                        <h1 className="text-2xl font-bold">Uplate</h1>
+                        <Button asChild>
+                            <Link href={route('payments.create')}>
+                                Dodaj novo
+                            </Link>
+                        </Button>
+                    </div>
+
+                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-5 sm:items-center">
                         <Input
                             placeholder="Ime ili prezime"
                             value={data.name}
@@ -96,93 +105,92 @@ export default function Index({ payments, filters }: { payments: Pagination<Paym
                             selected={parsePickerDate(data.date)}
                             handleChange={(date) => setData('date', formatPickerDate(date))}
                         />
-                        
-                            <Button type="submit" variant="secondary">Pretraži</Button>
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={() => {
-                                    setData({ name: '', amount: '', date: '' });
-                                    router.get(route('payments'), {}, { preserveScroll: true });
-                                }}
-                            >
-                                Reset
-                            </Button>
-                        
+                        <Button type="submit" variant="secondary" className="w-full sm:w-auto">
+                            Pretraži
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full sm:w-auto"
+                            onClick={() => {
+                                setData({ name: '', amount: '', date: '' });
+                                router.get(route('payments'), {}, { preserveScroll: true });
+                            }}
+                        >
+                            Reset
+                        </Button>
                     </form>
-                    <Button asChild>
-                        <Link href={route('payments.create')}>
-                            <PlusIcon className="w-4 h-4 mr-2" />
-                            Dodaj uplatu
-                        </Link>
-                    </Button>
                 </div>
                 <p className="text-sm text-muted-foreground my-2">Prikazuje se zadnjih 20 uplata po stranici.</p>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>ID</TableHead>
-                            <TableHead>Iznos</TableHead>
-                            <TableHead>Datum uplate</TableHead>
-                            <TableHead>Vrsta</TableHead>
-                            <TableHead>Ime i prezime</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Telefon</TableHead>
-                            <TableHead className="text-right">Akcije</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {payments.data.length > 0 ? (
-                            payments.data.map((payment) => (
-                                <TableRow key={payment.id}>
-                                    <TableCell>{payment.id}</TableCell>
-                                    <TableCell>{payment.amount}</TableCell>
-                                    <TableCell>{formatDate(payment.date_of_payment)}</TableCell>
-                                    <TableCell>{payment.type_of_payment}</TableCell>
-
-                                    <TableCell>{payment.member.first_name} {payment.member.last_name}</TableCell>
-                                    <TableCell>{payment.member.email}</TableCell>
-                                    <TableCell>{payment.member.phone}</TableCell>
-                                    <TableCell className="text-right">
-                                        <ActionsMenu
-                                            actions={[
-                                                {
-                                                    type: 'item',
-                                                    label: 'Detalji',
-                                                    href: route('payments.edit', { payment: payment.id }),
-                                                },
-                                                {
-                                                    type: 'item',
-                                                    label: 'Uredi',
-                                                    href: route('payments.edit', { payment: payment.id }),
-                                                },
-                                                { type: 'separator' },
-                                                {
-                                                    type: 'item',
-                                                    label: 'Obriši',
-                                                    variant: 'destructive',
-                                                    onSelect: () => router.delete(route('payments.destroy', { payment: payment.id })),
-                                                },
-                                            ]}
-                                        />
-                                    </TableCell>
+                <Card>
+                    <CardContent className="p-0">
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>ID</TableHead>
+                                    <TableHead>Iznos</TableHead>
+                                    <TableHead>Datum uplate</TableHead>
+                                    <TableHead>Vrsta</TableHead>
+                                    <TableHead>Ime i prezime</TableHead>
+                                    <TableHead>Email</TableHead>
+                                    <TableHead>Telefon</TableHead>
+                                    <TableHead className="w-40 text-right">Opcije</TableHead>
                                 </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={8} className="text-center">
-                                    Nema uplata
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {payments.data.length > 0 ? (
+                                    payments.data.map((payment) => (
+                                        <TableRow key={payment.id}>
+                                            <TableCell>{payment.id}</TableCell>
+                                            <TableCell>{payment.amount}</TableCell>
+                                            <TableCell>{formatDate(payment.date_of_payment)}</TableCell>
+                                            <TableCell>{payment.type_of_payment}</TableCell>
+
+                                            <TableCell>{payment.member.first_name} {payment.member.last_name}</TableCell>
+                                            <TableCell>{payment.member.email}</TableCell>
+                                            <TableCell>{payment.member.phone}</TableCell>
+                                            <TableCell className="text-right">
+                                                <ActionsMenu
+                                                    actions={[
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Detalji',
+                                                            href: route('payments.edit', { payment: payment.id }),
+                                                        },
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Uredi',
+                                                            href: route('payments.edit', { payment: payment.id }),
+                                                        },
+                                                        { type: 'separator' },
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Obriši',
+                                                            variant: 'destructive',
+                                                            onSelect: () => router.delete(route('payments.destroy', { payment: payment.id })),
+                                                        },
+                                                    ]}
+                                                />
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={8} className="text-center text-muted-foreground">
+                                            Nema uplata
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
                 <div className="flex justify-end gap-2 mt-4">
                     {payments.links.map((link, index) => (
                         <Button
                             key={index}
                             asChild
-                            variant={link.active ? "secondary" : "outline"}
+                            variant={link.active ? 'secondary' : 'outline'}
                             disabled={!link.url}
                         >
                             <Link

@@ -6,6 +6,7 @@ import ContentHolder from "@/components/content-holder";
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { PlusIcon } from 'lucide-react';
 import { DatePicker } from '@/components/date-picker';
 import MemberAutocomplete from '@/components/member-autocomplete';
@@ -135,7 +136,12 @@ export default function Create({ users }: { users: any }) {
                 <AppLayout breadcrumbs={breadcrumbs}>
                         <Head title="Članovi" />
                         <ContentHolder>
-                <form className="grid grid-cols-1" onSubmit={handleSubmit}>
+                                <Card>
+                                        <CardHeader>
+                                                <CardTitle>Dodaj člana</CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                                <form className="grid grid-cols-1" onSubmit={handleSubmit}>
                                         <div className="mb-6 flex flex-col items-center gap-3">
                                                 <div className="h-24 w-24 overflow-hidden rounded-full border bg-muted">
                                                         {previewUrl ? (
@@ -339,7 +345,9 @@ export default function Create({ users }: { users: any }) {
                                                         Spremite info o članu
                                                 </Button>
                                         </div>
-                                </form>
+                                                </form>
+                                        </CardContent>
+                                </Card>
                         </ContentHolder>
                 </AppLayout>
         )

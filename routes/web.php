@@ -114,6 +114,7 @@ Route::middleware([
     Route::delete('projects/{project}', [\App\Http\Controllers\ProjectController::class, 'destroy'])->name('projects.destroy');
     Route::post('projects/{project}/join', [\App\Http\Controllers\ProjectController::class, 'join'])->name('projects.join');
     Route::post('projects/{project}/interests/{interest}/confirm', [\App\Http\Controllers\ProjectController::class, 'confirmInterest'])->name('projects.interests.confirm');
+    Route::delete('projects/{project}/interests/{interest}', [\App\Http\Controllers\ProjectController::class, 'destroyInterest'])->name('projects.interests.destroy');
 
     //Memorials
     Route::get('memorials', [\App\Http\Controllers\MemorialController::class, 'index'])->name('memorials.index');
