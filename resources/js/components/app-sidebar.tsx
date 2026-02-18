@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarGroup, SidebarGroupLabel, SidebarMenuBadge } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
-import { BookOpen, DollarSign, Folder, LayoutGrid, User, HandCoins, Newspaper, BarChart2, Users, Heart, Book, PieChart, FileText, MoonStar, FileText as PaperIcon, MapPin } from 'lucide-react';
+import { BookOpen, DollarSign, Folder, LayoutGrid, User, HandCoins, Newspaper, BarChart2, Users, Heart, Book, PieChart, FileText, MoonStar, FileText as PaperIcon, MapPin, LibraryBig } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const footerNavItems: NavItem[] = [
@@ -139,7 +139,7 @@ export function AppSidebar() {
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild isActive={page.url.startsWith('/documents')} tooltip={{ children: 'Biblioteka dokumenata' }}>
                                 <Link href="/documents" prefetch>
-                                    <PaperIcon />
+                                    <LibraryBig />
                                     <span>Biblioteka dokumenata</span>
                                 </Link>
                             </SidebarMenuButton>
