@@ -137,6 +137,14 @@ export function AppSidebar() {
                     <SidebarGroupLabel>Dokumenti</SidebarGroupLabel>
                     <SidebarMenu>
                         <SidebarMenuItem>
+                            <SidebarMenuButton asChild isActive={page.url.startsWith('/documents')} tooltip={{ children: 'Biblioteka dokumenata' }}>
+                                <Link href="/documents" prefetch>
+                                    <PaperIcon />
+                                    <span>Biblioteka dokumenata</span>
+                                </Link>
+                            </SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
                             <SidebarMenuButton asChild tooltip={{ children: 'Ustav IZBiH' }}>
                                 <a href="/Ustav_IZBIH_2014.pdf" target="_blank" rel="noreferrer">
                                     <PaperIcon />

@@ -23,5 +23,6 @@ class DzematPage extends Model implements HasMedia
     public function registerMediaCollections(): void
     {
         $this->addMediaCollection('gallery');
+        $this->addMediaCollection('documents');
     }
 }

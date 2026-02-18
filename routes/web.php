@@ -134,6 +134,11 @@ Route::middleware([
     Route::post('dzemat', [\App\Http\Controllers\DzematPageController::class, 'update'])->name('dzemat.update');
     Route::post('dzemat/upload', [\App\Http\Controllers\DzematPageController::class, 'upload'])->name('dzemat.upload');
 
+    //Document library
+    Route::get('documents', [\App\Http\Controllers\DocumentLibraryController::class, 'index'])->name('documents.index');
+    Route::post('documents', [\App\Http\Controllers\DocumentLibraryController::class, 'store'])->name('documents.store');
+    Route::delete('documents/{media}', [\App\Http\Controllers\DocumentLibraryController::class, 'destroy'])->name('documents.destroy');
+
     //Mekteb
     Route::get('mekteb', [\App\Http\Controllers\MektebController::class, 'index'])->name('mekteb.index');
     Route::get('mekteb/create', [\App\Http\Controllers\MektebController::class, 'create'])->name('mekteb.create');
