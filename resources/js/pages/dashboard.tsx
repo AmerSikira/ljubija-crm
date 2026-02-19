@@ -46,6 +46,16 @@ export default function Dashboard({ articles, daily_content }: any) {
             timeZone,
         }).format(now);
 
+    const formatPublishedDate = (value?: string) => {
+        if (!value) return '';
+        const date = new Date(value);
+        if (Number.isNaN(date.getTime())) return '';
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Početna stranica" />
@@ -112,6 +122,9 @@ export default function Dashboard({ articles, daily_content }: any) {
                                         <span className="text-gray-500">Nema slike</span>
                                     </div>
                                 )}
+                                <div className="px-4 pt-2 text-xs text-muted-foreground">
+                                    {formatPublishedDate(article.created_at)}
+                                </div>
                                 <div className="p-4">
                                     <h2 className="mb-2 text-xl font-bold">{article.title}</h2>
                                     <div

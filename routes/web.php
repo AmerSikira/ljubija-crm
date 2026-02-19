@@ -5,7 +5,7 @@ use Inertia\Inertia;
 use Laravel\WorkOS\Http\Middleware\ValidateSessionWithWorkOS;
 
 Route::get('/', function () {
-    return Inertia::render('welcome');
+    return redirect('/login');
 })->name('home');
 
 Route::middleware([

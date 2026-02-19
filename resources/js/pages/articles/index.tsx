@@ -120,13 +120,19 @@ export default function Index({ articles }: Member[] | any) {
                                             <TableRow key={article.id}>
                                                 <TableCell>{article.id}</TableCell>
                                                 <TableCell>
-                                                    <img
-                                                        src={article.image_url}
-                                                        className="h-16 w-16 rounded-md object-cover"
-                                                        alt={article.title ?? 'Vijest'}
-                                                    />
+                                                    <Link href={route('articles.show', { article: article.id })}>
+                                                        <img
+                                                            src={article.image_url}
+                                                            className="h-16 w-16 rounded-md object-cover"
+                                                            alt={article.title ?? 'Vijest'}
+                                                        />
+                                                    </Link>
                                                 </TableCell>
-                                                <TableCell className="font-medium">{article.title}</TableCell>
+                                                <TableCell className="font-medium">
+                                                    <Link href={route('articles.show', { article: article.id })} className="hover:underline">
+                                                        {article.title}
+                                                    </Link>
+                                                </TableCell>
                                                 <TableCell className="max-w-[360px] text-sm text-muted-foreground">
                                                     <div
                                                         className="max-h-20 overflow-hidden"

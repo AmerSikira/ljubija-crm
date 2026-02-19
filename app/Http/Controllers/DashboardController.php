@@ -21,6 +21,7 @@ class DashboardController extends Controller
                 'title'      => $article->title,
                 'intro'      => $article->intro,
                 'main_text'  => $article->main_text,
+                'created_at' => $article->created_at?->toDateString(),
                 // change 'images' to your media collection if needed
                 'image_url'  => $article->getFirstMediaUrl('images', 'preview'),
             ];
