@@ -181,7 +181,7 @@ export function AppSidebar() {
                             <SidebarMenuButton asChild tooltip={{ children: 'Pravilnik' }}>
                                 <a href="/Radni_zadatak_imama_2025.pdf" target="_blank" rel="noreferrer">
                                     <PaperIcon />
-                                    <span>Radni zadataka imama</span>
+                                    <span>Radni zadaci imama</span>
                                 </a>
                             </SidebarMenuButton>
                         </SidebarMenuItem>

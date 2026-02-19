@@ -88,13 +88,13 @@ export default function BoardsIndex({
             <ContentHolder>
                 <div className="flex flex-col gap-6">
                     {(role === 'admin' || role === 'manager') && (
-                        <div className="flex justify-end gap-2">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
                             {currentBoard && (
-                                <Button variant="outline" asChild>
+                                <Button variant="outline" asChild className="w-full sm:w-auto">
                                     <Link href={route('boards.edit', currentBoard.id)}>Uredi aktuelni odbor</Link>
                                 </Button>
                             )}
-                            <Button asChild>
+                            <Button asChild className="w-full sm:w-auto">
                                 <Link href={route('boards.create')}>Dodaj odbor</Link>
                             </Button>
                         </div>

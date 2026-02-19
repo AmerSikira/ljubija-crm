@@ -68,7 +68,7 @@ export default function Show({ poll }: { poll: Poll }) {
                                         {poll.items.map((item) => (
                                             <label
                                                 key={item.id}
-                                                className="flex items-center justify-between border rounded-md px-3 py-2 cursor-pointer"
+                                                className="flex cursor-pointer items-center justify-between rounded-md border px-3 py-2"
                                             >
                                                 <div className="flex items-center gap-2">
                                                     <input
@@ -78,6 +78,7 @@ export default function Show({ poll }: { poll: Poll }) {
                                                         checked={data.poll_item_id === item.id}
                                                         onChange={() => setData("poll_item_id", item.id)}
                                                         disabled={!!poll.finished_at}
+                                                        className="h-4 w-4 accent-primary"
                                                     />
                                                     <span>{item.title}</span>
                                                 </div>
@@ -87,7 +88,7 @@ export default function Show({ poll }: { poll: Poll }) {
                                     </div>
                                     {errors.poll_item_id && <div className="text-red-500">{errors.poll_item_id}</div>}
                                     {!poll.finished_at && (
-                                        <Button type="submit" disabled={processing || !data.poll_item_id}>
+                                        <Button type="submit" className="w-full sm:w-auto" disabled={processing || !data.poll_item_id}>
                                             Glasaj
                                         </Button>
                                     )}

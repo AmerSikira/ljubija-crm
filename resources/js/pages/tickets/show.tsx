@@ -94,7 +94,9 @@ export default function TicketShow({ ticket, messages }: { ticket: Ticket; messa
                                     <div
                                         key={message.id}
                                         className={`rounded-md border p-3 ${
-                                            message.author_type === 'admin' ? 'bg-slate-50' : 'bg-white'
+                                            message.author_type === 'admin'
+                                                ? 'border-border bg-muted/50'
+                                                : 'border-border bg-background'
                                         }`}
                                     >
                                         <div className="flex flex-col gap-1 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
@@ -120,7 +122,7 @@ export default function TicketShow({ ticket, messages }: { ticket: Ticket; messa
                             <InputError message={errors.message} />
                             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                                 <div className="flex flex-col gap-2 sm:flex-row">
-                                    <Button variant="ghost" asChild className="w-full sm:w-auto">
+                                    <Button variant="outline" asChild className="w-full sm:w-auto">
                                         <Link href={route('tickets.index')}>Nazad na listu</Link>
                                     </Button>
                                     <Button variant="destructive" type="button" className="w-full sm:w-auto" onClick={handleTicketDelete}>

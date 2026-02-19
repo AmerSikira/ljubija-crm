@@ -190,8 +190,9 @@ export default function CreateBoard({
                                                 />
                                                 <Button
                                                     type="button"
-                                                    variant="ghost"
+                                                    variant="outline"
                                                     size="icon"
+                                                    className="shrink-0"
                                                     onClick={() => removeMemberField(index)}
                                                     aria-label="Ukloni člana"
                                                 >
@@ -202,7 +203,7 @@ export default function CreateBoard({
                                     })}
                                 </div>
                                 <div>
-                                    <Button type="button" variant="outline" onClick={addMemberField}>
+                                    <Button type="button" variant="outline" onClick={addMemberField} className="w-full sm:w-auto">
                                         Dodaj novog člana
                                     </Button>
                                 </div>
@@ -223,8 +224,9 @@ export default function CreateBoard({
                                                 />
                                                 <Button
                                                     type="button"
-                                                    variant="ghost"
+                                                    variant="outline"
                                                     size="icon"
+                                                    className="shrink-0"
                                                     onClick={() => removeExternalMemberField(index)}
                                                     aria-label="Ukloni člana"
                                                 >
@@ -234,7 +236,7 @@ export default function CreateBoard({
                                         ))}
                                     </div>
                                     <div className="mt-2">
-                                        <Button type="button" variant="outline" onClick={addExternalMemberField}>
+                                        <Button type="button" variant="outline" onClick={addExternalMemberField} className="w-full sm:w-auto">
                                             Dodaj vanjskog člana
                                         </Button>
                                     </div>
@@ -243,11 +245,11 @@ export default function CreateBoard({
                         </CardContent>
                     </Card>
 
-                    <div className="flex items-center justify-between">
-                        <Button variant="outline" asChild>
+                    <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <Button variant="outline" asChild className="w-full sm:w-auto">
                             <Link href={route('boards.index')}>Nazad</Link>
                         </Button>
-                        <Button type="submit">Sačuvaj odbor</Button>
+                        <Button type="submit" className="w-full sm:w-auto">Sačuvaj odbor</Button>
                     </div>
                 </form>
             </ContentHolder>

@@ -53,7 +53,7 @@ export default function ReportsIndex({ reports, filters }: { reports: ReportList
                     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                         <h1 className="text-2xl font-bold">Zapisnici</h1>
                         {isAdmin && (
-                            <Button asChild>
+                            <Button asChild className="w-full sm:w-auto">
                                 <Link href={route('reports.create')}>
                                     Dodaj novo
                                 </Link>

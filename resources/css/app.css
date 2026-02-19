@@ -93,6 +93,9 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+    --editor-surface: oklch(0.985 0 0);
+    --editor-toolbar: oklch(0.96 0 0);
+    --editor-panel: oklch(1 0 0);
 }
 
 .dark {
@@ -128,6 +131,9 @@
     --sidebar-accent-foreground: oklch(0.985 0 0);
     --sidebar-border: oklch(0.269 0 0);
     --sidebar-ring: oklch(0.439 0 0);
+    --editor-surface: oklch(0.19 0 0);
+    --editor-toolbar: oklch(0.24 0 0);
+    --editor-panel: oklch(0.22 0 0);
 }
 
 @layer base {
@@ -137,5 +143,42 @@
 
     body {
         @apply bg-background text-foreground;
+    }
+}
+
+@layer components {
+    .ck.ck-editor {
+        --ck-color-base-background: var(--editor-surface);
+        --ck-color-toolbar-background: var(--editor-toolbar);
+        --ck-color-toolbar-border: var(--border);
+        --ck-color-base-border: var(--border);
+        --ck-color-panel-background: var(--editor-panel);
+        --ck-color-panel-border: var(--border);
+        --ck-color-text: var(--foreground);
+        --ck-color-input-background: var(--editor-surface);
+        --ck-color-input-border: var(--border);
+        --ck-color-focus-border: var(--ring);
+        --ck-color-list-button-hover-background: var(--accent);
+        --ck-color-list-button-on-background: color-mix(in oklch, var(--accent) 70%, transparent);
+        --ck-color-button-default-hover-background: var(--accent);
+        --ck-color-button-default-active-background: color-mix(in oklch, var(--accent) 70%, transparent);
+        --ck-color-button-on-background: color-mix(in oklch, var(--accent) 70%, transparent);
+        --ck-color-button-on-hover-background: color-mix(in oklch, var(--accent) 80%, transparent);
+    }
+
+    .ck.ck-editor .ck-editor__main > .ck-editor__editable {
+        background: var(--editor-surface);
+        color: var(--foreground);
+        border-color: var(--border);
+    }
+
+    .ck.ck-editor .ck-toolbar {
+        border-color: var(--border);
+    }
+
+    .ck.ck-editor .ck-dropdown .ck-dropdown__panel,
+    .ck.ck-editor .ck-balloon-panel {
+        background: var(--editor-panel);
+        border-color: var(--border);
     }
 }

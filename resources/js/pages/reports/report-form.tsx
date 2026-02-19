@@ -216,7 +216,8 @@ export function ReportForm({ data, errors, setData, onSubmit, processing, submit
                                         />
                                         <Button
                                             type="button"
-                                            variant="secondary"
+                                            variant="outline"
+                                            className="shrink-0"
                                             onClick={() => removeBoardMember(index)}
                                         >
                                             Ukloni
@@ -224,7 +225,7 @@ export function ReportForm({ data, errors, setData, onSubmit, processing, submit
                                     </div>
                                 );
                             })}
-                            <Button type="button" variant="outline" onClick={addBoardMember}>
+                            <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={addBoardMember}>
                                 Dodaj člana
                             </Button>
                         </div>
@@ -259,14 +260,20 @@ export function ReportForm({ data, errors, setData, onSubmit, processing, submit
                                         onChange={(e) => updateAgendaItem(index, e.target.value)}
                                         placeholder={`Tačka ${index + 1}`}
                                     />
-                                    <Button type="button" variant="secondary" onClick={() => removeAgendaItem(index)} disabled={agendaItems.length <= 1}>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="shrink-0"
+                                        onClick={() => removeAgendaItem(index)}
+                                        disabled={agendaItems.length <= 1}
+                                    >
                                         Ukloni
                                     </Button>
                                 </div>
                             ))}
                         </div>
                         {errors.agenda && <span className="text-sm text-destructive">{errors.agenda}</span>}
-                        <Button type="button" variant="outline" onClick={addAgendaItem}>
+                        <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={addAgendaItem}>
                             Dodaj tačku
                         </Button>
                     </div>
@@ -378,13 +385,13 @@ export function ReportForm({ data, errors, setData, onSubmit, processing, submit
                                 </div>
                             </div>
                             <div className="flex justify-end">
-                                <Button type="button" variant="secondary" onClick={() => removeDecision(index)} disabled={decisions.length <= 1}>
+                                <Button type="button" variant="outline" onClick={() => removeDecision(index)} disabled={decisions.length <= 1}>
                                     Ukloni odluku
                                 </Button>
                             </div>
                         </div>
                     ))}
-                    <Button type="button" variant="outline" onClick={addDecision}>
+                    <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={addDecision}>
                         Dodaj odluku
                     </Button>
                     {errors.decisions && <span className="text-sm text-destructive">{errors.decisions}</span>}
@@ -419,13 +426,13 @@ export function ReportForm({ data, errors, setData, onSubmit, processing, submit
                 </CardContent>
             </Card>
 
-            <div className="flex justify-end gap-2">
+            <div className="flex flex-col-reverse justify-end gap-2 sm:flex-row">
                 {onDelete && (
-                    <Button type="button" variant="destructive" onClick={onDelete}>
+                    <Button type="button" variant="destructive" className="w-full sm:w-auto" onClick={onDelete}>
                         Obriši zapisnik
                     </Button>
                 )}
-                <Button type="submit" disabled={processing}>
+                <Button type="submit" className="w-full sm:w-auto" disabled={processing}>
                     {submitLabel}
                 </Button>
             </div>

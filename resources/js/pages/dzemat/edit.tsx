@@ -42,7 +42,7 @@ export default function DzematEdit({ page }: { page: DzematPage | null }) {
             <ContentHolder>
                 <div className="mb-4 flex items-center justify-between">
                     <h1 className="text-2xl font-bold">Uredi Džemat Ljubija</h1>
-                    <Button variant="ghost" asChild>
+                    <Button variant="outline" asChild>
                         <Link href={route('dzemat.show')}>Nazad</Link>
                     </Button>
                 </div>
@@ -101,11 +101,11 @@ export default function DzematEdit({ page }: { page: DzematPage | null }) {
                                 />
                                 {errors.gallery_uploads && <span className="text-sm text-destructive">{errors.gallery_uploads as string}</span>}
                             </div>
-                            <div className="flex items-center justify-end gap-2">
-                                <Button variant="ghost" asChild>
+                            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-end">
+                                <Button variant="outline" asChild className="w-full sm:w-auto">
                                     <Link href={route('dzemat.show')}>Otkaži</Link>
                                 </Button>
-                                <Button type="submit" disabled={processing}>
+                                <Button type="submit" disabled={processing} className="w-full sm:w-auto">
                                     Sačuvaj
                                 </Button>
                             </div>

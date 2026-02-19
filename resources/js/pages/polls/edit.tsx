@@ -5,6 +5,7 @@ import { Head, useForm, router } from "@inertiajs/react";
 import ContentHolder from "@/components/content-holder";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -100,9 +101,9 @@ export default function Edit({ poll }: { poll: Poll }) {
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="description">Opis</Label>
-                                <textarea
+                                <Textarea
                                     id="description"
-                                    className="border rounded-md p-2 min-h-[120px]"
+                                    className="min-h-[120px]"
                                     value={data.description}
                                     onChange={(e) => setData("description", e.target.value)}
                                     disabled={!!poll.finished_at}
@@ -114,7 +115,7 @@ export default function Edit({ poll }: { poll: Poll }) {
                                 <Label>Opcije</Label>
                                 <div className="space-y-3">
                                     {data.items.map((item, index) => (
-                                        <div key={`${item.id ?? "new"}-${index}`} className="flex gap-2 items-center">
+                                        <div key={`${item.id ?? "new"}-${index}`} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                                             <Input
                                                 type="text"
                                                 value={item.title}
@@ -124,7 +125,8 @@ export default function Edit({ poll }: { poll: Poll }) {
                                             />
                                             <Button
                                                 type="button"
-                                                variant="secondary"
+                                                variant="outline"
+                                                className="w-full shrink-0 sm:w-auto"
                                                 onClick={() => removeItem(index)}
                                                 disabled={data.items.length <= 1 || !!poll.finished_at}
                                             >
@@ -135,7 +137,13 @@ export default function Edit({ poll }: { poll: Poll }) {
                                 </div>
                                 {errors["items"] && <div className="text-red-500">{errors["items"]}</div>}
                                 {errors["items.*.title"] && <div className="text-red-500">{errors["items.*.title"]}</div>}
-                                <Button type="button" variant="outline" onClick={addItem} disabled={!!poll.finished_at}>
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    className="w-full sm:w-auto"
+                                    onClick={addItem}
+                                    disabled={!!poll.finished_at}
+                                >
                                     Dodaj opciju
                                 </Button>
                             </div>
@@ -152,12 +160,12 @@ export default function Edit({ poll }: { poll: Poll }) {
                                 </div>
                             )}
 
-                            <div className="flex gap-2">
-                                <Button type="submit" disabled={processing || !!poll.finished_at}>
+                            <div className="flex flex-col gap-2 sm:flex-row">
+                                <Button type="submit" className="w-full sm:w-auto" disabled={processing || !!poll.finished_at}>
                                     Spremi promjene
                                 </Button>
                                 {!poll.finished_at && (
-                                    <Button type="button" variant="destructive" onClick={handleDelete}>
+                                    <Button type="button" variant="destructive" className="w-full sm:w-auto" onClick={handleDelete}>
                                         Obriši anketu
                                     </Button>
                                 )}

@@ -22,28 +22,41 @@ export default function AppearanceToggleDropdown({ className = '', ...props }: H
         <div className={className} {...props}>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-9 w-9 rounded-md">
+                    <Button
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 rounded-md border-border bg-background text-foreground hover:bg-accent hover:text-accent-foreground"
+                    >
                         {getCurrentIcon()}
                         <span className="sr-only">Toggle theme</span>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={() => updateAppearance('light')}>
+                <DropdownMenuContent align="end" className="w-40">
+                    <DropdownMenuItem
+                        className="cursor-pointer text-foreground focus:bg-accent focus:text-accent-foreground"
+                        onClick={() => updateAppearance('light')}
+                    >
                         <span className="flex items-center gap-2">
                             <Sun className="h-5 w-5" />
-                            Light
+                            Svijetla
                         </span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => updateAppearance('dark')}>
+                    <DropdownMenuItem
+                        className="cursor-pointer text-foreground focus:bg-accent focus:text-accent-foreground"
+                        onClick={() => updateAppearance('dark')}
+                    >
                         <span className="flex items-center gap-2">
                             <Moon className="h-5 w-5" />
-                            Dark
+                            Tamna
                         </span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => updateAppearance('system')}>
+                    <DropdownMenuItem
+                        className="cursor-pointer text-foreground focus:bg-accent focus:text-accent-foreground"
+                        onClick={() => updateAppearance('system')}
+                    >
                         <span className="flex items-center gap-2">
                             <Monitor className="h-5 w-5" />
-                            System
+                            Sistem
                         </span>
                     </DropdownMenuItem>
                 </DropdownMenuContent>

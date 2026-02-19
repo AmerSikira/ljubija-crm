@@ -3,7 +3,7 @@ import AppLayout from '@/layouts/app-layout';
 import ContentHolder from '@/components/content-holder';
 import { Head, Link, router, useForm } from '@inertiajs/react';
 import { type BreadcrumbItem } from '@/types';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -66,32 +66,30 @@ export default function AdminTicketsIndex({ tickets, filters }: { tickets: Ticke
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Poruke (admin)" />
             <ContentHolder>
-                <div className="mb-4 space-y-3">
-                    <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                        <h1 className="text-2xl font-bold">Poruke</h1>
-                        <Badge variant="secondary">Nepročitani: {tickets.filter((t) => t.admin_unread).length}</Badge>
-                    </div>
-
-                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:items-center">
-                        <Input
-                            placeholder="Pretraži po naslovu"
-                            value={data.search}
-                            onChange={(e) => setData('search', e.target.value)}
-                        />
-
-                        <div className="flex items-center gap-2">
-                            <Button type="submit" variant="secondary" className="w-full sm:w-auto">
-                                Pretraži
-                            </Button>
-                            <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleReset}>
-                                Reset
-                            </Button>
-                        </div>
-                    </form>
-                </div>
-
                 <Card>
-                    <CardContent className="p-0">
+                    <CardHeader className="space-y-3">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                            <CardTitle>Poruke (admin)</CardTitle>
+                            <Badge variant="secondary">Nepročitani: {tickets.filter((t) => t.admin_unread).length}</Badge>
+                        </div>
+                        <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_auto] sm:items-center">
+                            <Input
+                                placeholder="Pretraži po naslovu"
+                                value={data.search}
+                                onChange={(e) => setData('search', e.target.value)}
+                            />
+
+                            <div className="flex items-center gap-2">
+                                <Button type="submit" variant="secondary" className="w-full sm:w-auto">
+                                    Pretraži
+                                </Button>
+                                <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={handleReset}>
+                                    Reset
+                                </Button>
+                            </div>
+                        </form>
+                    </CardHeader>
+                    <CardContent className="p-0 pt-0">
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -123,8 +121,7 @@ export default function AdminTicketsIndex({ tickets, filters }: { tickets: Ticke
                                             <TableCell className="text-right">
                                                 <ActionsMenu
                                                     actions={[
-                                                        { type: 'item', label: 'Odgovori', href: route('admin.tickets.show', { ticket: ticket.id }) },
-                                                        { type: 'item', label: 'Pogledaj', href: route('admin.tickets.show', { ticket: ticket.id }) },
+                                                        { type: 'item', label: 'Otvori razgovor', href: route('admin.tickets.show', { ticket: ticket.id }) },
                                                         { type: 'separator' },
                                                         {
                                                             type: 'item',

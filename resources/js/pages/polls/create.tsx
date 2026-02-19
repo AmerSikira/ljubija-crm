@@ -5,6 +5,7 @@ import { Head, useForm } from "@inertiajs/react";
 import ContentHolder from "@/components/content-holder";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -78,9 +79,9 @@ export default function Create() {
 
                             <div className="flex flex-col gap-2">
                                 <Label htmlFor="description">Opis</Label>
-                                <textarea
+                                <Textarea
                                     id="description"
-                                    className="border rounded-md p-2 min-h-[120px]"
+                                    className="min-h-[120px]"
                                     value={data.description}
                                     onChange={(e) => setData("description", e.target.value)}
                                 />
@@ -91,7 +92,7 @@ export default function Create() {
                                 <Label>Opcije</Label>
                                 <div className="space-y-3">
                                     {data.items.map((item, index) => (
-                                        <div key={index} className="flex gap-2 items-center">
+                                        <div key={index} className="flex flex-col gap-2 sm:flex-row sm:items-center">
                                             <Input
                                                 type="text"
                                                 value={item.title}
@@ -100,7 +101,8 @@ export default function Create() {
                                             />
                                             <Button
                                                 type="button"
-                                                variant="secondary"
+                                                variant="outline"
+                                                className="w-full shrink-0 sm:w-auto"
                                                 onClick={() => removeItem(index)}
                                                 disabled={data.items.length <= 1}
                                             >
@@ -111,12 +113,12 @@ export default function Create() {
                                 </div>
                                 {errors["items"] && <div className="text-red-500">{errors["items"]}</div>}
                                 {errors["items.*.title"] && <div className="text-red-500">{errors["items.*.title"]}</div>}
-                                <Button type="button" variant="outline" onClick={addItem}>
+                                <Button type="button" variant="outline" className="w-full sm:w-auto" onClick={addItem}>
                                     Dodaj opciju
                                 </Button>
                             </div>
 
-                            <Button type="submit" disabled={processing}>
+                            <Button type="submit" disabled={processing} className="w-full sm:w-auto">
                                 Spremi anketu
                             </Button>
                         </form>

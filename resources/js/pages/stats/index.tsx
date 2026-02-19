@@ -35,46 +35,82 @@ const breadcrumbs: BreadcrumbItem[] = [
 const formatMoney = (val: number) =>
     new Intl.NumberFormat('bs-BA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(val);
 
+const getCssVar = (name: string, fallback: string) => {
+    if (typeof window === 'undefined') return fallback;
+    const value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    return value || fallback;
+};
+
+const getChartPalette = (count: number) => {
+    const vars = ['--chart-1', '--chart-2', '--chart-3', '--chart-4', '--chart-5'];
+    const fallbacks = ['#3b82f6', '#22c55e', '#f59e0b', '#8b5cf6', '#ef4444'];
+    return Array.from({ length: count }).map((_, idx) => getCssVar(vars[idx % vars.length], fallbacks[idx % fallbacks.length]));
+};
+
+const commonChartOptions = () => ({
+    responsive: true,
+    maintainAspectRatio: false as const,
+    plugins: {
+        legend: { labels: { color: getCssVar('--foreground', '#111827') } },
+    },
+    scales: {
+        x: {
+            grid: { color: getCssVar('--border', '#e5e7eb') },
+            ticks: { color: getCssVar('--muted-foreground', '#6b7280') },
+        },
+        y: {
+            grid: { color: getCssVar('--border', '#e5e7eb') },
+            ticks: { color: getCssVar('--muted-foreground', '#6b7280') },
+        },
+    },
+});
+
 function Bars({ data, title }: { data: ChartDatum[]; title: string }) {
     if (!data.length) {
         return <p className="text-sm text-muted-foreground">Nema podataka za prikaz.</p>;
     }
     const labels = data.map((d) => d.label);
     const values = data.map((d) => Number(d.amount));
-    const colors = data.map((_, idx) => `hsl(${200 + (idx * 40) % 140}, 65%, 55%)`);
+    const colors = getChartPalette(data.length);
     return (
         <div className="space-y-3">
             <p className="text-sm font-semibold">{title}</p>
-            <Bar
-                data={{
-                    labels,
-                    datasets: [
-                        {
-                            label: title,
-                            data: values,
-                            backgroundColor: colors,
-                        },
-                    ],
-                }}
-                options={{
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => `${ctx.label}: ${formatMoney(Number(ctx.parsed.y))} KM`,
+            <div className="h-[280px]">
+                <Bar
+                    data={{
+                        labels,
+                        datasets: [
+                            {
+                                label: title,
+                                data: values,
+                                backgroundColor: colors,
+                            },
+                        ],
+                    }}
+                    options={{
+                        ...commonChartOptions(),
+                        plugins: {
+                            ...commonChartOptions().plugins,
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => `${ctx.label}: ${formatMoney(Number(ctx.parsed.y))} KM`,
+                                },
                             },
                         },
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                callback: (val) => formatMoney(Number(val as number)),
+                        scales: {
+                            ...commonChartOptions().scales,
+                            y: {
+                                ...commonChartOptions().scales.y,
+                                ticks: {
+                                    color: getCssVar('--muted-foreground', '#6b7280'),
+                                    callback: (val) => formatMoney(Number(val as number)),
+                                },
                             },
                         },
-                    },
-                }}
-            />
+                    }}
+                />
+            </div>
         </div>
     );
 }
@@ -83,42 +119,48 @@ function PeriodBars({ data, title }: { data: PeriodDatum[]; title: string }) {
     if (!data.length) {
         return <p className="text-sm text-muted-foreground">Nema podataka za prikaz.</p>;
     }
-    const labels = data.map((d) => d.period);
+    const labels = data.map((d) => (d.period.includes('-') ? d.period.split('-').reverse().join('.') : d.period));
     const values = data.map((d) => Number(d.total));
-    const colors = data.map((_, idx) => `hsl(${120 + (idx * 30) % 150}, 65%, 55%)`);
+    const colors = getChartPalette(data.length);
     return (
         <div className="space-y-3">
             <p className="text-sm font-semibold">{title}</p>
-            <Bar
-                data={{
-                    labels,
-                    datasets: [
-                        {
-                            label: title,
-                            data: values,
-                            backgroundColor: colors,
-                        },
-                    ],
-                }}
-                options={{
-                    responsive: true,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => `${ctx.label}: ${formatMoney(Number(ctx.parsed.y))} KM`,
+            <div className="h-[280px]">
+                <Bar
+                    data={{
+                        labels,
+                        datasets: [
+                            {
+                                label: title,
+                                data: values,
+                                backgroundColor: colors,
+                            },
+                        ],
+                    }}
+                    options={{
+                        ...commonChartOptions(),
+                        plugins: {
+                            ...commonChartOptions().plugins,
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => `${ctx.label}: ${formatMoney(Number(ctx.parsed.y))} KM`,
+                                },
                             },
                         },
-                    },
-                    scales: {
-                        y: {
-                            ticks: {
-                                callback: (val) => formatMoney(Number(val as number)),
+                        scales: {
+                            ...commonChartOptions().scales,
+                            y: {
+                                ...commonChartOptions().scales.y,
+                                ticks: {
+                                    color: getCssVar('--muted-foreground', '#6b7280'),
+                                    callback: (val) => formatMoney(Number(val as number)),
+                                },
                             },
                         },
-                    },
-                }}
-            />
+                    }}
+                />
+            </div>
         </div>
     );
 }
@@ -129,31 +171,36 @@ function PieChart({ data, title }: { data: ChartDatum[]; title: string }) {
     }
     const labels = data.map((d) => d.label);
     const values = data.map((d) => Number(d.amount));
-    const colors = data.map((_, idx) => `hsl(${(idx * 45) % 360}, 65%, 55%)`);
+    const colors = getChartPalette(data.length);
     return (
         <div className="space-y-3">
             <p className="text-sm font-semibold">{title}</p>
-            <Pie
-                data={{
-                    labels,
-                    datasets: [
-                        {
-                            label: title,
-                            data: values,
-                            backgroundColor: colors,
-                        },
-                    ],
-                }}
-                options={{
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => `${ctx.label}: ${formatMoney(Number(ctx.parsed))} KM`,
+            <div className="h-[280px]">
+                <Pie
+                    data={{
+                        labels,
+                        datasets: [
+                            {
+                                label: title,
+                                data: values,
+                                backgroundColor: colors,
+                            },
+                        ],
+                    }}
+                    options={{
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { labels: { color: getCssVar('--foreground', '#111827') } },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => `${ctx.label}: ${formatMoney(Number(ctx.parsed))} KM`,
+                                },
                             },
                         },
-                    },
-                }}
-            />
+                    }}
+                />
+            </div>
         </div>
     );
 }
@@ -216,17 +263,19 @@ export default function StatsIndex({
                     <div className="flex items-center justify-between">
                         <h1 className="text-2xl font-bold">Statistika</h1>
                     </div>
-                    <form className="grid grid-cols-1 gap-3 md:grid-cols-5 md:items-end">
+                    <form
+                        className="grid grid-cols-1 gap-3 md:grid-cols-5 md:items-end"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            submitFilters(data as NextFilters);
+                        }}
+                    >
                         <div className="flex flex-col gap-1">
                             <label className="text-sm text-muted-foreground">Od datuma</label>
                             <Input
                                 type="date"
                                 value={data.start_date}
-                                onChange={(e) => {
-                                    const next = { ...data, start_date: e.target.value };
-                                    setData(next);
-                                    submitFilters(next);
-                                }}
+                                onChange={(e) => setData('start_date', e.target.value)}
                             />
                         </div>
                         <div className="flex flex-col gap-1">
@@ -234,22 +283,14 @@ export default function StatsIndex({
                             <Input
                                 type="date"
                                 value={data.end_date}
-                                onChange={(e) => {
-                                    const next = { ...data, end_date: e.target.value };
-                                    setData(next);
-                                    submitFilters(next);
-                                }}
+                                onChange={(e) => setData('end_date', e.target.value)}
                             />
                         </div>
                         <div className="flex flex-col gap-1">
                             <label className="text-sm text-muted-foreground">Vrsta</label>
                             <Select
                                 value={data.type}
-                                onValueChange={(val) => {
-                                    const next = { ...data, type: val };
-                                    setData(next);
-                                    submitFilters(next);
-                                }}
+                                onValueChange={(val) => setData('type', val)}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Sve vrste" />
@@ -268,11 +309,7 @@ export default function StatsIndex({
                             <label className="text-sm text-muted-foreground">Podaci</label>
                             <Select
                                 value={data.mode}
-                                onValueChange={(val: 'payments' | 'expenses') => {
-                                    const next = { ...data, mode: val };
-                                    setData(next);
-                                    submitFilters(next);
-                                }}
+                                onValueChange={(val: 'payments' | 'expenses') => setData('mode', val)}
                             >
                                 <SelectTrigger>
                                     <SelectValue placeholder="Tip podataka" />
@@ -284,6 +321,9 @@ export default function StatsIndex({
                             </Select>
                         </div>
                         <div className="flex gap-2 md:justify-end">
+                            <Button type="submit" variant="secondary" className="w-full md:w-auto">
+                                Primijeni
+                            </Button>
                             <Button
                                 type="button"
                                 variant="outline"
