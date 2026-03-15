@@ -20,7 +20,13 @@ type User = {
     created_at?: string;
 };
 
-export default function UsersEdit({ user, roleLabels = {} }: { user: User; roleLabels: Record<string, string> }) {
+export default function UsersEdit({
+    user,
+    roleLabels = {},
+}: {
+    user: User;
+    roleLabels: Record<string, string>;
+}) {
     const breadcrumbs: BreadcrumbItem[] = [
         { title: 'Početna stranica', href: '/dashboard' },
         { title: 'Korisnici', href: '/users' },

@@ -2,7 +2,6 @@ import React from 'react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem, type Member } from '@/types';
 import { Head, Link, router, usePage } from '@inertiajs/react';
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import ContentHolder from '@/components/content-holder';
 import { ActionsMenu } from '@/components/actions-menu';
@@ -101,91 +100,74 @@ export default function Index({ articles }: Member[] | any) {
                             </div>
                         </form>
                     </CardHeader>
-                    <CardContent className="p-0 pt-0">
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>ID</TableHead>
-                                    <TableHead>Slika</TableHead>
-                                    <TableHead>Naslov</TableHead>
-                                    <TableHead>Uvod</TableHead>
-                                    <TableHead>Datum</TableHead>
-                                    <TableHead className="w-40 text-right">Opcije</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {filteredArticles.length > 0 ? (
-                                    filteredArticles.map((article: any) => {
-                                        return (
-                                            <TableRow key={article.id}>
-                                                <TableCell>{article.id}</TableCell>
-                                                <TableCell>
-                                                    <Link href={route('articles.show', { article: article.id })}>
-                                                        <img
-                                                            src={article.image_url}
-                                                            className="h-16 w-16 rounded-md object-cover"
-                                                            alt={article.title ?? 'Vijest'}
-                                                        />
-                                                    </Link>
-                                                </TableCell>
-                                                <TableCell className="font-medium">
-                                                    <Link href={route('articles.show', { article: article.id })} className="hover:underline">
-                                                        {article.title}
-                                                    </Link>
-                                                </TableCell>
-                                                <TableCell className="max-w-[360px] text-sm text-muted-foreground">
-                                                    <div
-                                                        className="max-h-20 overflow-hidden"
-                                                        dangerouslySetInnerHTML={{ __html: article.intro ?? '' }}
-                                                    />
-                                                </TableCell>
-                                                <TableCell className="whitespace-nowrap text-sm text-muted-foreground">
-                                                    {article.created_at ? formatDateEU(article.created_at) : '-'}
-                                                </TableCell>
-                                                <TableCell className="text-right">
-                                                    <ActionsMenu
-                                                        actions={[
-                                                            {
-                                                                type: 'item',
-                                                                label: 'Detalji',
-                                                                href: route('articles.show', { article: article.id }),
-                                                            },
-                                                            ...(isManager
-                                                                ? [
-                                                                    {
-                                                                        type: 'item' as const,
-                                                                        label: 'Uredi',
-                                                                        href: route('articles.edit', { article: article.id }),
-                                                                    },
-                                                                ]
-                                                                : []),
-                                                            ...(isAdmin
-                                                                ? [
-                                                                    { type: 'separator' as const },
-                                                                    {
-                                                                        type: 'item' as const,
-                                                                        label: 'Obriši',
-                                                                        variant: 'destructive',
-                                                                        onSelect: () =>
-                                                                            router.delete(route('articles.destroy', { article: article.id })),
-                                                                    },
-                                                                ]
-                                                                : []),
-                                                        ]}
-                                                    />
-                                                </TableCell>
-                                            </TableRow>
-                                        );
-                                    })
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={6} className="text-center text-muted-foreground">
-                                            {search || date ? 'Nema rezultata pretrage' : 'Nema vijesti'}
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                    <CardContent>
+                        {filteredArticles.length > 0 ? (
+                            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                                {filteredArticles.map((article: any) => (
+                                    <Card key={article.id} className="overflow-hidden">
+                                        <Link href={route('articles.show', { article: article.id })}>
+                                            <img
+                                                src={article.image_url}
+                                                className="h-44 w-full object-cover"
+                                                alt={article.title ?? 'Vijest'}
+                                            />
+                                        </Link>
+                                        <CardContent className="space-y-3 p-4">
+                                            <div className="flex items-start justify-between gap-3">
+                                                <Link
+                                                    href={route('articles.show', { article: article.id })}
+                                                    className="line-clamp-2 font-semibold hover:underline"
+                                                >
+                                                    {article.title}
+                                                </Link>
+                                                <ActionsMenu
+                                                    actions={[
+                                                        {
+                                                            type: 'item',
+                                                            label: 'Detalji',
+                                                            href: route('articles.show', { article: article.id }),
+                                                        },
+                                                        ...(isManager
+                                                            ? [
+                                                                {
+                                                                    type: 'item' as const,
+                                                                    label: 'Uredi',
+                                                                    href: route('articles.edit', { article: article.id }),
+                                                                },
+                                                            ]
+                                                            : []),
+                                                        ...(isAdmin
+                                                            ? [
+                                                                { type: 'separator' as const },
+                                                                {
+                                                                    type: 'item' as const,
+                                                                    label: 'Obriši',
+                                                                    variant: 'destructive',
+                                                                    onSelect: () =>
+                                                                        router.delete(route('articles.destroy', { article: article.id })),
+                                                                },
+                                                            ]
+                                                            : []),
+                                                    ]}
+                                                />
+                                            </div>
+
+                                            <div
+                                                className="line-clamp-3 text-sm text-muted-foreground"
+                                                dangerouslySetInnerHTML={{ __html: article.intro ?? '' }}
+                                            />
+                                            <p className="text-xs text-muted-foreground">
+                                                {article.created_at ? formatDateEU(article.created_at) : '-'}
+                                            </p>
+                                        </CardContent>
+                                    </Card>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="py-6 text-center text-muted-foreground">
+                                {search || date ? 'Nema rezultata pretrage' : 'Nema vijesti'}
+                            </p>
+                        )}
                     </CardContent>
                 </Card>
             </ContentHolder>

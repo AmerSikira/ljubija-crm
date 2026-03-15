@@ -12,7 +12,7 @@ class ReportController extends Controller
 {
     public function index(Request $request)
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeRead($request);
         $search = $request->string('search')->toString();
 
         $reports = Report::query()
@@ -54,7 +54,7 @@ class ReportController extends Controller
 
     public function create(Request $request)
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeManage($request);
 
         return Inertia::render('reports/create', [
             'boardMembers' => $this->boardMemberOptions(),
@@ -63,7 +63,7 @@ class ReportController extends Controller
 
     public function store(Request $request)
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeManage($request);
 
         $validated = $this->validateReport($request);
 
@@ -76,7 +76,7 @@ class ReportController extends Controller
 
     public function show(Request $request, Report $report)
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeRead($request);
         $report->load('creator:id,name');
 
         return Inertia::render('reports/show', [
@@ -86,7 +86,7 @@ class ReportController extends Controller
 
     public function edit(Request $request, Report $report)
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeManage($request);
         $report->load(['creator:id,name', 'recorder', 'verifierOne', 'verifierTwo', 'chairperson']);
 
         return Inertia::render('reports/edit', [
@@ -116,7 +116,7 @@ class ReportController extends Controller
 
     public function update(Request $request, Report $report)
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeManage($request);
 
         $validated = $this->validateReport($request);
         $report->update($validated);
@@ -126,7 +126,7 @@ class ReportController extends Controller
 
     public function destroy(Request $request, Report $report)
     {
-        $this->authorizeAdmin($request);
+        $this->authorizeManage($request);
         $report->delete();
 
         return redirect()->route('reports.index')->with('success', 'Zapisnik je obrisan.');
@@ -197,7 +197,15 @@ class ReportController extends Controller
         return $validated;
     }
 
-    private function authorizeAdmin(Request $request): void
+    private function authorizeRead(Request $request): void
+    {
+        $role = $request->user()?->role;
+        if (!in_array($role, ['admin', 'family_member'], true)) {
+            abort(403, 'Nedovoljno privilegija.');
+        }
+    }
+
+    private function authorizeManage(Request $request): void
     {
         if ($request->user()?->role !== 'admin') {
             abort(403, 'Nedovoljno privilegija.');

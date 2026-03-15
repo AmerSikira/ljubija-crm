@@ -18,6 +18,10 @@ class UnverifiedUserController extends Controller
             $users = User::query()
                 ->whereDoesntHave('member')
                 ->where('role', '!=', 'admin')
+                ->where(function ($query) {
+                    $query->where('role', '!=', 'family_member')
+                        ->orWhereNull('parent_member_id');
+                })
                 ->orderByDesc('created_at')
                 ->get(['id', 'name', 'email', 'role', 'created_at']);
         }
@@ -40,6 +44,10 @@ class UnverifiedUserController extends Controller
 
         if ($user->member) {
             return back()->with('error', 'Korisnik već ima dodijeljenog člana.');
+        }
+
+        if ($user->role === 'family_member' && $user->parent_member_id) {
+            return back()->with('error', 'Korisnik već ima dodijeljenog roditeljskog člana.');
         }
 
         $user->delete();

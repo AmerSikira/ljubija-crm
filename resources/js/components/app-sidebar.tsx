@@ -72,7 +72,7 @@ export function AppSidebar() {
             items: [
                 { title: 'Projekti', href: '/projects', icon: Folder },
                 { title: 'Upravni odbor', href: '/boards', icon: Users },
-                ...(role === 'admin' ? [{ title: 'Zapisnici', href: '/reports', icon: FileText }] : []),
+                ...(role === 'admin' || role === 'family_member' ? [{ title: 'Zapisnici', href: '/reports', icon: FileText }] : []),
                 { title: 'Ankete', href: '/polls', icon: BarChart2 },
                 ...(role === 'admin' ? [{ title: 'Poruke (admin)', href: '/admin/tickets', icon: FileText }] : []),
             ],
@@ -90,7 +90,7 @@ export function AppSidebar() {
             label: 'Finansije',
             items: [
                 ...(role === 'admin' || role === 'manager' ? [{ title: 'Uplate', href: '/payments', icon: DollarSign }] : []),
-                ...(role === 'admin' || role === 'manager' ? [{ title: 'Rashodi', href: '/expenses', icon: DollarSign }] : []),
+                ...(role === 'admin' || role === 'manager' || role === 'family_member' ? [{ title: 'Rashodi', href: '/expenses', icon: DollarSign }] : []),
                 { title: 'Moje uplate', href: '/my-payments', icon: HandCoins },
             ],
         },

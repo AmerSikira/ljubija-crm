@@ -50,7 +50,7 @@ class HandleInertiaRequests extends Middleware
     {
         [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
         $user = $request->user();
-        $memberId = $user?->member?->id;
+        $memberId = $user?->effectiveMember()?->id;
 
         return [
             ...parent::share($request),
@@ -71,7 +71,14 @@ class HandleInertiaRequests extends Middleware
                 'admin_tickets' => Ticket::count(),
                 'users' => User::count(),
                 'members' => Member::count(),
-                'unverified_users' => User::whereDoesntHave('member')->where('role', '!=', 'admin')->count(),
+                'unverified_users' => User::query()
+                    ->whereDoesntHave('member')
+                    ->where('role', '!=', 'admin')
+                    ->where(function ($query) {
+                        $query->where('role', '!=', 'family_member')
+                            ->orWhereNull('parent_member_id');
+                    })
+                    ->count(),
                 'payments' => Payments::count(),
                 'expenses' => Expense::count(),
                 'my_payments' => $memberId ? Payments::where('member_id', $memberId)->count() : 0,

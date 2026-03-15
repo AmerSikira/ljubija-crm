@@ -192,7 +192,7 @@ class PaymentsController extends Controller
 
     public function myPaymentsIndex(Request $request) {
         $user = $request->user();
-        $member = Member::where('user_id', $user->id)->first();
+        $member = $user?->effectiveMember();
 
         if (!$member) {
             return redirect()->route('dashboard')->with('error', 'Nemate pridruženog člana za pregled uplata.');

@@ -71,4 +71,5 @@ type MemberForm = {
   address_abroad: string;
   city_abroad: string;
   country: string;
+  family_user_ids?: number[];
 };

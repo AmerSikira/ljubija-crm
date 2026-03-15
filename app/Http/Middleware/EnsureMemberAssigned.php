@@ -33,6 +33,10 @@ class EnsureMemberAssigned
             return $next($request);
         }
 
+        if ($user->role === 'family_member' && $user->parent_member_id) {
+            return $next($request);
+        }
+
         $isUnverified = !$user->member()->exists();
 
         if (!$isUnverified) {

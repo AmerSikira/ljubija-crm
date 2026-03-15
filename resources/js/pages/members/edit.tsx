@@ -27,7 +27,17 @@ const breadcrumbs: BreadcrumbItem[] = [
         }
 ];
 
-export default function Edit({ member, users }: { member:any, users: any }) {
+export default function Edit({
+        member,
+        users,
+        familyUserCandidates = [],
+        familyUserIds = [],
+}: {
+        member: any;
+        users: any;
+        familyUserCandidates?: any[];
+        familyUserIds?: number[];
+}) {
         const userOptions = useMemo(
                 () =>
                         users.map((u: any) => ({
@@ -55,6 +65,7 @@ export default function Edit({ member, users }: { member:any, users: any }) {
                 city_abroad: member.city_abroad || "",
                 country: member.country || "",
                 user_id: member.user_id || null,
+                family_user_ids: familyUserIds || [],
         })
 
         const handleChange = (name: string, value: string): void => {
@@ -93,6 +104,13 @@ export default function Edit({ member, users }: { member:any, users: any }) {
                         "family_members",
                         data.family_members.filter((_, i) => i !== index)
                 );
+        };
+
+        const toggleFamilyUser = (userId: number) => {
+                const current = (data as any).family_user_ids || [];
+                const exists = current.includes(userId);
+                const next = exists ? current.filter((id: number) => id !== userId) : [...current, userId];
+                setData('family_user_ids' as any, next);
         };
 
         const handleSelectUser = (value: number | null) => {
@@ -282,6 +300,31 @@ export default function Edit({ member, users }: { member:any, users: any }) {
                                                         </Label>
                                                         <Input type="text" name="email_abroad" id="email_abroad" placeholder='npr. osman@click.de' onChange={(e) => handleChange(e.target.name, e.target.value)} value={data.email_abroad}/>
                                                 </div>
+                                        </div>
+
+                                        <hr className='my-5' />
+                                        <h3 className='font-bold text-lg sm:text-xl'>Članovi porodice sa pristupom sistemu</h3>
+                                        <p className="text-sm text-muted-foreground">
+                                                Odaberite registrovane korisnike koji treba da imaju pristup kao član porodice ovog člana.
+                                        </p>
+                                        <div className="grid grid-cols-1 gap-2 rounded-md border p-3">
+                                                {familyUserCandidates.length === 0 ? (
+                                                        <p className="text-sm text-muted-foreground">
+                                                                Nema dostupnih registrovanih korisnika bez dodijeljenog člana.
+                                                        </p>
+                                                ) : (
+                                                        familyUserCandidates.map((u: any) => (
+                                                                <label key={u.id} className="flex items-center gap-2 text-sm">
+                                                                        <input
+                                                                                type="checkbox"
+                                                                                checked={((data as any).family_user_ids || []).includes(u.id)}
+                                                                                onChange={() => toggleFamilyUser(u.id)}
+                                                                        />
+                                                                        <span>{u.name || '-'}</span>
+                                                                        <span className="text-muted-foreground">({u.email})</span>
+                                                                </label>
+                                                        ))
+                                                )}
                                         </div>
 
                                         <hr className='my-5' />

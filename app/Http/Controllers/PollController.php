@@ -137,6 +137,10 @@ class PollController extends Controller
 
     public function vote(Request $request, Poll $poll)
     {
+        if ($request->user()?->role === 'family_member') {
+            return redirect()->route('polls.show', $poll)->with('error', 'Član porodice nema pravo učešća u anketama.');
+        }
+
         if ($poll->finished_at) {
             return redirect()->route('polls.show', $poll)->with('error', 'Glasanje je završeno.');
         }

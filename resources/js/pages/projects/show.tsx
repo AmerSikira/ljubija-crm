@@ -50,6 +50,7 @@ export default function ProjectShow({
     const role = (props as any)?.auth?.user?.role ?? '';
     const currentUserId = (props as any)?.auth?.user?.id ?? null;
     const isAdmin = role === 'admin';
+    const isFamilyMember = role === 'family_member';
     const { data, setData } = useForm({
         search: filters?.search ?? '',
         status: (filters?.status as string) ?? '',
@@ -80,9 +81,9 @@ export default function ProjectShow({
     };
 
     const statusLabel = (interest: Interest) => (interest.confirmed_at ? 'Potvrđeno' : 'Na čekanju');
-    const canShowActionsColumn = isAdmin || (!!currentInterest && !currentInterest.confirmed_at);
+    const canShowActionsColumn = !isFamilyMember && (isAdmin || (!!currentInterest && !currentInterest.confirmed_at));
     const canManageInterest = (interest: Interest) =>
-        isAdmin || (!!currentUserId && Number(interest.user?.id) === Number(currentUserId) && !interest.confirmed_at);
+        !isFamilyMember && (isAdmin || (!!currentUserId && Number(interest.user?.id) === Number(currentUserId) && !interest.confirmed_at));
 
     return (
         <AppLayout breadcrumbs={[...breadcrumbs, { title: project.name, href: `/projects/${project.id}` }]}>
@@ -90,8 +91,13 @@ export default function ProjectShow({
             <ContentHolder>
                 <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                     <h1 className="text-2xl font-bold">{project.name}</h1>
-                    {!currentInterest && (
+                    {!currentInterest && !isFamilyMember && (
                         <Button className="w-full md:w-auto" onClick={handleJoin}>Uključujem se i ja</Button>
+                    )}
+                    {isFamilyMember && (
+                        <Badge variant="secondary" className="w-fit">
+                            Član porodice nema pravo učešća
+                        </Badge>
                     )}
                     {currentInterest && (
                         <Badge variant="secondary" className="w-fit">

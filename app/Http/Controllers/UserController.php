@@ -39,6 +39,9 @@ class UserController extends Controller
     public function edit(Request $request, User $user)
     {
         $this->ensureAdmin($request);
+        if ($user->role === 'family_member') {
+            return redirect()->route('users.index')->with('error', 'Članovima porodice upravljate kroz profil člana.');
+        }
 
         return Inertia::render('users/edit', [
             'user' => $user->only(['id', 'name', 'email', 'role', 'avatar', 'created_at']),
@@ -49,6 +52,9 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $this->ensureAdmin($request);
+        if ($user->role === 'family_member') {
+            return redirect()->route('users.index')->with('error', 'Članovima porodice upravljate kroz profil člana.');
+        }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],

@@ -26,6 +26,7 @@ class User extends Authenticatable
         'workos_id',
         'avatar',
         'role',
+        'parent_member_id',
     ];
 
     /**
@@ -54,6 +55,16 @@ class User extends Authenticatable
     public function member()
     {
         return $this->hasOne(Member::class);
+    }
+
+    public function parentMember()
+    {
+        return $this->belongsTo(Member::class, 'parent_member_id');
+    }
+
+    public function effectiveMember(): ?Member
+    {
+        return $this->member()->first() ?: $this->parentMember()->first();
     }
 
     public function polls()

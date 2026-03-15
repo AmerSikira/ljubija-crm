@@ -126,8 +126,28 @@ class MemberController extends Controller
             return redirect()->route('members')->with('error', 'Član nije pronađen.');
         }
         $member->family_members = json_decode($member->family_members, true) ?? [];
+        $familyUserCandidates = User::query()
+            ->whereDoesntHave('member')
+            ->where('role', '!=', 'admin')
+            ->where(function ($query) use ($member) {
+                $query->whereNull('parent_member_id')
+                    ->orWhere('parent_member_id', $member->id);
+            })
+            ->orderBy('name')
+            ->get(['id', 'name', 'email']);
+
+        $familyUserIds = User::query()
+            ->where('role', 'family_member')
+            ->where('parent_member_id', $member->id)
+            ->pluck('id')
+            ->values();
         // dd($member->user);
-        return Inertia::render("members/edit", ['member' => $member, 'users' => $users]);
+        return Inertia::render("members/edit", [
+            'member' => $member,
+            'users' => $users,
+            'familyUserCandidates' => $familyUserCandidates,
+            'familyUserIds' => $familyUserIds,
+        ]);
     }
 
 
@@ -148,6 +168,8 @@ class MemberController extends Controller
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'profile_image' => 'nullable|image|max:2048',
+            'family_user_ids' => 'nullable|array',
+            'family_user_ids.*' => 'integer|exists:users,id',
         ], [
             'user_id.required' => 'Morate odabrati korisnika',
             'user_id.exists' => 'Odabrani korisnik ne postoji',
@@ -185,11 +207,20 @@ class MemberController extends Controller
             $member->save();
         }
 
+        $this->syncFamilyUsers($member, $request->input('family_user_ids', []));
+
         return redirect()->route('members')->with('success', 'Član je uspješno ažuriran.');
     }
 
     public function editSelf(Request $request)
     {
+        if ($request->user()?->role === 'family_member') {
+            return Inertia::render('members/family-profile', [
+                'user' => $request->user()->only(['id', 'name', 'email', 'avatar']),
+                'parentMember' => $request->user()->parentMember?->only(['id', 'title', 'first_name', 'last_name', 'email']),
+            ]);
+        }
+
         $member = Member::where('user_id', $request->user()->id)->first();
 
         if (!$member) {
@@ -203,6 +234,24 @@ class MemberController extends Controller
 
     public function updateSelf(Request $request)
     {
+        if ($request->user()?->role === 'family_member') {
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'avatar' => 'nullable|string|max:1000',
+            ], [
+                'name.required' => 'Ime je obavezno.',
+                'name.max' => 'Ime ne može biti duže od 255 znakova.',
+                'avatar.max' => 'Avatar URL ne može biti duži od 1000 znakova.',
+            ]);
+
+            $request->user()->update([
+                'name' => $validated['name'],
+                'avatar' => $validated['avatar'] ?? null,
+            ]);
+
+            return redirect()->route('members.self')->with('success', 'Profil je uspješno ažuriran.');
+        }
+
         $member = Member::where('user_id', $request->user()->id)->first();
 
         if (!$member) {
@@ -261,5 +310,39 @@ class MemberController extends Controller
         $member->delete();
 
         return redirect()->route('members')->with('success', 'Član je uspješno obrisan.');
+    }
+
+    private function syncFamilyUsers(Member $member, array $selectedIds): void
+    {
+        $selectedIds = collect($selectedIds)
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        $eligibleIds = User::query()
+            ->whereIn('id', $selectedIds)
+            ->whereDoesntHave('member')
+            ->where('role', '!=', 'admin')
+            ->pluck('id');
+
+        User::query()
+            ->where('role', 'family_member')
+            ->where('parent_member_id', $member->id)
+            ->whereNotIn('id', $eligibleIds)
+            ->update([
+                'role' => 'subscriber',
+                'parent_member_id' => null,
+            ]);
+
+        if ($eligibleIds->isNotEmpty()) {
+            User::query()
+                ->whereIn('id', $eligibleIds)
+                ->where('role', '!=', 'admin')
+                ->update([
+                    'role' => 'family_member',
+                    'parent_member_id' => $member->id,
+                ]);
+        }
     }
 }

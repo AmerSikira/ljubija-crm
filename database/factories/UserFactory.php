@@ -25,6 +25,7 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
             'avatar' => '',
             'role' => 'subscriber',
+            'parent_member_id' => null,
         ];
     }
 

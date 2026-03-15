@@ -1,7 +1,7 @@
 import React from "react";
 import AppLayout from "@/layouts/app-layout";
 import { type BreadcrumbItem } from "@/types";
-import { Head, useForm } from "@inertiajs/react";
+import { Head, useForm, usePage } from "@inertiajs/react";
 import ContentHolder from "@/components/content-holder";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -37,13 +37,17 @@ const breadcrumbs = (pollId: number): BreadcrumbItem[] => [
 ];
 
 export default function Show({ poll }: { poll: Poll }) {
+    const { props } = usePage();
+    const role = (props as any)?.auth?.user?.role ?? '';
+    const isFamilyMember = role === 'family_member';
+
     const { data, setData, post, processing, errors } = useForm<{ poll_item_id: number | null }>({
         poll_item_id: null,
     });
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (!data.poll_item_id || poll.finished_at) return;
+        if (!data.poll_item_id || poll.finished_at || isFamilyMember) return;
         post(route("polls.vote", { poll: poll.id }));
     };
 
@@ -62,6 +66,11 @@ export default function Show({ poll }: { poll: Poll }) {
                                 <h2 className="text-lg font-semibold mb-2">Opcije</h2>
                                 {poll.finished_at && (
                                     <div className="text-sm text-red-600 mb-2">Glasanje je završeno.</div>
+                                )}
+                                {isFamilyMember && (
+                                    <div className="text-sm text-muted-foreground mb-2">
+                                        Član porodice može pregledati anketu, ali nema pravo glasanja.
+                                    </div>
                                 )}
                                 <form onSubmit={handleSubmit} className="space-y-3">
                                     <div className="space-y-2">
@@ -87,7 +96,7 @@ export default function Show({ poll }: { poll: Poll }) {
                                         ))}
                                     </div>
                                     {errors.poll_item_id && <div className="text-red-500">{errors.poll_item_id}</div>}
-                                    {!poll.finished_at && (
+                                    {!poll.finished_at && !isFamilyMember && (
                                         <Button type="submit" className="w-full sm:w-auto" disabled={processing || !data.poll_item_id}>
                                             Glasaj
                                         </Button>

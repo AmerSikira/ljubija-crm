@@ -137,6 +137,10 @@ class ProjectController extends Controller
             return redirect()->route('projects.show', $project)->with('error', 'Morate biti prijavljeni.');
         }
 
+        if ($user->role === 'family_member') {
+            return redirect()->route('projects.show', $project)->with('error', 'Član porodice nema pravo učešća u projektima.');
+        }
+
         ProjectInterest::firstOrCreate(
             ['project_id' => $project->id, 'user_id' => $user->id],
             ['confirmed_at' => null]
@@ -167,6 +171,10 @@ class ProjectController extends Controller
         $user = $request->user();
         if (!$user) {
             abort(403, 'Morate biti prijavljeni.');
+        }
+
+        if ($user->role === 'family_member') {
+            abort(403, 'Član porodice nema pravo učešća u projektima.');
         }
 
         $isAdmin = $user->role === 'admin';

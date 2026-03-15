@@ -103,15 +103,19 @@ export default function UsersIndex({ users = [], roleLabels = {} }: { users: Use
                                             <TableCell className="capitalize">{roleLabels[user.role] ?? user.role}</TableCell>
                                             <TableCell>{formatDate(user.created_at)}</TableCell>
                                             <TableCell className="text-right">
-                                                <ActionsMenu
-                                                    actions={[
-                                                        {
-                                                            type: 'item',
-                                                            label: 'Uredi',
-                                                            href: route('users.edit', { user: user.id }),
-                                                        },
-                                                    ]}
-                                                />
+                                                {user.role === 'family_member' ? (
+                                                    <span className="text-xs text-muted-foreground">Uredi kroz člana</span>
+                                                ) : (
+                                                    <ActionsMenu
+                                                        actions={[
+                                                            {
+                                                                type: 'item',
+                                                                label: 'Uredi',
+                                                                href: route('users.edit', { user: user.id }),
+                                                            },
+                                                        ]}
+                                                    />
+                                                )}
                                             </TableCell>
                                         </TableRow>
                                     ))
