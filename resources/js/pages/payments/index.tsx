@@ -10,6 +10,9 @@ import { DatePicker } from '@/components/date-picker';
 import { ActionsMenu } from '@/components/actions-menu';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatDateEU } from '@/lib/utils';
+import MemberAutocomplete, { type MemberOption } from '@/components/member-autocomplete';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useMemo } from 'react';
 
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -45,7 +48,16 @@ type Pagination<T> = {
     }[];
 };
 
-export default function Index({ payments, filters }: { payments: Pagination<Payment>; filters: { name?: string; amount?: string; date?: string } }) {
+type Filters = {
+    name?: string;
+    member_id?: number | null;
+    amount?: string;
+    date?: string;
+    sort_by?: 'name' | 'date' | 'amount';
+    sort_dir?: 'asc' | 'desc';
+};
+
+export default function Index({ payments, filters, members }: { payments: Pagination<Payment>; filters: Filters; members: MemberOption[] }) {
     const formatDate = (value?: string | null) => formatDateEU(value) || '';
 
     const formatPickerDate = (date?: Date | null) => {
@@ -64,14 +76,28 @@ export default function Index({ payments, filters }: { payments: Pagination<Paym
     };
 
     const { data, setData } = useForm({
-        name: filters.name ?? '',
+        member_id: filters.member_id ?? null,
         amount: filters.amount ?? '',
         date: filters.date ?? '',
+        sort_by: filters.sort_by ?? 'date',
+        sort_dir: filters.sort_dir ?? 'desc',
     });
+
+    const memberOptions = useMemo(() => members ?? [], [members]);
 
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        router.get(route('payments'), { name: data.name, amount: data.amount, date: data.date }, { preserveState: true, preserveScroll: true });
+        router.get(
+            route('payments'),
+            {
+                member_id: data.member_id,
+                amount: data.amount,
+                date: data.date,
+                sort_by: data.sort_by,
+                sort_dir: data.sort_dir,
+            },
+            { preserveState: true, preserveScroll: true }
+        );
     };
 
     return (
@@ -88,11 +114,12 @@ export default function Index({ payments, filters }: { payments: Pagination<Paym
                         </Button>
                     </div>
 
-                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-5 sm:items-center">
-                        <Input
-                            placeholder="Ime ili prezime"
-                            value={data.name}
-                            onChange={(e) => setData('name', e.target.value)}
+                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-7 sm:items-center">
+                        <MemberAutocomplete
+                            members={memberOptions}
+                            value={data.member_id}
+                            onChange={(value) => setData('member_id', value)}
+                            placeholder="Odaberite člana"
                         />
                         <Input
                             placeholder="Iznos"
@@ -105,6 +132,25 @@ export default function Index({ payments, filters }: { payments: Pagination<Paym
                             selected={parsePickerDate(data.date)}
                             handleChange={(date) => setData('date', formatPickerDate(date))}
                         />
+                        <Select value={data.sort_by} onValueChange={(value: 'name' | 'date' | 'amount') => setData('sort_by', value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Sortiraj po" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="name">Ime</SelectItem>
+                                <SelectItem value="date">Datum</SelectItem>
+                                <SelectItem value="amount">Iznos</SelectItem>
+                            </SelectContent>
+                        </Select>
+                        <Select value={data.sort_dir} onValueChange={(value: 'asc' | 'desc') => setData('sort_dir', value)}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Smjer" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="asc">Rastuće</SelectItem>
+                                <SelectItem value="desc">Opadajuće</SelectItem>
+                            </SelectContent>
+                        </Select>
                         <Button type="submit" variant="secondary" className="w-full sm:w-auto">
                             Pretraži
                         </Button>
@@ -113,7 +159,7 @@ export default function Index({ payments, filters }: { payments: Pagination<Paym
                             variant="outline"
                             className="w-full sm:w-auto"
                             onClick={() => {
-                                setData({ name: '', amount: '', date: '' });
+                                setData({ member_id: null, amount: '', date: '', sort_by: 'date', sort_dir: 'desc' });
                                 router.get(route('payments'), {}, { preserveScroll: true });
                             }}
                         >

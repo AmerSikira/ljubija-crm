@@ -29,13 +29,31 @@ class PaymentsController extends Controller
         $name = trim((string) $request->input('name', ''));
         $amountInput = trim((string) $request->input('amount', ''));
         $dateInput = trim((string) $request->input('date', ''));
+        $memberIdInput = $request->input('member_id');
+        $memberId = is_numeric($memberIdInput) ? (int) $memberIdInput : null;
+        if ($memberId !== null && $memberId <= 0) {
+            $memberId = null;
+        }
 
-        $payments = Payments::with('member')
+        $sortBy = strtolower(trim((string) $request->input('sort_by', 'date')));
+        if (!in_array($sortBy, ['name', 'date', 'amount'], true)) {
+            $sortBy = 'date';
+        }
+        $sortDir = strtolower(trim((string) $request->input('sort_dir', 'desc')));
+        if (!in_array($sortDir, ['asc', 'desc'], true)) {
+            $sortDir = 'desc';
+        }
+
+        $paymentsQuery = Payments::query()
+            ->with('member')
             ->when($name !== '', function ($query) use ($name) {
                 $query->whereHas('member', function ($memberQuery) use ($name) {
                     $memberQuery->where('first_name', 'like', "%{$name}%")
                         ->orWhere('last_name', 'like', "%{$name}%");
                 });
+            })
+            ->when($memberId !== null, function ($query) use ($memberId) {
+                $query->where('member_id', $memberId);
             })
             ->when($amountInput !== '', function ($query) use ($amountInput) {
                 $normalizedAmount = $this->normalizeAmount($amountInput);
@@ -46,15 +64,30 @@ class PaymentsController extends Controller
             ->when($dateInput !== '', function ($query) use ($dateInput) {
                 $date = $this->parseDate($dateInput);
                 if ($date) {
-                    $query->whereDate('date_of_payment', $date)
-                        ->orWhereDate('paid_from', $date)
-                        ->orWhereDate('paid_to', $date);
+                    $query->where(function ($dateQuery) use ($date) {
+                        $dateQuery->whereDate('date_of_payment', $date)
+                            ->orWhereDate('paid_from', $date)
+                            ->orWhereDate('paid_to', $date);
+                    });
                 }
-            })
-            ->orderByDesc('date_of_payment')
-            ->orderByDesc('id')
+            });
+
+        if ($sortBy === 'name') {
+            $paymentsQuery
+                ->leftJoin('members', 'members.id', '=', 'payments.member_id')
+                ->select('payments.*')
+                ->orderBy('members.first_name', $sortDir)
+                ->orderBy('members.last_name', $sortDir);
+        } elseif ($sortBy === 'amount') {
+            $paymentsQuery->orderBy('amount', $sortDir);
+        } else {
+            $paymentsQuery->orderBy('date_of_payment', $sortDir);
+        }
+
+        $payments = $paymentsQuery
+            ->orderBy('id', $sortDir)
             ->paginate(20)
-            ->appends($request->only(['name', 'amount', 'date']))
+            ->appends($request->only(['name', 'member_id', 'amount', 'date', 'sort_by', 'sort_dir']))
             ->through(function (Payments $payment) {
                 return [
                     'id' => $payment->id,
@@ -71,12 +104,30 @@ class PaymentsController extends Controller
                     ],
                 ];
             });
+
+        $members = Member::query()
+            ->select('id', 'first_name', 'last_name', 'email')
+            ->orderBy('first_name')
+            ->orderBy('last_name')
+            ->get()
+            ->map(function (Member $member) {
+                return [
+                    'id' => $member->id,
+                    'name' => trim(($member->first_name ?? '') . ' ' . ($member->last_name ?? '')) ?: ('Član #' . $member->id),
+                    'email' => $member->email,
+                ];
+            });
+
         return Inertia::render('payments/index', [
             'payments' => $payments,
+            'members' => $members,
             'filters' => [
                 'name' => $name,
+                'member_id' => $memberId,
                 'amount' => $amountInput,
                 'date' => $dateInput,
+                'sort_by' => $sortBy,
+                'sort_dir' => $sortDir,
             ],
         ]);
     }
