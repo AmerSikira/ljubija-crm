@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Member;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -94,8 +95,8 @@ class MemberController extends Controller
         $member->email = $request->email;
         $member->phone = $request->phone;
         $member->address = $request->address;
-        $member->birthdate = $request->birthdate;
-        $member->family_members = json_encode($request->family_members);
+        $member->birthdate = $this->normalizeDateInput($request->input('birthdate'));
+        $member->family_members = $this->normalizeFamilyMembersInput($request->input('family_members'));
         $member->email_abroad = $request->email_abroad;
         $member->phone_abroad = $request->phone_abroad;
         $member->address_abroad = $request->address_abroad;
@@ -190,8 +191,8 @@ class MemberController extends Controller
         $member->email = $request->email;
         $member->phone = $request->phone;
         $member->address = $request->address;
-        $member->birthdate = $request->birthdate;
-        $member->family_members = json_encode($request->family_members);
+        $member->birthdate = $this->normalizeDateInput($request->input('birthdate'));
+        $member->family_members = $this->normalizeFamilyMembersInput($request->input('family_members'));
         $member->email_abroad = $request->email_abroad;
         $member->phone_abroad = $request->phone_abroad;
         $member->address_abroad = $request->address_abroad;
@@ -285,8 +286,8 @@ class MemberController extends Controller
         $member->email = $request->email;
         $member->phone = $request->phone;
         $member->address = $request->address;
-        $member->birthdate = $request->birthdate;
-        $member->family_members = json_encode($request->family_members);
+        $member->birthdate = $this->normalizeDateInput($request->input('birthdate'));
+        $member->family_members = $this->normalizeFamilyMembersInput($request->input('family_members'));
         $member->email_abroad = $request->email_abroad;
         $member->phone_abroad = $request->phone_abroad;
         $member->address_abroad = $request->address_abroad;
@@ -344,5 +345,54 @@ class MemberController extends Controller
                     'parent_member_id' => $member->id,
                 ]);
         }
+    }
+
+    private function normalizeDateInput(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if ($value instanceof \DateTimeInterface) {
+            return Carbon::instance($value)->format('Y-m-d');
+        }
+
+        $raw = trim((string) $value);
+        if ($raw === '') {
+            return null;
+        }
+
+        try {
+            if (preg_match('/^\d{2}\/\d{2}\/\d{4}$/', $raw) === 1) {
+                return Carbon::createFromFormat('d/m/Y', $raw)->format('Y-m-d');
+            }
+
+            if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $raw) === 1) {
+                return $raw;
+            }
+
+            return Carbon::parse($raw, config('app.timezone'))->setTimezone(config('app.timezone'))->format('Y-m-d');
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    private function normalizeFamilyMembersInput(mixed $value): string
+    {
+        $members = is_array($value) ? $value : [];
+
+        $normalized = array_map(function ($member) {
+            if (!is_array($member)) {
+                return $member;
+            }
+
+            if (array_key_exists('birthdate', $member)) {
+                $member['birthdate'] = $this->normalizeDateInput($member['birthdate']);
+            }
+
+            return $member;
+        }, $members);
+
+        return json_encode($normalized);
     }
 }

@@ -11,7 +11,6 @@ import { ActionsMenu } from '@/components/actions-menu';
 import { Card, CardContent } from '@/components/ui/card';
 import { formatDateEU } from '@/lib/utils';
 import MemberAutocomplete, { type MemberOption } from '@/components/member-autocomplete';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useMemo } from 'react';
 
 
@@ -100,6 +99,33 @@ export default function Index({ payments, filters, members }: { payments: Pagina
         );
     };
 
+    const applySort = (column: 'name' | 'date' | 'amount') => {
+        const nextDir: 'asc' | 'desc' =
+            data.sort_by === column
+                ? (data.sort_dir === 'asc' ? 'desc' : 'asc')
+                : (column === 'date' ? 'desc' : 'asc');
+
+        setData('sort_by', column);
+        setData('sort_dir', nextDir);
+
+        router.get(
+            route('payments'),
+            {
+                member_id: data.member_id,
+                amount: data.amount,
+                date: data.date,
+                sort_by: column,
+                sort_dir: nextDir,
+            },
+            { preserveState: true, preserveScroll: true }
+        );
+    };
+
+    const sortLabel = (column: 'name' | 'date' | 'amount') => {
+        if (data.sort_by !== column) return '';
+        return data.sort_dir === 'asc' ? ' ↑' : ' ↓';
+    };
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Uplate" />
@@ -114,7 +140,7 @@ export default function Index({ payments, filters, members }: { payments: Pagina
                         </Button>
                     </div>
 
-                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-7 sm:items-center">
+                    <form onSubmit={handleSearch} className="grid grid-cols-1 gap-2 sm:grid-cols-5 sm:items-center">
                         <MemberAutocomplete
                             members={memberOptions}
                             value={data.member_id}
@@ -132,25 +158,6 @@ export default function Index({ payments, filters, members }: { payments: Pagina
                             selected={parsePickerDate(data.date)}
                             handleChange={(date) => setData('date', formatPickerDate(date))}
                         />
-                        <Select value={data.sort_by} onValueChange={(value: 'name' | 'date' | 'amount') => setData('sort_by', value)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Sortiraj po" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="name">Ime</SelectItem>
-                                <SelectItem value="date">Datum</SelectItem>
-                                <SelectItem value="amount">Iznos</SelectItem>
-                            </SelectContent>
-                        </Select>
-                        <Select value={data.sort_dir} onValueChange={(value: 'asc' | 'desc') => setData('sort_dir', value)}>
-                            <SelectTrigger>
-                                <SelectValue placeholder="Smjer" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="asc">Rastuće</SelectItem>
-                                <SelectItem value="desc">Opadajuće</SelectItem>
-                            </SelectContent>
-                        </Select>
                         <Button type="submit" variant="secondary" className="w-full sm:w-auto">
                             Pretraži
                         </Button>
@@ -174,10 +181,22 @@ export default function Index({ payments, filters, members }: { payments: Pagina
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>ID</TableHead>
-                                    <TableHead>Iznos</TableHead>
-                                    <TableHead>Datum uplate</TableHead>
+                                    <TableHead>
+                                        <button type="button" className="font-medium hover:underline" onClick={() => applySort('amount')}>
+                                            Iznos{sortLabel('amount')}
+                                        </button>
+                                    </TableHead>
+                                    <TableHead>
+                                        <button type="button" className="font-medium hover:underline" onClick={() => applySort('date')}>
+                                            Datum uplate{sortLabel('date')}
+                                        </button>
+                                    </TableHead>
                                     <TableHead>Vrsta</TableHead>
-                                    <TableHead>Ime i prezime</TableHead>
+                                    <TableHead>
+                                        <button type="button" className="font-medium hover:underline" onClick={() => applySort('name')}>
+                                            Ime i prezime{sortLabel('name')}
+                                        </button>
+                                    </TableHead>
                                     <TableHead>Email</TableHead>
                                     <TableHead>Telefon</TableHead>
                                     <TableHead className="w-40 text-right">Opcije</TableHead>

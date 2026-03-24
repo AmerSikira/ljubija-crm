@@ -111,8 +111,22 @@ export default function MyProfile({ member }: { member: any }) {
         post(route('members.self.update'));
     };
 
+    const formatDateForSubmit = (date?: Date) => {
+        if (!date) return "";
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    };
+
     const convertDate = (dateString?: string) => {
         if (!dateString) return undefined;
+        if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+            const [year, month, day] = dateString.split('-').map(Number);
+            if (year && month && day) {
+                return new Date(year, month - 1, day);
+            }
+        }
         const parsed = new Date(dateString);
         return isNaN(parsed.getTime()) ? undefined : parsed;
     };
@@ -181,7 +195,7 @@ export default function MyProfile({ member }: { member: any }) {
                             <Label htmlFor='birthdate'>
                                 Datum rođenja
                             </Label>
-                            <DatePicker selected={convertDate(data.birthdate)} handleChange={(date: any) => handleChange('birthdate', date)} />
+                            <DatePicker selected={convertDate(data.birthdate)} handleChange={(date: any) => handleChange('birthdate', formatDateForSubmit(date))} />
                         </div>
                         <div className="flex flex-col gap-2">
                             <Label htmlFor='email'>
@@ -306,7 +320,7 @@ export default function MyProfile({ member }: { member: any }) {
                                             <Label htmlFor='birthdate'>
                                                 Datum rođenja
                                             </Label>
-                                            <DatePicker selected={convertDate(familyMember.birthdate)} handleChange={(date: any) => changeFamilyMember('birthdate', date, index)} />
+                                            <DatePicker selected={convertDate(familyMember.birthdate)} handleChange={(date: any) => changeFamilyMember('birthdate', formatDateForSubmit(date), index)} />
                                         </div>
                                         <div className="flex flex-col gap-2">
                                             <Label htmlFor='email'>
